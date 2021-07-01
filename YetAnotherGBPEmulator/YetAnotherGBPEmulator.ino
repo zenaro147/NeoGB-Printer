@@ -1,72 +1,14 @@
-/*************************************************************************
- *
- * GAMEBOY PRINTER EMULATION PROJECT V3 (Arduino)
- * Copyright (C) 2020 Brian Khuu
- *
- * PURPOSE: To capture gameboy printer images without a gameboy printer
- *          via the arduino platform. (Tested on the arduino nano)
- *          This version is to investigate gameboy behaviour.
- *          This was originally started on 2017-4-6 but updated on 2020-08-16
- * LICENCE:
- *   This file is part of Arduino Gameboy Printer Emulator.
- *
- *   Arduino Gameboy Printer Emulator is free software:
- *   you can redistribute it and/or modify it under the terms of the
- *   GNU General Public License as published by the Free Software Foundation,
- *   either version 3 of the License, or (at your option) any later version.
- *
- *   Arduino Gameboy Printer Emulator is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with Arduino Gameboy Printer Emulator.  If not, see <https://www.gnu.org/licenses/>.
- *
- */
-
 #include <stdint.h> // uint8_t
 #include <stddef.h> // size_t
 
+#include "gbp_emulator_config.h"
 #include "gameboy_printer_protocol.h"
 #include "gbp_serial_io.h"
-
-/* Gameboy Link Cable Mapping to Arduino Pin */
-// Note: Serial Clock Pin must be attached to an interrupt pin of the arduino
-//  ___________
-// |  6  4  2  |
-//  \_5__3__1_/   (at cable)
-//
-
-#ifdef ESP32
-// Pin Setup for Arduinos
-//                  | Arduino Pin | Gameboy Link Pin  |
-#define GBP_VCC_PIN               // Pin 1            : 5.0V (Unused)
-#define GBP_SO_PIN       23       // Pin 2            : ESP-pin 7 MOSI (Serial OUTPUT) -> Arduino 13
-#define GBP_SI_PIN       19       // Pin 3            : ESP-pin 6 MISO (Serial INPUT)  -> Arduino 12
-#define GBP_SD_PIN                // Pin 4            : Serial Data  (Unused)
-#define GBP_SC_PIN       18       // Pin 5            : ESP-pin 5 CLK  (Serial Clock)  -> Arduino 14
-#define GBP_GND_PIN               // Pin 6            : GND (Attach to GND Pin)
-#define LED_STATUS_PIN    4       // Internal LED blink on packet reception
-#endif
-
-#ifdef ESP8266
-// Pin Setup for ESP8266 Devices
-//                  | Arduino Pin | Gameboy Link Pin  |
-#define GBP_VCC_PIN               // Pin 1            : 5.0V (Unused)
-#define GBP_SO_PIN       13       // Pin 2            : ESP-pin 7 MOSI (Serial OUTPUT) -> Arduino 13
-#define GBP_SI_PIN       12       // Pin 3            : ESP-pin 6 MISO (Serial INPUT)  -> Arduino 12
-#define GBP_SD_PIN                // Pin 4            : Serial Data  (Unused)
-#define GBP_SC_PIN       14       // Pin 5            : ESP-pin 5 CLK  (Serial Clock)  -> Arduino 14
-#define GBP_GND_PIN               // Pin 6            : GND (Attach to GND Pin)
-#define LED_STATUS_PIN    2       // Internal LED blink on packet reception
-#endif
 
 /*******************************************************************************
 *******************************************************************************/
 
 // Dev Note: Gamboy camera sends data payload of 640 bytes usually
-
 #define GBP_BUFFER_SIZE 650
 
 /* Serial IO */
@@ -75,9 +17,24 @@ uint8_t gbp_serialIO_raw_buffer[GBP_BUFFER_SIZE] = {0};
 inline void gbp_packet_capture_loop();
 
 /*******************************************************************************
+ * Custom Sets
+*******************************************************************************/
+uint8_t chkHeader=99;
+uint8_t cmdPRNT=0x00;
+bool isWriting = false;
+unsigned int nextFreeFileIndex();
+unsigned int freeFileIndex = 0;
+
+const char nibbleToCharLUT[] = "0123456789ABCDEF";
+byte image_data[83000] = {}; //moreless 14 photos (82.236)
+uint32_t img_index=0x00;
+
+SPIClass spiSD(HSPI);
+TaskHandle_t TaskWrite;
+
+/*******************************************************************************
   Utility Functions
 *******************************************************************************/
-
 const char *gbpCommand_toStr(int val)
 {
   switch (val)
@@ -94,12 +51,7 @@ const char *gbpCommand_toStr(int val)
 /*******************************************************************************
   Interrupt Service Routine
 *******************************************************************************/
-
-#ifdef ESP8266
 void ICACHE_RAM_ATTR serialClock_ISR(void)
-#else
-void serialClock_ISR(void)
-#endif
 {
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
@@ -112,9 +64,116 @@ void serialClock_ISR(void)
 
 
 /*******************************************************************************
+  Initialize File System and SD Card
+*******************************************************************************/
+void fs_setup() {
+  spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
+  FSYS.begin(SD_CS, spiSD);
+  if (!FSYS.begin(true)) {
+    Serial.println("SD Card Mount Failed");
+    return;
+  }
+  
+  uint8_t cardType = SD.cardType();
+  if(cardType == CARD_NONE){
+      Serial.println("No SD card attached");
+      ESP.restart();
+      return;
+  }
+
+  Serial.print("SD Card Type: ");
+  if(cardType == CARD_MMC){
+      Serial.println("MMC");
+  } else if(cardType == CARD_SD){
+      Serial.println("SDSC");
+  } else if(cardType == CARD_SDHC){
+      Serial.println("SDHC");
+  } else {
+      Serial.println("UNKNOWN");
+  }
+
+  uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+  Serial.printf("SD Card Size: %lluMB\n", cardSize);
+
+  Serial.println(" done");
+}
+
+/*******************************************************************************
+  Reset Variables
+*******************************************************************************/
+void resetValues() {
+  memset(image_data, 0x00, sizeof(image_data));
+  img_index = 0x00;     
+    
+  // Turn LED ON
+  digitalWrite(LED_STATUS_PIN, false);
+  Serial.println("Printer ready.");
+  
+  cmdPRNT = 0x00;
+  chkHeader = 99;  
+  isWriting = false;
+}
+
+/*******************************************************************************
+  Write Dump Function
+*******************************************************************************/
+unsigned int nextFreeFileIndex() {
+  int totFiles = 0;
+  File root = FSYS.open("/d");
+  File file = root.openNextFile();
+  while(file){
+    if(file){
+      totFiles++;
+    }
+    file = root.openNextFile();
+  }
+  return totFiles + 1;
+}
+
+void full() {
+  Serial.println("no more space on printer");
+  digitalWrite(LED_STATUS_PIN, HIGH);
+  ESP.restart();
+}
+
+void storeData(void *pvParameters)
+{
+  byte *image_data2 = ((byte*)pvParameters);
+  
+  unsigned long perf = millis();
+  char fileName[31];
+    
+  sprintf(fileName, "/d/%05d.txt", freeFileIndex);
+  digitalWrite(LED_STATUS_PIN, LOW);
+
+  File file = FSYS.open(fileName, "w");
+  if (!file) {
+    Serial.println("file creation failed");
+  }
+  //file.write(, img_index);
+  for (int i = 0; i <= img_index; i++) {
+    file.print((char)nibbleToCharLUT[(image_data2[i]>>4)&0xF]);
+    file.print((char)nibbleToCharLUT[(image_data2[i]>>0)&0xF]);    
+  }
+  file.close();
+  
+  perf = millis() - perf;
+  Serial.printf("File /d/%05d.txt written in %lums\n", freeFileIndex, perf);
+
+  if (freeFileIndex < MAX_IMAGES) { 
+    freeFileIndex++;
+    resetValues();
+    vTaskDelete(NULL); 
+  } else {
+    Serial.println("no more space on printer\nrebooting...");
+    full();
+  }    
+}
+
+
+/*******************************************************************************
   Main Setup and Loop
 *******************************************************************************/
-
 void setup(void)
 {
   // Config Serial
@@ -137,13 +196,15 @@ void setup(void)
   gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
 
   /* Attach ISR */
-#ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-  attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-#else
-  attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-#endif
+  #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+    attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+  #else
+    attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+  #endif
 
-} // setup()
+  fs_setup();
+  freeFileIndex = nextFreeFileIndex();
+}
 
 void loop()
 {
@@ -183,10 +244,9 @@ void loop()
   };
 } // loop()
 
-/******************************************************************************/
 
-inline void gbp_packet_capture_loop()
-{
+/******************************************************************************/
+inline void gbp_packet_capture_loop() {
   /* tiles received */
   static uint32_t byteTotal = 0;
   static uint32_t pktTotalCount = 0;
@@ -194,45 +254,125 @@ inline void gbp_packet_capture_loop()
   static uint16_t pktDataLength = 0;
   const size_t dataBuffCount = gbp_serial_io_dataBuff_getByteCount();
   if (
-      ((pktByteIndex != 0)&&(dataBuffCount>0))||
-      ((pktByteIndex == 0)&&(dataBuffCount>=6))
-      )
-  {
+    ((pktByteIndex != 0) && (dataBuffCount > 0)) ||
+    ((pktByteIndex == 0) && (dataBuffCount >= 6))
+  ) {
     const char nibbleToCharLUT[] = "0123456789ABCDEF";
     uint8_t data_8bit = 0;
-    for (int i = 0 ; i < dataBuffCount ; i++)
-    { // Display the data payload encoded in hex
+    
+    // Display the data payload encoded in hex
+    for (int i = 0 ; i < dataBuffCount ; i++) {     
       // Start of a new packet
-      if (pktByteIndex == 0)
-      {
+      if (pktByteIndex == 0) {
         pktDataLength = gbp_serial_io_dataBuff_getByte_Peek(4);
         pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5)<<8)&0xFF00;
-#if 0
-        Serial.print("// ");
-        Serial.print(pktTotalCount);
-        Serial.print(" : ");
-        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
-#endif
+        
+        switch ((int)gbp_serial_io_dataBuff_getByte_Peek(2)) {
+          case 1:
+          case 2:
+          case 4:
+            chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
+            break;
+          default:
+            break;
+        }
+                
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
+
       // Print Hex Byte
       data_8bit = gbp_serial_io_dataBuff_getByte();
-      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
-      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
+
+      if (!isWriting){
+        if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
+          image_data[img_index] = (byte)data_8bit;
+          img_index++;
+          if (chkHeader == 2 && pktByteIndex == 7) { 
+            cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
+          } 
+        }
+      }
+      
       // Splitting packets for convenience
-      if ((pktByteIndex>5)&&(pktByteIndex>=(9+pktDataLength)))
-      {
+      if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {        
         digitalWrite(LED_STATUS_PIN, LOW);
-        Serial.println("");
+        if (chkHeader == 2) {
+          if (cmdPRNT > 0 && !isWriting) {
+            gbp_serial_io_print_set();  
+            isWriting=true;
+            xTaskCreatePinnedToCore(storeData,            // Task function. 
+                                    "storeData",          // name of task. 
+                                    10000,                // Stack size of task 
+                                    (void*)&image_data,   // parameter of the task 
+                                    1,                    // priority of the task 
+                                    &TaskWrite,           // Task handle to keep track of created task 
+                                    0);                   // pin task to core 0 
+          }else{
+              cmdPRNT = 0x00;
+              chkHeader = 99;
+              isWriting = false;
+              delay(200);
+              gbp_serial_io_print_done();
+          }
+        }
         pktByteIndex = 0;
         pktTotalCount++;
-      }
-      else
-      {
-        Serial.print((char)' ');
+      } else {
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }
     }
   }
 }
+
+//inline void gbp_packet_capture_loop()
+//{
+//  /* tiles received */
+//  static uint32_t byteTotal = 0;
+//  static uint32_t pktTotalCount = 0;
+//  static uint32_t pktByteIndex = 0;
+//  static uint16_t pktDataLength = 0;
+//  const size_t dataBuffCount = gbp_serial_io_dataBuff_getByteCount();
+//  if (
+//      ((pktByteIndex != 0)&&(dataBuffCount>0))||
+//      ((pktByteIndex == 0)&&(dataBuffCount>=6))
+//      )
+//  {
+//    const char nibbleToCharLUT[] = "0123456789ABCDEF";
+//    uint8_t data_8bit = 0;
+//    for (int i = 0 ; i < dataBuffCount ; i++)
+//    { // Display the data payload encoded in hex
+//      // Start of a new packet
+//      if (pktByteIndex == 0)
+//      {
+//        pktDataLength = gbp_serial_io_dataBuff_getByte_Peek(4);
+//        pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5)<<8)&0xFF00;
+//#if 0
+//        Serial.print("// ");
+//        Serial.print(pktTotalCount);
+//        Serial.print(" : ");
+//        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
+//#endif
+//        digitalWrite(LED_STATUS_PIN, HIGH);
+//      }
+//      // Print Hex Byte
+//      data_8bit = gbp_serial_io_dataBuff_getByte();
+//      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
+//      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
+//      // Splitting packets for convenience
+//      if ((pktByteIndex>5)&&(pktByteIndex>=(9+pktDataLength)))
+//      {
+//        digitalWrite(LED_STATUS_PIN, LOW);
+//        Serial.println("");
+//        pktByteIndex = 0;
+//        pktTotalCount++;
+//      }
+//      else
+//      {
+//        Serial.print((char)' ');
+//        pktByteIndex++; // Byte hex split counter
+//        byteTotal++; // Byte total counter
+//      }
+//    }
+//  }
+//}
