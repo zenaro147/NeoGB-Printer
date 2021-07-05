@@ -21,13 +21,18 @@ inline void gbp_packet_capture_loop();
 *******************************************************************************/
 uint8_t chkHeader=99;
 uint8_t cmdPRNT=0x00;
+bool isPrinting = false;
 bool isWriting = false;
+bool isConverting = false;
+bool isFileMounted = false;
 unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
 
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte image_data[83000] = {}; //moreless 14 photos (82.236)
 uint32_t img_index=0x00;
+
+bool isShowingSplash=false;
 
 SPIClass spiSD(HSPI);
 TaskHandle_t TaskWrite;
@@ -68,16 +73,23 @@ void ICACHE_RAM_ATTR serialClock_ISR(void)
 *******************************************************************************/
 void fs_setup() {
   spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
+    
   FSYS.begin(SD_CS, spiSD);
   if (!FSYS.begin(true)) {
+    isFileMounted = true;
     Serial.println("SD Card Mount Failed");
+    #ifdef USE_OLED
+      oled_msg("ERROR","Can not mount SD Card");
+    #endif
     return;
   }
   
   uint8_t cardType = SD.cardType();
   if(cardType == CARD_NONE){
       Serial.println("No SD card attached");
-      ESP.restart();
+      #ifdef USE_OLED
+        oled_msg("ERROR","No SD card attached");
+      #endif
       return;
   }
 
@@ -111,6 +123,7 @@ void resetValues() {
   
   cmdPRNT = 0x00;
   chkHeader = 99;  
+  isPrinting = false;
   isWriting = false;
 }
 
@@ -133,6 +146,10 @@ unsigned int nextFreeFileIndex() {
 void full() {
   Serial.println("no more space on printer");
   digitalWrite(LED_STATUS_PIN, HIGH);
+  #ifdef USE_OLED
+    oled_msg("Printer is full!","Rebooting...");
+  #endif
+  delay(5000);
   ESP.restart();
 }
 
@@ -142,7 +159,11 @@ void storeData(void *pvParameters)
   
   unsigned long perf = millis();
   char fileName[31];
-    
+
+  #ifdef USE_OLED
+    oled_msg("Saving RAW file...");
+  #endif
+  
   sprintf(fileName, "/d/%05d.txt", freeFileIndex);
   digitalWrite(LED_STATUS_PIN, LOW);
 
@@ -180,6 +201,13 @@ void setup(void)
   // Has to be fast or it will not transfer the image fast enough to the computer
   Serial.begin(115200);
 
+  /* Setup File System and OLED*/
+  #ifdef USE_OLED
+    oled_setup();
+  #endif
+  fs_setup();
+  freeFileIndex = nextFreeFileIndex();
+
   /* Pins from gameboy link cable */
   pinMode(GBP_SC_PIN, INPUT);
   pinMode(GBP_SO_PIN, INPUT);
@@ -192,18 +220,18 @@ void setup(void)
   pinMode(LED_STATUS_PIN, OUTPUT);
   digitalWrite(LED_STATUS_PIN, LOW);
 
+  /* Pin for pushbutton */
+  pinMode(BTN_CONVERT, INPUT);
+
   /* Setup */
   gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
 
   /* Attach ISR */
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-    attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
   #else
-    attachInterrupt( digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
-
-  fs_setup();
-  freeFileIndex = nextFreeFileIndex();
 }
 
 void loop()
@@ -218,30 +246,23 @@ void loop()
     uint32_t elapsed_ms = curr_millis - last_millis;
     if (gbp_serial_io_timeout_handler(elapsed_ms))
     {
+      
+    Serial.print ("Timeout Printer");
       // Timeout code
       digitalWrite(LED_STATUS_PIN, LOW);
+      if (!isShowingSplash){
+        isShowingSplash=true;
+        oled_drawSplashScreen();      
+      }
     }
   }
   last_millis = curr_millis;
 
-  // Diagnostics Console
-  while (Serial.available() > 0)
-  {
-    switch (Serial.read())
-    {
-      case '?':
-        Serial.println("d=debug, ?=help");
-        break;
-
-      case 'd':
-        Serial.print("waterline: ");
-        Serial.print(gbp_serial_io_dataBuff_waterline(false));
-        Serial.print("B out of ");
-        Serial.print(gbp_serial_io_dataBuff_max());
-        Serial.println("B");
-        break;
-    }
-  };
+  if(digitalRead(BTN_CONVERT) == HIGH && !isConverting && !isWriting){
+    isConverting = true;
+    detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+    Serial.print ("Botão Pressionado");
+  }
 } // loop()
 
 
@@ -276,7 +297,14 @@ inline void gbp_packet_capture_loop() {
           default:
             break;
         }
-                
+
+        #ifdef USE_OLED
+          if (!isPrinting){
+            isPrinting = true;
+            oled_msg("Receiving Data...");
+          }          
+        #endif
+        
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
 

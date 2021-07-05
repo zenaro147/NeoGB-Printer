@@ -7,9 +7,16 @@
 #define SD_CS 15
 #define SD_SCK 14
 #define SD_MOSI 13
-#define SD_MISO 27
+#define SD_MISO 32
+
+#define BTN_CONVERT 34
 
 #define MAX_IMAGES 400
+
+//Using OLED Display
+#define USE_OLED
+#define OLED_SDA 21
+#define OLED_SCL 17 //22
 
 /* Gameboy Link Cable Mapping to Arduino Pin */
 // Note: Serial Clock Pin must be attached to an interrupt pin of the arduino
