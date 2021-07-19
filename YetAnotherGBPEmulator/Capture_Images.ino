@@ -40,6 +40,11 @@ void storeData(void *pvParameters)
 *******************************************************************************/
 void ConvertFilesBMP()
 {
+
+  Serial.println("P2");
+  Serial.println("160 144");
+  Serial.println("3");
+  
   byte ch = 0;
   bool skipLine = false;
   int  lowNibFound = 0;
