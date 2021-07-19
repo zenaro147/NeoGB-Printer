@@ -157,8 +157,6 @@ void loop()
     uint32_t elapsed_ms = curr_millis - last_millis;
     if (gbp_serial_io_timeout_handler(elapsed_ms))
     {
-
-      Serial.print ("Timeout Printer");
       // Timeout code
       digitalWrite(LED_STATUS_PIN, LOW);
 #ifdef USE_OLED
@@ -189,6 +187,8 @@ void loop()
 #endif
 
     isConverting = false;
+
+    oled_drawSplashScreen();
   }
 
     // Diagnostics Console

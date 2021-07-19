@@ -63,13 +63,13 @@ void ConvertFilesBMP()
   File filedir = root.openNextFile();
   while (filedir) {
     if (filedir.isDirectory()) {
-      Serial.print("  DIR : ");
-      Serial.println(filedir.name());
+//      Serial.print("  DIR : ");
+//      Serial.println(filedir.name());
     } else {
-      Serial.print("  FILE: ");
-      Serial.print(filedir.name());
-      Serial.print("  SIZE: ");
-      Serial.println(filedir.size());
+//      Serial.print("  FILE: ");
+//      Serial.print(filedir.name());
+//      Serial.print("  SIZE: ");
+//      Serial.println(filedir.size());
 
       char path[14];
       sprintf(path, "/d/%s", filedir.name());
@@ -79,7 +79,6 @@ void ConvertFilesBMP()
         Serial.println("Failed to open file for reading");
         return;
       }
-      Serial.print("Read from file: ");
       while (file.available())
       {
         ch = ((byte)file.read());
