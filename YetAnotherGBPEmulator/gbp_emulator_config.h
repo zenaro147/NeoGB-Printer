@@ -7,7 +7,7 @@
 #define SD_CS 15
 #define SD_SCK 14
 #define SD_MOSI 13
-#define SD_MISO 32
+#define SD_MISO 26
 
 #define BTN_CONVERT 34
 
