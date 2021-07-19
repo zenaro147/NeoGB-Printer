@@ -5,7 +5,9 @@ Currently the code only generates a PGM output (with a fixed header to Gameboy C
 If you want to use with another game, just change the 144 in the header to the number of lines in the output (without first 3 lines)
 
 # ToDo List:
-* Create the BMP file
+* Write the PGM file on SD
+* Write automatically (maybe when the printer timed out)
+* Create the BMP file instead PGM
 
 # Based on:
 * [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
