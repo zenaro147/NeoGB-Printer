@@ -5,8 +5,11 @@ Currently the code only generates a PGM output (with a fixed header to Gameboy C
 If you want to use with another game, just change the 144 in the header to the number of lines in the output (without the first 3 lines)
 
 # ToDo List:
+* Update the code to support all 107 games
+* Parse Palette present in Print Command
+* Merge the files properly
 * Write the PGM file on SD
-* Write automatically (maybe when the printer timed out)
+* Write automatically when printer reachs timeout
 * Create the BMP file instead PGM
 
 # Based on:
