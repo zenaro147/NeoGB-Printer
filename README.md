@@ -1,4 +1,4 @@
-# Yet-Another-GBP-Emulator
+# Yet Another GBP Emulator
 Yes... it's another Game Boy Printer emulator... just plug an SD card, print your files and save the BMP image (big goal)
 
 Currently the code only generates a PGM output (with a fixed header to Gameboy Camera) and only if you push a button (pin G34)
