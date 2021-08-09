@@ -26,7 +26,7 @@
 //
 
 #ifdef ESP32
-// Pin Setup for Arduinos
+// Pin Setup for ESP32
 //                  | Arduino Pin | Gameboy Link Pin  |
 #define GBP_VCC_PIN               // Pin 1            : 5.0V (Unused)
 #define GBP_SO_PIN       23       // Pin 2            : ESP-pin 7 MOSI (Serial OUTPUT) -> Arduino 13

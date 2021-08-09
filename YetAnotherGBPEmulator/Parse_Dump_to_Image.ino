@@ -2,97 +2,61 @@ bool getLB = false;
 bool getHB = false;
 char LBbytes[256];
 char HBbytes[256];
+
 uint8_t lineReceived = 0;
 uint8_t tilePerLineReceived = 0;
 uint8_t tileLine[8][160];
 
 int totalHeight = 0;
 
+TaskHandle_t TaskWriteImage;
 /*******************************************************************************
-  Recieve Raw Data from GameBoy
+  Convert to BMP
 *******************************************************************************/
-inline void gbp_packet_capture_loop() {
-  /* tiles received */
-  static uint32_t byteTotal = 0;
-  static uint32_t pktTotalCount = 0;
-  static uint32_t pktByteIndex = 0;
-  static uint16_t pktDataLength = 0;
-  const size_t dataBuffCount = gbp_serial_io_dataBuff_getByteCount();
-  if (
-    ((pktByteIndex != 0) && (dataBuffCount > 0)) ||
-    ((pktByteIndex == 0) && (dataBuffCount >= 6))
-  ) {
-    uint8_t data_8bit = 0;
+void ConvertFilesBMP()
+{
 
-    // Display the data payload encoded in hex
-    for (int i = 0 ; i < dataBuffCount ; i++) {
-      // Start of a new packet
-      if (pktByteIndex == 0) {
-        pktDataLength = gbp_serial_io_dataBuff_getByte_Peek(4);
-        pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5) << 8) & 0xFF00;
+  Serial.println("P2");
+  Serial.println("160 144");
+  Serial.println("3");
+  
+  byte ch = 0;
+  bool skipLine = false;
+  int  lowNibFound = 0;
+  uint8_t byt = 0;
+  unsigned int bytec = 0;
 
-        switch ((int)gbp_serial_io_dataBuff_getByte_Peek(2)) {
-          case 1:
-          case 2:
-          case 4:
-            chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
-            break;
-          default:
-            break;
-        }
-
-#ifdef USE_OLED
-        if (!isPrinting) {
-          isPrinting = true;
-          oled_msg("Receiving Data...");
-        }
-#endif
-
-        digitalWrite(LED_STATUS_PIN, HIGH);
-      }
-
-      // Print Hex Byte
-      data_8bit = gbp_serial_io_dataBuff_getByte();
-
-      if (!isWriting) {
-        if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4) {
-          image_data[img_index] = (byte)data_8bit;
-          img_index++;
-          if (chkHeader == 2 && pktByteIndex == 7) {
-            cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit >> 0) & 0xF]) - '0';
-          }
-        }
-      }
-
-      if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
-        digitalWrite(LED_STATUS_PIN, LOW);
-        if (chkHeader == 2) {
-          if (cmdPRNT > 0 && !isWriting) {
-            gbp_serial_io_print_set();
-            isWriting = true;
-            xTaskCreatePinnedToCore(storeData,            // Task function.
-                                    "storeData",          // name of task.
-                                    10000,                // Stack size of task
-                                    (void*)&image_data,   // parameter of the task
-                                    1,                    // priority of the task
-                                    &TaskWrite,           // Task handle to keep track of created task
-                                    0);                   // pin task to core 0
-          } else {
-            cmdPRNT = 0x00;
-            chkHeader = 99;
-            isWriting = false;
-            delay(200);
-            gbp_serial_io_print_done();
-          }
-        }
-        pktByteIndex = 0;
-        pktTotalCount++;
-      } else {
-        pktByteIndex++; // Byte hex split counter
-        byteTotal++; // Byte total counter
-      }
-    }
+  File root = FSYS.open("/dumps");
+  if (!root) {
+    Serial.println("Failed to open directory");
+    return;
   }
+  if (!root.isDirectory()) {
+    Serial.println("Not a directory");
+    return;
+  }
+  File filedir = root.openNextFile();
+  while (filedir) {
+    if (!filedir.isDirectory()) {
+      char path[14];
+      sprintf(path, "/dumps/%s", filedir.name());
+
+      File file = FSYS.open(path);
+      if (!file) {
+        Serial.println("Failed to open file for reading");
+        return;
+      }
+      while (file.available())
+      {
+        ch = ((byte)file.read());
+        gbpdecoder_gotByte(ch);
+      }
+      file.close();
+      Serial.println("");
+    }
+    filedir = root.openNextFile();
+  }
+  
 }
 
 /*******************************************************************************
@@ -109,6 +73,13 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
           for (int j = 0; j < 160 ;j++){
             Serial.print(tileLine[i][j]);            
             Serial.print(" ");
+            //          xTaskCreatePinnedToCore(storeData,            // Task function.
+//                                              "storeData",          // name of task.
+//                                              10000,                // Stack size of task
+//                                              (void*)&image_data,   // parameter of the task
+//                                              1,                    // priority of the task
+//                                              &TaskWriteDump,       // Task handle to keep track of created task
+//                                              0);                   // pin task to core 0
           }
         }
       }
@@ -170,6 +141,13 @@ void parsebyte(uint8_t abyte){
         for (int j = 0; j < 160 ;j++){
           Serial.print(tileLine[i][j]);            
           Serial.print(" ");
+//          xTaskCreatePinnedToCore(storeData,            // Task function.
+//                                  "storeData",          // name of task.
+//                                  10000,                // Stack size of task
+//                                  (void*)&image_data,   // parameter of the task
+//                                  1,                    // priority of the task
+//                                  &TaskWriteDump,       // Task handle to keep track of created task
+//                                  0);                   // pin task to core 0
         }
       }
     }
@@ -202,4 +180,37 @@ void parsebyte(uint8_t abyte){
     memset(LBbytes, 0x00, sizeof(LBbytes));
     memset(HBbytes, 0x00, sizeof(HBbytes));
   }  
+}
+
+
+/*******************************************************************************
+   DEBUG
+*******************************************************************************/
+void clearDumps() {
+  unsigned int dumpcount = 0;
+  File dumpDir = FSYS.open("/dumps");    
+  File file = dumpDir.openNextFile();
+
+  char filename[12]; 
+
+  while(file) {
+    sprintf(filename, "/dumps/%s", file.name());
+    dumpcount++;    
+    file = dumpDir.openNextFile();
+    FSYS.remove(filename);
+  } 
+  Serial.println(((String)dumpcount) + " images deleted on DUMPS");
+
+  dumpcount = 0;
+  dumpDir = FSYS.open("/temp");
+  file = dumpDir.openNextFile();
+  while(file) {
+    sprintf(filename, "/temp/%s", file.name());
+    dumpcount++;    
+    file = dumpDir.openNextFile();
+    FSYS.remove(filename);
+  }
+  Serial.println(((String)dumpcount) + " images deleted on TEMP");
+  
+  nextFreeFileIndex();
 }
