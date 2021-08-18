@@ -14,7 +14,7 @@
 #define MAX_IMAGES 400
 
 //Using OLED Display
-#define USE_OLED
+//#define USE_OLED
 #define OLED_SDA 21
 #define OLED_SCL 17 //22
 

@@ -1,24 +1,9 @@
-bool getLB = false;
-bool getHB = false;
-char LBbytes[256];
-char HBbytes[256];
-
-uint8_t lineReceived = 0;
-uint8_t tilePerLineReceived = 0;
-uint8_t tileLine[8][160];
-
-int totalHeight = 0;
-
-TaskHandle_t TaskWriteImage;
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
-void ConvertFilesBMP()
+void ConvertFilesBMP(void *pvParameters)
 {
-
-  Serial.println("P2");
-  Serial.println("160 144");
-  Serial.println("3");
+  detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
   
   byte ch = 0;
   bool skipLine = false;
@@ -27,14 +12,6 @@ void ConvertFilesBMP()
   unsigned int bytec = 0;
 
   File root = FSYS.open("/dumps");
-  if (!root) {
-    Serial.println("Failed to open directory");
-    return;
-  }
-  if (!root.isDirectory()) {
-    Serial.println("Not a directory");
-    return;
-  }
   File filedir = root.openNextFile();
   while (filedir) {
     if (!filedir.isDirectory()) {
@@ -42,21 +19,28 @@ void ConvertFilesBMP()
       sprintf(path, "/dumps/%s", filedir.name());
 
       File file = FSYS.open(path);
-      if (!file) {
-        Serial.println("Failed to open file for reading");
-        return;
-      }
       while (file.available())
       {
-        ch = ((byte)file.read());
-        gbpdecoder_gotByte(ch);
+        gbpdecoder_gotByte((byte)file.read());
       }
       file.close();
-      Serial.println("");
+      
+      Serial.println("Done");
     }
     filedir = root.openNextFile();
   }
+
+  #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+  #else
+    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+  #endif
   
+  isConverting = false;
+  #ifdef USE_OLED
+    oled_drawSplashScreen();
+  #endif
+  vTaskDelete(NULL);   
 }
 
 /*******************************************************************************
@@ -64,124 +48,73 @@ void ConvertFilesBMP()
 *******************************************************************************/
 void gbpdecoder_gotByte(const uint8_t bytgb){
   if (gbp_pkt_processByte(&gbp_pktBuff, bytgb, gbp_pktbuff, &gbp_pktbuffSize, sizeof(gbp_pktbuff))){
-    if (gbp_pktBuff.received == GBP_REC_GOT_PACKET){
+    if (gbp_pktBuff.received == GBP_REC_GOT_PACKET)
+    {
       pktCounter++;
-      if (gbp_pktBuff.command == GBP_COMMAND_PRINT){
-        //Save as Image File (print the last tile group)
-        for (int i = 0; i < 8 ;i++){
-          Serial.println(" ");
-          for (int j = 0; j < 160 ;j++){
-            Serial.print(tileLine[i][j]);            
-            Serial.print(" ");
-            //          xTaskCreatePinnedToCore(storeData,            // Task function.
-//                                              "storeData",          // name of task.
-//                                              10000,                // Stack size of task
-//                                              (void*)&image_data,   // parameter of the task
-//                                              1,                    // priority of the task
-//                                              &TaskWriteDump,       // Task handle to keep track of created task
-//                                              0);                   // pin task to core 0
-          }
+      if (gbp_pktBuff.command == GBP_COMMAND_PRINT)
+      {
+        const bool cutPaper = ((gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED]&0xF) != 0) ? true : false;  ///< if lower margin is zero, then new pic
+        gbp_tiles_print(&gbp_tiles,
+            gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_SHEETS],
+            gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED],
+            gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_PALETTE_VALUE],
+            gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_PRINT_DENSITY]);
+
+        // Streaming BMP Writer
+        // Dev Note: Done this way to allow for streaming writes to file without a large buffer
+  
+        // Open New File
+        if (!gbp_bmp_isopen(&gbp_bmp))
+        {
+          //gbp_bmp_open(&gbp_bmp, ofilenameBuf, GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE);
+        } 
+  
+        // Write Decode Data Buffer Into BMP
+        for (int j = 0; j < gbp_tiles.tileRowOffset; j++)
+        {
+          const long int tileHeightIncrement = GBP_TILE_PIXEL_HEIGHT*GBP_BMP_MAX_TILE_HEIGHT;
+          //gbp_bmp_add(&gbp_bmp, (const uint8_t *) &gbp_tiles.bmpLineBuffer[tileHeightIncrement*j][0], (GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), tileHeightIncrement, palletColor);
+        }
+        gbp_tiles_reset(&gbp_tiles); ///< Written to file, clear decoded tile line buffer
+  
+        // Print finished and cut requested
+         if (cutPaper)
+        {
+          //gbp_bmp_render(&gbp_bmp);
         }
       }
     }else{
       // Support compression payload
-      while (gbp_pkt_decompressor(&gbp_pktBuff, gbp_pktbuff, gbp_pktbuffSize, &tileBuff)){
-        if (gbp_pkt_tileAccu_tileReadyCheck(&tileBuff)){
-          // Got Tile
-          for (int i = 0 ; i < GBP_TILE_SIZE_IN_BYTE ; i++){
-            const uint8_t data_8bit = tileBuff.tile[i];
-            parsebyte(data_8bit); 
-            if(i == GBP_TILE_SIZE_IN_BYTE-1){
-              //Last char of the tile
-              //parsebyte(data_8bit);  
-            } else {
-              //Print char
-              //parsebyte(data_8bit);
+      while (gbp_pkt_decompressor(&gbp_pktBuff, gbp_pktbuff, gbp_pktbuffSize, &tileBuff))
+      {
+        if (gbp_pkt_tileAccu_tileReadyCheck(&tileBuff))
+        {
+          // Got tile
+          if (gbp_tiles_line_decoder(&gbp_tiles, tileBuff.tile))
+          {
+            // Line Obtained
+           // Per Line Decoded (Pre Pallet Harmonisation)
+            for (int j = 0; j < GBP_TILE_PIXEL_HEIGHT; j++)
+            {
+              for (int i = 0; i < (GBP_TILE_PIXEL_WIDTH * GBP_TILES_PER_LINE); i++)
+              {
+                int pixel = 0b11 & (gbp_tiles.bmpLineBuffer[j+(gbp_tiles.tileRowOffset-1)*8][GBP_TILE_2BIT_LINEPACK_INDEX(i)] >> GBP_TILE_2BIT_LINEPACK_BITOFFSET(i));;
+                int b = 0;
+                switch (pixel)
+                {
+                  case 0: b = 0; break;
+                  case 1: b = 64; break;
+                  case 2: b = 130; break;
+                  case 3: b = 255; break;
+                }
+              }
             }
           }
         }
-      }      
+      }     
     }
   }
 }
-
-void parsebyte(uint8_t abyte){
-  //Convert int to binary
-  uint8_t bitsCount = sizeof(abyte) * 8;
-  char str[ bitsCount + 1 ];
-  uint8_t i = 0;
-  while ( bitsCount-- )
-      str[i++] = bitRead( abyte, bitsCount ) + '0';
-  str[i] = '\0';
-  
-  //Get High and Low Bytes
-  if(!getLB && !getHB){
-    strcpy(LBbytes, str);
-    getLB = true;
-  }else{
-    if(getLB && !getHB){
-      strcpy(HBbytes, str);
-      getHB = true;
-    }
-  }
-
-  //Process Pixels of the line
-  if(getLB && getHB){
-
-    if (lineReceived > 7){
-      lineReceived = 0;
-      tilePerLineReceived++;
-    }
-    if(tilePerLineReceived > 19){
-      totalHeight = totalHeight + 8;
-      tilePerLineReceived = 0;
-  
-      for (int i = 0; i < 8 ;i++){
-        Serial.println(" ");
-        for (int j = 0; j < 160 ;j++){
-          Serial.print(tileLine[i][j]);            
-          Serial.print(" ");
-//          xTaskCreatePinnedToCore(storeData,            // Task function.
-//                                  "storeData",          // name of task.
-//                                  10000,                // Stack size of task
-//                                  (void*)&image_data,   // parameter of the task
-//                                  1,                    // priority of the task
-//                                  &TaskWriteDump,       // Task handle to keep track of created task
-//                                  0);                   // pin task to core 0
-        }
-      }
-    }
-    
-    char resultbytes[2];
-    for (int i = 0 ; i < 8 ; i++){
-      sprintf(resultbytes, "%c%c", HBbytes[i],LBbytes[i]);
-      switch (atoi(resultbytes)) {
-        case 0:
-          tileLine[lineReceived][i+(tilePerLineReceived*8)] = 3;
-          break;
-        case 1:
-          tileLine[lineReceived][i+(tilePerLineReceived*8)] = 2;       
-          break;
-        case 10:
-          tileLine[lineReceived][i+(tilePerLineReceived*8)] = 1;
-          break;
-        case 11:
-          tileLine[lineReceived][i+(tilePerLineReceived*8)] = 0;
-          break;
-        default:
-          break;
-      }
-    }
-
-    lineReceived++;
-    
-    getLB = false;
-    getHB = false;
-    memset(LBbytes, 0x00, sizeof(LBbytes));
-    memset(HBbytes, 0x00, sizeof(HBbytes));
-  }  
-}
-
 
 /*******************************************************************************
    DEBUG

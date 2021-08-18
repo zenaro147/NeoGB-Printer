@@ -7,6 +7,9 @@
 
 #include "gbp_serial_io.h"
 
+#include "gbp_tiles.h"
+#include "gbp_bmp.h"
+
 /*******************************************************************************
 *******************************************************************************/
 
@@ -27,6 +30,12 @@ gbp_pkt_t gbp_pktBuff = {GBP_REC_NONE, 0};
 uint8_t gbp_pktbuff[GBP_PKT_PAYLOAD_BUFF_SIZE_IN_BYTE] = {0};
 uint8_t gbp_pktbuffSize = 0;
 gbp_pkt_tileAcc_t tileBuff = {0};
+
+
+uint32_t palletColor[4] = {0xFFFFFF,0xAAAAAA,0x555555,0x000000};
+gbp_tile_t gbp_tiles = {0};
+gbp_bmp_t  gbp_bmp = {0};
+TaskHandle_t TaskWriteImage;
 
 static void gbpdecoder_gotByte(const uint8_t bytgb);
 
@@ -150,30 +159,26 @@ void loop(){
       }
     }
     last_millis = curr_millis;
-  
-  
+    
     // Check Button Press to Convert
     if (digitalRead(BTN_CONVERT) == HIGH && !isConverting && !isWriting){
       isConverting = true;
-      detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+      
       #ifdef USE_OLED
         oled_msg("Saving BMP Image...");
       #endif
     
-        ConvertFilesBMP();
-    
-      #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-      #else
-        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-      #endif
-  
-      isConverting = false;
-  
-      oled_drawSplashScreen();
+        xTaskCreatePinnedToCore(ConvertFilesBMP,    // Task function. 
+                                "ConvertFilesBMP",      // name of task. 
+                                20000,                  // Stack size of task 
+                                NULL,                   // parameter of the task 
+                                1,                      // priority of the task 
+                                &TaskWriteImage,         // Task handle to keep track of created task 
+                                0);                     // pin task to core 0  
+                                
+ 
     }
   }
-  
 
   // Diagnostics Console
   while (Serial.available() > 0)

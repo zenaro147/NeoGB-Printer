@@ -7,7 +7,10 @@ const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte image_data[12000] = {}; 
 byte img_tmp[12000] = {};
 uint32_t img_index = 0x00;
+
 uint8_t cmdPRNT = 0x00;
+uint8_t cmdPalette = 0x00;
+uint8_t cmdDataReceived = 0x00;
 
 TaskHandle_t TaskWriteDump;
 /*******************************************************************************
@@ -21,7 +24,8 @@ void resetValues() {
   Serial.println("Printer ready.");
 
   chkHeader = 99;
-  cmdPRNT = 0x00;  
+  cmdPRNT = 0x00;
+  cmdPalette = 0x00; 
   
   dtpck = 0x00;
   inqypck = 0x00;
@@ -110,6 +114,16 @@ inline void gbp_packet_capture_loop() {
           img_index++;
           if (chkHeader == 2 && pktByteIndex == 7) { 
             cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
+            switch (pktByteIndex){
+              case 7:
+                cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
+                break;
+              case 8:
+                cmdPalette = (int)data_8bit;
+                break;
+              default:
+                break;
+            }
           } 
         }
       }
