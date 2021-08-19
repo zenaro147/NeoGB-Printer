@@ -9,12 +9,13 @@
 #define SD_MOSI 13
 #define SD_MISO 26
 
-#define BTN_CONVERT 34
+// Define a PushButton to use to Reset the emulator/Force merge files.
+#define BTN_PUSH 34
 
 #define MAX_IMAGES 400
 
 //Using OLED Display
-//#define USE_OLED
+#define USE_OLED
 #define OLED_SDA 21
 #define OLED_SCL 17 //22
 

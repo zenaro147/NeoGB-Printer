@@ -2,13 +2,10 @@
 #include <stddef.h> // size_t
 
 #include "config.h"
+
 #include "gameboy_printer_protocol.h"
 #include "gbp_pkt.h"
-
 #include "gbp_serial_io.h"
-
-#include "gbp_tiles.h"
-#include "gbp_bmp.h"
 
 /*******************************************************************************
 *******************************************************************************/
@@ -22,30 +19,26 @@ uint8_t gbp_serialIO_raw_buffer[GBP_BUFFER_SIZE] = {0};
 inline void gbp_packet_capture_loop();
 
 /*******************************************************************************
-   Custom Variables
+   Process Variables
 *******************************************************************************/
-// Other Variables
-uint8_t pktCounter = 0; // Dev Varible
 gbp_pkt_t gbp_pktBuff = {GBP_REC_NONE, 0};
 uint8_t gbp_pktbuff[GBP_PKT_PAYLOAD_BUFF_SIZE_IN_BYTE] = {0};
-uint8_t gbp_pktbuffSize = 0;
-gbp_pkt_tileAcc_t tileBuff = {0};
-
-
-uint32_t palletColor[4] = {0xFFFFFF,0xAAAAAA,0x555555,0x000000};
-gbp_tile_t gbp_tiles = {0};
-gbp_bmp_t  gbp_bmp = {0};
-TaskHandle_t TaskWriteImage;
-
-static void gbpdecoder_gotByte(const uint8_t bytgb);
 
 /*******************************************************************************
    Custom Variables
 *******************************************************************************/
+// Button Variables
+long buttonTimer = 0;
+long longPressTime = 2000;
+boolean buttonActive = false;
+boolean longPressActive = false;
+
 bool isPrinting = false;
 bool isWriting = false;
 bool isConverting = false;
+
 bool isFileSystemMounted = false;
+
 unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
 
@@ -53,6 +46,8 @@ bool setMultiPrint = false;
 unsigned int totalMultiImages = 1;
 
 bool isShowingSplash = false;
+
+TaskHandle_t TaskWriteImage;
 
 SPIClass spiSD(HSPI);
 /*******************************************************************************
@@ -115,9 +110,9 @@ void setup(void)
     /* LED Indicator */
     pinMode(LED_STATUS_PIN, OUTPUT);
     digitalWrite(LED_STATUS_PIN, LOW);
-  
-    /* Pin for pushbutton */
-    pinMode(BTN_CONVERT, INPUT);
+     
+    /* Pin for pushbutton */ 
+    pinMode(BTN_PUSH, INPUT);
   
     /* Setup */
     gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
@@ -160,24 +155,51 @@ void loop(){
     }
     last_millis = curr_millis;
     
-    // Check Button Press to Convert
-    if (digitalRead(BTN_CONVERT) == HIGH && !isConverting && !isWriting){
-      isConverting = true;
-      
-      #ifdef USE_OLED
-        oled_msg("Saving BMP Image...");
-      #endif
-    
-        xTaskCreatePinnedToCore(ConvertFilesBMP,    // Task function. 
-                                "ConvertFilesBMP",      // name of task. 
-                                20000,                  // Stack size of task 
-                                NULL,                   // parameter of the task 
-                                1,                      // priority of the task 
-                                &TaskWriteImage,         // Task handle to keep track of created task 
-                                0);                     // pin task to core 0  
-                                
- 
+    // Feature to detect a short press and a Long Press
+    if(!isWriting){
+      if (digitalRead(BTN_PUSH) == HIGH) {  
+        if (buttonActive == false) {  
+          buttonActive = true;
+          buttonTimer = millis();  
+        }  
+        if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {  
+          longPressActive = true;
+          //Long press to convert to BMP
+          if (!isConverting && (freeFileIndex-1) > 0){
+            Serial.println("Converting to BMP");
+            isConverting = true;              
+            #ifdef USE_OLED
+              oled_msg("Saving BMP Image...");
+            #endif
+              xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
+                                      "ConvertFilesBMP",      // name of task. 
+                                      20000,                  // Stack size of task 
+                                      NULL,                   // parameter of the task 
+                                      1,                      // priority of the task 
+                                      &TaskWriteImage,        // Task handle to keep track of created task 
+                                      0);                     // pin task to core 0         
+          }
+        }  
+      } else {  
+        if (buttonActive == true) {
+          if (longPressActive == true) {
+            longPressActive = false;  
+          } else {
+            if((totalMultiImages-1) > 1){
+              Serial.println("Force File Merger");
+              #ifdef USE_OLED
+                oled_msg("Force Merging Files...");
+              #endif
+              isWriting = true;
+              totalMultiImages--;
+              callFileMerger();
+            }
+          }  
+          buttonActive = false;  
+        }  
+      }
     }
+    
   }
 
   // Diagnostics Console
@@ -191,3 +213,36 @@ void loop(){
     }
   };
 } // loop()
+
+
+/*******************************************************************************
+   DEBUG
+*******************************************************************************/
+void clearDumps() {
+  unsigned int dumpcount = 0;
+  File dumpDir = FSYS.open("/dumps");    
+  File file = dumpDir.openNextFile();
+
+  char filename[12]; 
+
+  while(file) {
+    sprintf(filename, "/dumps/%s", file.name());
+    dumpcount++;    
+    file = dumpDir.openNextFile();
+    FSYS.remove(filename);
+  } 
+  Serial.println(((String)dumpcount) + " images deleted on DUMPS");
+
+  dumpcount = 0;
+  dumpDir = FSYS.open("/temp");
+  file = dumpDir.openNextFile();
+  while(file) {
+    sprintf(filename, "/temp/%s", file.name());
+    dumpcount++;    
+    file = dumpDir.openNextFile();
+    FSYS.remove(filename);
+  }
+  Serial.println(((String)dumpcount) + " images deleted on TEMP");
+  
+  nextFreeFileIndex();
+}

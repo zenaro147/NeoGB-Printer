@@ -1,3 +1,18 @@
+
+#include "gbp_tiles.h"
+#include "gbp_bmp.h"
+
+uint8_t pktCounter = 0; // Dev Varible
+
+uint32_t palletColor[4] = {0xFFFFFF,0xAAAAAA,0x555555,0x000000};
+
+uint8_t gbp_pktbuffSize = 0;
+gbp_pkt_tileAcc_t tileBuff = {0};
+gbp_tile_t gbp_tiles = {0};
+gbp_bmp_t  gbp_bmp = {0};
+
+static void gbpdecoder_gotByte(const uint8_t bytgb);
+
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
@@ -114,36 +129,4 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
       }     
     }
   }
-}
-
-/*******************************************************************************
-   DEBUG
-*******************************************************************************/
-void clearDumps() {
-  unsigned int dumpcount = 0;
-  File dumpDir = FSYS.open("/dumps");    
-  File file = dumpDir.openNextFile();
-
-  char filename[12]; 
-
-  while(file) {
-    sprintf(filename, "/dumps/%s", file.name());
-    dumpcount++;    
-    file = dumpDir.openNextFile();
-    FSYS.remove(filename);
-  } 
-  Serial.println(((String)dumpcount) + " images deleted on DUMPS");
-
-  dumpcount = 0;
-  dumpDir = FSYS.open("/temp");
-  file = dumpDir.openNextFile();
-  while(file) {
-    sprintf(filename, "/temp/%s", file.name());
-    dumpcount++;    
-    file = dumpDir.openNextFile();
-    FSYS.remove(filename);
-  }
-  Serial.println(((String)dumpcount) + " images deleted on TEMP");
-  
-  nextFreeFileIndex();
 }

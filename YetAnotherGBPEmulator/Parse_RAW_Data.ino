@@ -9,8 +9,6 @@ byte img_tmp[12000] = {};
 uint32_t img_index = 0x00;
 
 uint8_t cmdPRNT = 0x00;
-uint8_t cmdPalette = 0x00;
-uint8_t cmdDataReceived = 0x00;
 
 TaskHandle_t TaskWriteDump;
 /*******************************************************************************
@@ -25,7 +23,6 @@ void resetValues() {
 
   chkHeader = 99;
   cmdPRNT = 0x00;
-  cmdPalette = 0x00; 
   
   dtpck = 0x00;
   inqypck = 0x00;
@@ -49,13 +46,20 @@ inline void gbp_packet_capture_loop() {
     ((pktByteIndex == 0) && (dataBuffCount >= 6))
   ) {
     uint8_t data_8bit = 0;
-
+    
     // Display the data payload encoded in hex
     for (int i = 0 ; i < dataBuffCount ; i++) {
       // Start of a new packet
       if (pktByteIndex == 0) {
         pktDataLength = gbp_serial_io_dataBuff_getByte_Peek(4);
         pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5) << 8) & 0xFF00;
+
+        #ifdef USE_OLED
+          if (!isPrinting) {
+            isPrinting = true;
+            oled_msg("Receiving Data...");
+          }
+        #endif
 
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
 
@@ -78,14 +82,8 @@ inline void gbp_packet_capture_loop() {
             if (totalMultiImages > 1 && !isWriting && !setMultiPrint){
               inqypck++;
               if(inqypck > 20){
-                //Force to write the saves images  
-                xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
-                                        "mergeMultiPrint",      // name of task. 
-                                        10000,                  // Stack size of task 
-                                        NULL,                   // parameter of the task 
-                                        1,                      // priority of the task 
-                                        &TaskWriteDump,             // Task handle to keep track of created task 
-                                        0);                     // pin task to core 0               
+                //Force to write the saves images
+                callFileMerger();               
                 inqypck=0;
               }
             }
@@ -93,15 +91,8 @@ inline void gbp_packet_capture_loop() {
             break;
           default:
             break;
-        }  
-
-#ifdef USE_OLED
-        if (!isPrinting) {
-          isPrinting = true;
-          oled_msg("Receiving Data...");
-        }
-#endif
-
+        } 
+        
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
 
@@ -114,16 +105,6 @@ inline void gbp_packet_capture_loop() {
           img_index++;
           if (chkHeader == 2 && pktByteIndex == 7) { 
             cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
-            switch (pktByteIndex){
-              case 7:
-                cmdPRNT = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
-                break;
-              case 8:
-                cmdPalette = (int)data_8bit;
-                break;
-              default:
-                break;
-            }
           } 
         }
       }
@@ -265,12 +246,16 @@ void gbp_detect_multiprint_loop(){
       oled_msg("Long Print detected","Merging Files...");
     #endif
     isWriting = true;
-    xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
-                    "mergeMultiPrint",              // name of task. 
-                    10000,                          // Stack size of task 
-                    NULL,                           // parameter of the task 
-                    1,                              // priority of the task 
-                    &TaskWriteDump,                     // Task handle to keep track of created task 
-                    0);                             // pin task to core 0  
+    callFileMerger();  
   }
+}
+
+void callFileMerger(){
+  xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
+                          "mergeMultiPrint",      // name of task. 
+                          10000,                  // Stack size of task 
+                          NULL,                   // parameter of the task 
+                          1,                      // priority of the task 
+                          &TaskWriteDump,             // Task handle to keep track of created task 
+                          0);                     // pin task to core 0  
 }
