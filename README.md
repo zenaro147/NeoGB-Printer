@@ -7,6 +7,7 @@ If you want to use with another game, just change the 144 in the header to the n
 You can check the compatibility list here: [Game Boy Printer Emulator - Games Support](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
 
 # ToDo List:
+* Update documetation (wiring, compatible devices, etc)
 * Update the code to support all 107 games
 * Parse Palette present in Print Command
 * Merge the files properly
