@@ -9,7 +9,7 @@ You can check the compatibility list here: [Game Boy Printer Emulator - Games Su
 # ToDo List:
 - [ ] Update documetation (wiring, compatible devices, etc)
 - [x] Update the code to support all games
-- [ ] Use the original BMP library from Mofosyne C decompiler
+- [x] Use the original BMP library from Mofosyne C decompiler
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Write the BMP file on SD
 
