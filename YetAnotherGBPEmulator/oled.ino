@@ -74,18 +74,22 @@ void oled_setup() {
 }
 
 void oled_msg(String message) {
+  display.clearDisplay();
   oled_msg(message, 12);
 }
 
 void oled_msg(String message1, String message2) {
+  display.clearDisplay();
   oled_msg(message1 + "\n" + message2, 8);
 }
 
 void oled_msg(String message1, String message2, String message3) {
+  display.clearDisplay();
   oled_msg(message1 + "\n" + message2 + "\n" + message3, 4);
 }
 
 void oled_msg(String message1, String message2, String message3, String message4) {
+  display.clearDisplay();
   oled_msg(message1 + "\n" + message2 + "\n" + message3 + "\n" + message4, 0);
 }
 
@@ -97,7 +101,7 @@ void oled_msg(String message, byte y) {
   display.println(message);
   display.display();
   #ifdef OLED_INVERT
-  display.invertDisplay(true);
+    display.invertDisplay(true);
   #endif
 }
 

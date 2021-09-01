@@ -2,6 +2,8 @@
   Initialize File System and SD Card
 *******************************************************************************/
 bool fs_setup() {
+//void fs_setup() {
+  pinMode(SD_CS, OUTPUT);
   spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
 
   FSYS.begin(SD_CS, spiSD);

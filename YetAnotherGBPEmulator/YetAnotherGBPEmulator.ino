@@ -96,6 +96,8 @@ void setup(void)
   delay(3000);
 
   isFileSystemMounted = fs_setup();
+//  fs_setup();
+//  isFileSystemMounted = true;
   if(isFileSystemMounted){
     freeFileIndex = nextFreeFileIndex();
 
@@ -142,7 +144,14 @@ void loop(){
         Serial.println("Printer Timeout");
         digitalWrite(LED_STATUS_PIN, LOW);
   
-        gbp_detect_multiprint_loop();
+          if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
+            #ifdef USE_OLED
+              oled_msg("Long Print detected","Merging Files...");
+            #endif
+            isWriting = true;
+        //    callFileMerger();
+            gpb_mergeMultiPrint(); 
+          }
         
         #ifdef USE_OLED
           if (!isShowingSplash) {
@@ -153,8 +162,8 @@ void loop(){
         
       }
     }
-    last_millis = curr_millis;
-    
+    last_millis = curr_millis;  
+
     // Feature to detect a short press and a Long Press
     if(!isWriting){
       if (digitalRead(BTN_PUSH) == HIGH) {  
@@ -192,15 +201,16 @@ void loop(){
               #endif
               isWriting = true;
               totalMultiImages--;
-              callFileMerger();
+              //callFileMerger();
+              gpb_mergeMultiPrint();
             }
           }  
           buttonActive = false;  
         }  
       }
     }
-    
   }
+  
 
   // Diagnostics Console
   while (Serial.available() > 0)
