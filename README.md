@@ -53,6 +53,29 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 
 ```
 
+## Push Button to Manual Merge Files/Reset printer
+You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to manually merge the files. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
+
+The function is simple:
+* Single press: Force to merge files when a long print is detected
+* Long Press: Convert all dumps to BMP
+
+```
+PushButton Schematic
+     __________
+    |          |
+1 --|----------|-- 2
+    |          |
+3 --|----------|-- 4
+    |__________|
+
+| Button | ESP32 |
+|--------|-------|
+| 1 or 2 |  3v3  | 
+| 3 or 4 |  G34  | <-- I recommend to coonect a 10K resistor to the GND together, to act as a Pull Down.
+
+```
+
 # ToDo List:
 - [ ] Update documetation (wiring, compatible devices, etc)
 - [x] Update the code to support all games
