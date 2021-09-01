@@ -83,8 +83,8 @@ inline void gbp_packet_capture_loop() {
               inqypck++;
               if(inqypck > 20){
                 //Force to write the saves images
-//                callFileMerger();
-                gpb_mergeMultiPrint();               
+                callFileMerger();
+//                gpb_mergeMultiPrint();               
                 inqypck=0;
               }
             }
@@ -191,10 +191,11 @@ void storeData(void *pvParameters)
 }
 
 /*******************************************************************************
-  Merge multiple files into one single file
+  Merge multiple files into one singsim
+  le file
 *******************************************************************************/
-//void gpb_mergeMultiPrint(void *pvParameters){
-void gpb_mergeMultiPrint(){
+void gpb_mergeMultiPrint(void *pvParameters){
+//void gpb_mergeMultiPrint(){
   byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};
   img_index = 0;
   memset(image_data, 0x00, sizeof(image_data));
@@ -270,16 +271,19 @@ void gpb_mergeMultiPrint(){
     Serial.println("no more space on printer\nrebooting...");
     full();
   }
-  
-  //vTaskDelete(NULL); 
+  #ifdef USE_OLED
+    isShowingSplash = true;
+    oled_drawSplashScreen();
+  #endif
+  vTaskDelete(NULL); 
 }
 
 void callFileMerger(){
-//  xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
-//                          "mergeMultiPrint",      // name of task. 
-//                          10000,                  // Stack size of task 
-//                          NULL,                   // parameter of the task 
-//                          1,                      // priority of the task 
-//                          &TaskWriteDump,             // Task handle to keep track of created task 
-//                          0);                     // pin task to core 0  
+  xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
+                          "mergeMultiPrint",      // name of task. 
+                          20000,                  // Stack size of task 
+                          NULL,                   // parameter of the task 
+                          1,                      // priority of the task 
+                          &TaskWriteDump,             // Task handle to keep track of created task 
+                          0);                     // pin task to core 0  
 }

@@ -120,11 +120,11 @@ void setup(void)
     gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
   
     /* Attach ISR */
-  #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-  #else
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-  #endif
+    #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+      attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+    #else
+      attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+    #endif
   
     gbp_pkt_init(&gbp_pktBuff);
   }
@@ -149,17 +149,9 @@ void loop(){
               oled_msg("Long Print detected","Merging Files...");
             #endif
             isWriting = true;
-        //    callFileMerger();
-            gpb_mergeMultiPrint(); 
+            callFileMerger();
+//            gpb_mergeMultiPrint(); 
           }
-        
-        #ifdef USE_OLED
-          if (!isShowingSplash) {
-            isShowingSplash = true;
-            oled_drawSplashScreen();
-          }
-        #endif
-        
       }
     }
     last_millis = curr_millis;  
@@ -201,8 +193,8 @@ void loop(){
               #endif
               isWriting = true;
               totalMultiImages--;
-              //callFileMerger();
-              gpb_mergeMultiPrint();
+              callFileMerger();
+//              gpb_mergeMultiPrint();
             }
           }  
           buttonActive = false;  
