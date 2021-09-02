@@ -4,9 +4,7 @@ uint8_t dtpck = 0;
 uint8_t inqypck = 0;
 
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
-byte image_data[12000] = {}; 
-byte img_tmp[12000] = {};
-uint32_t img_index = 0x00;
+byte img_tmp[6000] = {}; // 1GBC Picute (5.874)
 
 uint8_t cmdPRNT = 0x00;
 
@@ -120,7 +118,7 @@ inline void gbp_packet_capture_loop() {
           }else if(cmdPRNT > 0 && setMultiPrint){
             setMultiPrint=false;
           }
-          memcpy(img_tmp,image_data,12000);
+          memcpy(img_tmp,image_data,6000);
           xTaskCreatePinnedToCore(storeData,            // Task function. 
                                   "storeData",          // name of task. 
                                   10000,                // Stack size of task 
@@ -157,7 +155,7 @@ void storeData(void *pvParameters)
   #endif
 
   if(setMultiPrint || totalMultiImages > 1){
-    sprintf(fileName, "/temp/%05d_%05d.txt", freeFileIndex,totalMultiImages);
+    sprintf(fileName, "/dumps/%05d_%05d.txt", freeFileIndex,totalMultiImages);
   }else{
     sprintf(fileName, "/dumps/%05d.txt", freeFileIndex);
   }
@@ -171,15 +169,16 @@ void storeData(void *pvParameters)
 
   perf = millis() - perf;
   if(setMultiPrint || totalMultiImages > 1){
-    Serial.printf("File /temp/%05d_%05d.txt written in %lums\n", freeFileIndex,totalMultiImages,perf);
+    Serial.printf("File /dumps/%05d_%05d.txt written in %lums\n", freeFileIndex,totalMultiImages,perf);
   }else{
     Serial.printf("File /dumps/%05d.txt written in %lums\n", freeFileIndex, perf);
   }
 
+  //Need to handle with free space remaining
   if (freeFileIndex < MAX_IMAGES) {
-    if(!setMultiPrint && totalMultiImages <= 1){
-      freeFileIndex++; 
-    }else if (setMultiPrint){    
+    if(!setMultiPrint){
+      freeFileIndex++;
+    }else{    
       totalMultiImages++;
     }
     resetValues();
@@ -194,96 +193,108 @@ void storeData(void *pvParameters)
   Merge multiple files into one singsim
   le file
 *******************************************************************************/
-void gpb_mergeMultiPrint(void *pvParameters){
-//void gpb_mergeMultiPrint(){
-  byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};
-  img_index = 0;
-  memset(image_data, 0x00, sizeof(image_data));
-  Serial.println("Merging Files");
+//void gpb_mergeMultiPrint(void *pvParameters){
+////void gpb_mergeMultiPrint(){
+//  byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};
+//  img_index = 0;
+//  memset(image_data, 0x00, sizeof(image_data));
+//  Serial.println("Merging Files");
+//
+//  char path[31];
+//
+//  bool gotCMDPRNT=false;  
+//  uint8_t chkmargin = 0;
+//  
+//  for (int i = 1 ; i <= totalMultiImages ; i++){
+//    sprintf(path, "/temp/%05d_%05d.txt", freeFileIndex,i);
+//    //Read File
+//    File file = FSYS.open(path);
+//    while(file.available()){
+//      image_data[img_index] = ((byte)file.read());
+//      img_index++;
+//    }
+//    file.close();
+//    FSYS.remove(path);
+//    
+//    //Write File
+//    sprintf(path, "/dumps/%05d.txt", freeFileIndex);
+//    if(i == 1){
+//      file = FSYS.open(path, FILE_WRITE);
+//    }else{
+//      file = FSYS.open(path, FILE_APPEND);
+//    }
+//    
+//    if(i < totalMultiImages){
+//      for(int x=0; x <= img_index; x++){
+//        if(image_data[x] == B10001000 && image_data[x+1] == B00110011 && image_data[x+2] == B00000010){
+//          gotCMDPRNT=true;
+//          chkmargin++;
+//          file.print((char)image_data[x]);
+//        }else{
+//          if(gotCMDPRNT){
+//            if(chkmargin==7){
+//              file.print((char)B00000000);
+//              gotCMDPRNT=false;
+//              chkmargin=0x00;
+//            }else{
+//              chkmargin++;
+//              file.print((char)image_data[x]);
+//            }              
+//          }else{
+//            file.print((char)image_data[x]);
+//            gotCMDPRNT=false;
+//            chkmargin=0x00;
+//          }
+//        }
+//      }
+//    }else{    
+//      Serial.println("LastFile");  
+//      file.write(image_data,img_index);
+//    }
+//    //file.write(image_data,img_index);    
+//    file.write(inqypck, 10);
+//    file.close();
+//    
+//    memset(image_data, 0x00, sizeof(image_data));
+//    img_index = 0;
+//  } 
+//  
+//  setMultiPrint = false;
+//  totalMultiImages = 1;
+//  
+//  Serial.printf("File %s written", path);
+//  if (freeFileIndex < MAX_IMAGES) {
+//    freeFileIndex++; 
+//    resetValues();
+//  } else {
+//    Serial.println("no more space on printer\nrebooting...");
+//    full();
+//  }
+//  #ifdef USE_OLED
+//    isShowingSplash = true;
+//    oled_drawSplashScreen();
+//  #endif
+//  vTaskDelete(NULL); 
+//}
 
-  char path[31];
-
-  bool gotCMDPRNT=false;  
-  uint8_t chkmargin = 0;
-  
-  for (int i = 1 ; i <= totalMultiImages ; i++){
-    sprintf(path, "/temp/%05d_%05d.txt", freeFileIndex,i);
-    //Read File
-    File file = FSYS.open(path);
-    while(file.available()){
-      image_data[img_index] = ((byte)file.read());
-      img_index++;
-    }
-    file.close();
-    FSYS.remove(path);
-    
-    //Write File
-    sprintf(path, "/dumps/%05d.txt", freeFileIndex);
-    if(i == 1){
-      file = FSYS.open(path, FILE_WRITE);
-    }else{
-      file = FSYS.open(path, FILE_APPEND);
-    }
-    
-    if(i < totalMultiImages){
-      for(int x=0; x <= img_index; x++){
-        if(image_data[x] == B10001000 && image_data[x+1] == B00110011 && image_data[x+2] == B00000010){
-          gotCMDPRNT=true;
-          chkmargin++;
-          file.print((char)image_data[x]);
-        }else{
-          if(gotCMDPRNT){
-            if(chkmargin==7){
-              file.print((char)B00000000);
-              gotCMDPRNT=false;
-              chkmargin=0x00;
-            }else{
-              chkmargin++;
-              file.print((char)image_data[x]);
-            }              
-          }else{
-            file.print((char)image_data[x]);
-            gotCMDPRNT=false;
-            chkmargin=0x00;
-          }
-        }
-      }
-    }else{    
-      Serial.println("LastFile");  
-      file.write(image_data,img_index);
-    }
-    //file.write(image_data,img_index);    
-    file.write(inqypck, 10);
-    file.close();
-    
-    memset(image_data, 0x00, sizeof(image_data));
-    img_index = 0;
-  } 
-  
+void callFileMerger(){
   setMultiPrint = false;
   totalMultiImages = 1;
   
-  Serial.printf("File %s written", path);
-  if (freeFileIndex < MAX_IMAGES) {
-    freeFileIndex++; 
-    resetValues();
-  } else {
-    Serial.println("no more space on printer\nrebooting...");
-    full();
-  }
+  resetValues();  
+  
+  memset(image_data, 0x00, sizeof(image_data));
+  img_index = 0;
+  
   #ifdef USE_OLED
     isShowingSplash = true;
     oled_drawSplashScreen();
-  #endif
-  vTaskDelete(NULL); 
-}
-
-void callFileMerger(){
-  xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
-                          "mergeMultiPrint",      // name of task. 
-                          20000,                  // Stack size of task 
-                          NULL,                   // parameter of the task 
-                          1,                      // priority of the task 
-                          &TaskWriteDump,             // Task handle to keep track of created task 
-                          0);                     // pin task to core 0  
+  #endif  
+//  xTaskCreatePinnedToCore(gpb_mergeMultiPrint,    // Task function. 
+//                          "mergeMultiPrint",      // name of task. 
+//                          20000,                  // Stack size of task 
+//                          NULL,                   // parameter of the task 
+//                          1,                      // priority of the task 
+//                          &TaskWriteDump,         // Task handle to keep track of created task 
+//                          0);                     // pin task to core 0  
 }

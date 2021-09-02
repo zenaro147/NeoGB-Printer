@@ -33,6 +33,9 @@ long longPressTime = 2000;
 boolean buttonActive = false;
 boolean longPressActive = false;
 
+byte image_data[6000] = {}; // 1GBC Picute (5.874)
+uint32_t img_index = 0x00;
+
 bool isPrinting = false;
 bool isWriting = false;
 bool isConverting = false;
@@ -145,9 +148,9 @@ void loop(){
         digitalWrite(LED_STATUS_PIN, LOW);
   
           if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-            #ifdef USE_OLED
-              oled_msg("Long Print detected","Merging Files...");
-            #endif
+//            #ifdef USE_OLED
+//              oled_msg("Long Print detected","Merging Files...");
+//            #endif
             isWriting = true;
             callFileMerger();
 //            gpb_mergeMultiPrint(); 
@@ -187,12 +190,12 @@ void loop(){
             longPressActive = false;  
           } else {
             if((totalMultiImages-1) > 1){
-              Serial.println("Force File Merger");
-              #ifdef USE_OLED
-                oled_msg("Force Merging Files...");
-              #endif
+//              Serial.println("Force File Merger");
+//              #ifdef USE_OLED
+//                oled_msg("Force Merging Files...");
+//              #endif
               isWriting = true;
-              totalMultiImages--;
+//              totalMultiImages--;
               callFileMerger();
 //              gpb_mergeMultiPrint();
             }
@@ -234,17 +237,6 @@ void clearDumps() {
     FSYS.remove(filename);
   } 
   Serial.println(((String)dumpcount) + " images deleted on DUMPS");
-
-  dumpcount = 0;
-  dumpDir = FSYS.open("/temp");
-  file = dumpDir.openNextFile();
-  while(file) {
-    sprintf(filename, "/temp/%s", file.name());
-    dumpcount++;    
-    file = dumpDir.openNextFile();
-    FSYS.remove(filename);
-  }
-  Serial.println(((String)dumpcount) + " images deleted on TEMP");
   
   nextFreeFileIndex();
 }
