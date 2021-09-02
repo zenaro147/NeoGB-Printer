@@ -28,6 +28,8 @@ void ConvertFilesBMP(void *pvParameters)
   for(int i = 1; i < freeFileIndex; i++){
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
+      Serial.println(i);
+      Serial.println(x);
       ProcessRAWFile(i,1);
     }else{
       sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
@@ -40,6 +42,8 @@ void ConvertFilesBMP(void *pvParameters)
             x++;
           }
         }
+        Serial.println(i);
+        Serial.println(x);
         ProcessRAWFile(i,x);
         x=0;
       }else{
@@ -68,16 +72,16 @@ void ProcessRAWFile(int currfile, int numfiles){
   uint8_t palettebyte = 0x00;
   char path[20];
 
+  Serial.println("Parsing...");
   Serial.println(currfile);
   Serial.println(numfiles);
-
+      
   for (int z = 1; z <= numfiles; z++){
-    if (numfiles = 1){
+    if (numfiles == 1){
       sprintf(path, "/dumps/%05d.txt", currfile);
     }else{
       sprintf(path, "/dumps/%05d_%05d.txt", currfile, z);
-    }
-    
+    }    
     Serial.println(path);
     
     File file = FSYS.open(path);
