@@ -18,41 +18,135 @@ static void gbpdecoder_gotByte(const uint8_t bytgb);
 *******************************************************************************/
 void ConvertFilesBMP(void *pvParameters)
 {
+  Serial.println(uxTaskGetStackHighWaterMark(NULL));
+  //Remove the interrupt to prevent receive data from Gameboy
   detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
-  
+
+  //Clear variables
   memset(image_data, 0x00, sizeof(image_data));
   img_index = 0;
 
+  //Create some vars to use in the process
   char path[20];
-  int x = 0;
+  int numfiles = 0;
+  uint8_t palettebyte = 0x00;
+
+  //Loop to check only the availables files based on nextFreeFileIndex function
   for(int i = 1; i < freeFileIndex; i++){
+    //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
-      Serial.println(i);
-      Serial.println(x);
-      ProcessRAWFile(i,1);
-    }else{
+      numfiles=1;
+    }else{     
+      //If is long print, count how many files exists
       sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
       if(FSYS.exists(path)){
-        for(int z=1; z <= 99999; z++){
-          sprintf(path, "/dumps/%05d_%05d.txt", i, z);
+        for(int filecount=1; filecount <= 100; filecount++){
+          sprintf(path, "/dumps/%05d_%05d.txt", i, filecount);
           if(!FSYS.exists(path)){
-            break;
+            break; //Exit from the loop to check the ammount of files in a multiprint
           }else{
-            x++;
+            numfiles++;
           }
         }
-        Serial.println(i);
-        Serial.println(x);
-        ProcessRAWFile(i,x);
-        x=0;
       }else{
-        break;
+        break; //Exit from the loop, because don't have any more files
       }
     }
+
+    // Loop to parse the files based on the previous results
+    for (int z = 1; z <= numfiles; z++){
+      //Check if is a single file or a long print
+      if (numfiles == 1){
+        sprintf(path, "/dumps/%05d.txt", i);
+      }else{
+        sprintf(path, "/dumps/%05d_%05d.txt", i, z);
+      }    
+      Serial.println(path);
+
+      //Open the file and copy it to the memory
+      File file = FSYS.open(path);
+      if(!file){
+          Serial.println("Failed to open file for reading");
+      }
+      while(file.available()){
+        image_data[img_index] = ((byte)file.read());
+        img_index++;
+      }
+      file.close();    
+      
+      //Find the Palette value present in PRINT command
+      for(int bytePos=0; bytePos < img_index; bytePos++){
+        if(image_data[bytePos] == B10001000 && image_data[bytePos+1] == B00110011 && image_data[bytePos+2] == B00000010){
+          palettebyte = ((int)image_data[bytePos+8]);
+          Serial.println(palettebyte);
+          break; //After find, exit from this loop
+        }
+      }
+      
+      //Parse the palette byte found previously from int to binary (as char array)
+      uint8_t bitsCount = sizeof(palettebyte) * 8;
+      char str[ bitsCount + 1 ];
+      uint8_t strcount = 0;
+      while ( bitsCount-- )
+          str[strcount++] = bitRead( palettebyte, bitsCount ) + '0';
+      str[strcount] = '\0';
+
+      //Update the palletColor with the palette values
+      for(int palPos=0; palPos <= 3; palPos++){
+        char resultbytes[2];
+        switch (palPos) {
+          case 0:
+            sprintf(resultbytes, "%c%c", str[0],str[1]);
+            break;
+          case 1:
+            sprintf(resultbytes, "%c%c", str[2],str[3]);
+            break;
+          case 2:
+            sprintf(resultbytes, "%c%c", str[4],str[5]);
+            break;
+          case 3:
+            sprintf(resultbytes, "%c%c", str[6],str[7]);
+            break;
+          default:
+            break;
+        }
+        switch (atoi(resultbytes)) {
+          case 0:
+            palletColor[palPos] = {0x000000};
+            break;
+          case 1:
+            palletColor[palPos] = {0x555555};
+            break;
+          case 10:
+            palletColor[palPos] = {0xAAAAAA};
+            break;
+          case 11:
+            palletColor[palPos] = {0xFFFFFF};
+            break;
+          default:
+            break;
+        }    
+      }
+      
+      //Send each byte to parse the tile
+      for(int bytePos=0; bytePos < img_index; bytePos++){
+        gbpdecoder_gotByte(image_data[bytePos]);       
+      }
+
+      //clear the variables
+      memset(image_data, 0x00, sizeof(image_data));
+      img_index = 0;
+      
+      Serial.println("Done");
+      delay(1000);
+    }
+    //Reset the counter for the number of files 
+    numfiles=0;
+    Serial.println(uxTaskGetStackHighWaterMark(NULL));
   }
 
-  x=0; 
+  numfiles=0; 
   isConverting = false;
   #ifdef USE_OLED
     oled_drawSplashScreen();
@@ -64,105 +158,10 @@ void ConvertFilesBMP(void *pvParameters)
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
   
+  Serial.println(uxTaskGetStackHighWaterMark(NULL));
   vTaskDelete(NULL);   
 }
-
-void ProcessRAWFile(int currfile, int numfiles){
-  bool gotCMDPRNT = false;
-  uint8_t palettebyte = 0x00;
-  char path[20];
-
-  Serial.println("Parsing...");
-  Serial.println(currfile);
-  Serial.println(numfiles);
-      
-  for (int z = 1; z <= numfiles; z++){
-    if (numfiles == 1){
-      sprintf(path, "/dumps/%05d.txt", currfile);
-    }else{
-      sprintf(path, "/dumps/%05d_%05d.txt", currfile, z);
-    }    
-    Serial.println(path);
-    
-    File file = FSYS.open(path);
-    if(!file){
-        Serial.println("Failed to open file for reading");
-    }else{
-      while(file.available()){
-        image_data[img_index] = ((byte)file.read());
-        img_index++;
-      }
-      file.close();
-    }
-    
-    
-    //Find the Palette value
-    for(int x=0; x < img_index; x++){
-      if(image_data[x] == B10001000 && image_data[x+1] == B00110011 && image_data[x+2] == B00000010){
-        palettebyte = ((int)image_data[x+8]);
-        Serial.println(palettebyte);
-      }
-    }
-    
-    //Parse the palette byte (int to binary (as char array))
-    uint8_t bitsCount = sizeof(palettebyte) * 8;
-    char str[ bitsCount + 1 ];
-    uint8_t i = 0;
-    while ( bitsCount-- )
-        str[i++] = bitRead( palettebyte, bitsCount ) + '0';
-    str[i] = '\0';
-   Serial.println(str);
-
-    for(int i=0; i <= 3; i++){
-      char resultbytes[2];
-      switch (i) {
-        case 0:
-          sprintf(resultbytes, "%c%c", str[0],str[1]);
-          break;
-        case 1:
-          sprintf(resultbytes, "%c%c", str[2],str[3]);
-          break;
-        case 2:
-          sprintf(resultbytes, "%c%c", str[4],str[5]);
-          break;
-        case 3:
-          sprintf(resultbytes, "%c%c", str[6],str[7]);
-          break;
-        default:
-          break;
-      }         
-              
-      switch (atoi(resultbytes)) {
-        case 0:
-          palletColor[i] = {0x000000};
-          break;
-        case 1:
-          palletColor[i] = {0x555555};
-          break;
-        case 10:
-          palletColor[i] = {0xAAAAAA};
-          break;
-        case 11:
-          palletColor[i] = {0xFFFFFF};
-          break;
-        default:
-          break;
-      }    
-    }
-    
-    //Send each byte to parse the tile
-    for(int y=0; y < img_index; y++){
-      //gbpdecoder_gotByte(image_data[y]);       
-    }
-    
-    memset(image_data, 0x00, sizeof(image_data));
-    img_index = 0;
-    
-    Serial.println("Done");
-    delay(1000);
-  }
-}
-
+  
 /*******************************************************************************
    Decode the Image
 *******************************************************************************/

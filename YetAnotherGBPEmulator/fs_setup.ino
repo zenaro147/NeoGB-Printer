@@ -86,7 +86,7 @@ unsigned int nextFreeFileIndex() {
     if (!FSYS.exists(path)) {
       sprintf(path, "/dumps/%05d_%05d.txt", i, x);
       if(!FSYS.exists(path)){
-        return i+1;
+        return i;
       }
     }
     i++;
@@ -100,6 +100,6 @@ void full() {
   Serial.println("no more space on printer");
   digitalWrite(LED_STATUS_PIN, HIGH);
 #ifdef USE_OLED
-  oled_msg("Printer is full!", "Rebooting...");
+  oled_msg("Printer is full!");
 #endif
 }
