@@ -2,6 +2,8 @@
   Initialize File System and SD Card
 *******************************************************************************/
 bool fs_setup() {
+//void fs_setup() {
+  pinMode(SD_CS, OUTPUT);
   spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
 
   FSYS.begin(SD_CS, spiSD);
@@ -36,19 +38,8 @@ bool fs_setup() {
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
-    File root = FSYS.open("/temp");
-    if(!root){
-        Serial.println("- failed to open Temp directory");
-        if(FSYS.mkdir("/temp")){
-            Serial.println("Temp Dir created");
-        } else {
-            Serial.println("mkdir failed");
-        }
-    }else{
-      Serial.println("Temp folder already exist.");
-    }
-  
-    root = FSYS.open("/dumps");
+
+    File root = FSYS.open("/dumps");
     if(!root){
         Serial.println("- failed to open Dump directory");
         if(FSYS.mkdir("/dumps")){
@@ -87,16 +78,19 @@ bool fs_setup() {
   Get Next File Name
 *******************************************************************************/
 unsigned int nextFreeFileIndex() {
-  int totFiles = 0;
-  File root = FSYS.open("/dumps");
-  File file = root.openNextFile();
-  while (file) {
-    if (file) {
-      totFiles++;
+  char path[31];
+  int i = 1;
+  int x = 1;
+  do {
+    sprintf(path, "/dumps/%05d.txt", i);
+    if (!FSYS.exists(path)) {
+      sprintf(path, "/dumps/%05d_%05d.txt", i, x);
+      if(!FSYS.exists(path)){
+        return i;
+      }
     }
-    file = root.openNextFile();
-  }
-  return totFiles + 1;
+    i++;
+  } while(true);
 }
 
 /*******************************************************************************
@@ -106,8 +100,6 @@ void full() {
   Serial.println("no more space on printer");
   digitalWrite(LED_STATUS_PIN, HIGH);
 #ifdef USE_OLED
-  oled_msg("Printer is full!", "Rebooting...");
+  oled_msg("Printer is full!");
 #endif
-  delay(5000);
-  ESP.restart();
 }
