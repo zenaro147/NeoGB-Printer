@@ -1,7 +1,6 @@
 # Yet Another GBP Emulator (NeoGB Printer)
 Yes, it's another Game Boy Printer emulator! The idea is just plug an SD card, print your images using a game compatible with Gameboy Printer and save as BMP image.
 
-
 You can check the compatibility list here: [Game Boy Printer Emulator - Games Support](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
 
 ## Hardware Setup
@@ -78,7 +77,8 @@ PushButton Schematic
 # ToDo List:
 - [x] Update the code to support all games
 - [x] Use the original BMP library from Mofosyne C decompiler
-- [ ] Write the BMP file on SD
+- [X] Write the BMP file on SD
+- [ ] Fix Palette issue with some games
 - [ ] Update documetation (wiring, compatible devices, etc)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 
