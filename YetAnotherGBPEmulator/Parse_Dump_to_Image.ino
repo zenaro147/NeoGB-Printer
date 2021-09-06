@@ -1,6 +1,7 @@
 
 #include "gbp_tiles.h"
 #include "gbp_bmp.h"
+#include "image\bmp_FixedWidthStream.h"
 
 uint8_t pktCounter = 0; // Dev Varible
 
@@ -12,6 +13,9 @@ gbp_tile_t gbp_tiles = {0};
 gbp_bmp_t  gbp_bmp = {0};
 
 static void gbpdecoder_gotByte(const uint8_t bytgb);
+
+File fileBMP;
+char fileBMPPath[40];
 
 /*******************************************************************************
   Convert to BMP
@@ -61,7 +65,8 @@ void ConvertFilesBMP(void *pvParameters)
         sprintf(path, "/dumps/%05d.txt", i);
       }else{
         sprintf(path, "/dumps/%05d_%05d.txt", i, z);
-      }    
+      }
+      sprintf(fileBMPPath, "/output/%05d.bmp", i);
       Serial.println(path);
 
       //Open the file and copy it to the memory
@@ -173,61 +178,111 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
       if (gbp_pktBuff.command == GBP_COMMAND_PRINT)
       {
         const bool cutPaper = ((gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED]&0xF) != 0) ? true : false;  ///< if lower margin is zero, then new pic
+        
         gbp_tiles_print(&gbp_tiles,
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_SHEETS],
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED],
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_PALETTE_VALUE],
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_PRINT_DENSITY]);
-
         // Streaming BMP Writer
         // Dev Note: Done this way to allow for streaming writes to file without a large buffer
   
         // Open New File
-        if (!gbp_bmp_isopen(&gbp_bmp))
+        /*
+         * Precisa criar um arquivo BMP para receber os dados da imagem. (checa antes se o arquivo já existe, para fecha-lo         
+         * ofilenameBuf - Nome do arquivo
+         * GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE - Define a Largura (Valores pre definidos, sempre será 8*20=160)
+         * 
+         * Reserva 54 bytes(espaço) no começo do arquivo
+         * 
+         * Atualiza a Struct gbp_bmp_t (variavel gbp_bmp) com 
+         * bmpSizeWidth = 160
+         * bmpSizeHeight = 0 (será atualizado no fim do processo todo)
+         * soma +1 no fileCounter (acho que não irá precisar disso)
+         * 
+         * AINDA NÃO FECHA O ARQUIVO, SÓ FECHA NO FIM DO PROCESSO TODO... (talvez de para usar o append para escrever os dados da imagem?)
+         */
+        if(!FSYS.exists(fileBMPPath))
         {
-          //gbp_bmp_open(&gbp_bmp, ofilenameBuf, GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE);
-          /*
-           * Precisa criar um arquivo BMP para receber os dados da imagem. (checa antes se o arquivo já existe, para fecha-lo         
-           * ofilenameBuf - Nome do arquivo
-           * GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE - Define a Largura (Valores pre definidos, sempre será 8*20=160)
-           * 
-           * Reserva 54 bytes(espaço) no começo do arquivo
-           * 
-           * Atualiza a Struct gbp_bmp_t (variavel gbp_bmp) com 
-           * bmpSizeWidth = 160
-           * bmpSizeHeight = 0 (será atualizado no fim do processo todo)
-           * soma +1 no fileCounter (acho que não irá precisar disso)
-           * 
-           * AINDA NÃO FECHA O ARQUIVO, SÓ FECHA NO FIM DO PROCESSO TODO... (talvez de para usar o append para escrever os dados da imagem?)
-           */
-        } 
+          fileBMP = FSYS.open(fileBMPPath, "w");
+          if (!fileBMP) {
+            Serial.println("file creation failed");
+          }
+          unsigned char buf[54] = {B01000010,B01001101,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,
+                                  B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,
+                                  B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,
+                                  B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,
+                                  B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,B00000000,
+                                  B00000000,B00000000,B00000000,B00000000};
+          fileBMP.write(buf,54);
+          fileBMP.close();
+
+           // Update
+          gbp_bmp.bmpSizeWidth = GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE;
+          gbp_bmp.bmpSizeHeight = 0;
+          gbp_bmp.fileCounter++;
+        }
   
-        // Write Decode Data Buffer Into BMP
+         // Write Decode Data Buffer Into BMP
+         /*
+         * Envia a Struct, uma linha de tiles, largura fixa (160), o o quanto se deve adicionar na altura, paleta de cores
+         * 
+         * Verifica se a Largura é igual a pre-definida (deve ser 160)
+         * Loop traduz uma linha de tiles em pixels
+         * Escreve no BMP
+         * Soma 8 na altura
+         */
         for (int j = 0; j < gbp_tiles.tileRowOffset; j++)
         {
           const long int tileHeightIncrement = GBP_TILE_PIXEL_HEIGHT*GBP_BMP_MAX_TILE_HEIGHT;
-          //gbp_bmp_add(&gbp_bmp, (const uint8_t *) &gbp_tiles.bmpLineBuffer[tileHeightIncrement*j][0], (GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), tileHeightIncrement, palletColor);
-          /*
-           * Envia a Struct, uma linha de tiles, largura fixa (160), o o quanto se deve adicionar na altura, paleta de cores
-           * 
-           * Verifica se a Largura é igual a pre-definida (deve ser 160)
-           * Loop traduz uma linha de tiles em pixels
-           * Escreve no BMP
-           * Soma 8 na altura
-           */
+          const uint8_t * bmpLineBuffer = &gbp_tiles.bmpLineBuffer[tileHeightIncrement*j][0];
+          
+          // Fixed width
+          if ((GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE) != gbp_bmp.bmpSizeWidth)
+              return;
+      
+          for (uint16_t y = 0; y < tileHeightIncrement; y++)
+          {
+              for (uint16_t x = 0; x < (GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE); x++)
+              {
+                  const int pixel = 0b11 & (bmpLineBuffer[(y * GBP_TILE_2BIT_LINEPACK_ROWSIZE_B((GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE))) + GBP_TILE_2BIT_LINEPACK_INDEX(x)] >> GBP_TILE_2BIT_LINEPACK_BITOFFSET(x));
+                  const unsigned long encodedColor = palletColor[pixel & 0b11];
+                  //printf("bmp_set %d, %d\r\n", x, y);
+                  bmp_set(gbp_bmp.bmpBuffer, (GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), x, y, encodedColor);
+              }
+          }
+      
+          //fwrite(gbp_bmp.bmpBuffer, BMP_PIXEL_BUFF_SIZE((GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), tileHeightIncrement), 1, gbp_bmp.f);
+          gbp_bmp.bmpSizeHeight += tileHeightIncrement;
+                    
+          fileBMP = FSYS.open(fileBMPPath, "a");
+          if (!fileBMP) {
+            Serial.println("file creation failed");
+          }
+          fileBMP.write(gbp_bmp.bmpBuffer,BMP_PIXEL_BUFF_SIZE((GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), tileHeightIncrement));
+          fileBMP.close();
         }
         gbp_tiles_reset(&gbp_tiles); ///< Written to file, clear decoded tile line buffer
   
-        // Print finished and cut requested
+        // Print finished and cut requested        
+        // Rewind and write header with the now known image size
          if (cutPaper)
         {
-          //gbp_bmp_render(&gbp_bmp);
           /*
            * Começa a escrever do começo do arquivo
            * Gera o cabeçalho do BMP (com altura negativa)
            * Escreve o buffer (cabeçalho fixo), com tamanho 54 bytes, 1 item, no arquivo
            * Fecha o arquivo
            */
+          bmp_header(gbp_bmp.bmpBuffer, gbp_bmp.bmpSizeWidth, gbp_bmp.bmpSizeHeight);
+          
+          fileBMP = FSYS.open(fileBMPPath, "r+");
+          fileBMP.seek(0,SeekSet);
+          fileBMP.write(gbp_bmp.bmpBuffer,54);
+      
+          // Close File
+          fileBMP.close();          
+
         }
       }
     }else{

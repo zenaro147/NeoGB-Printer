@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "./image/bmp_FixedWidthStream.h"
+#include "./image/bmp_FixedWidthStream.h" 
 
 
 // Image Rendering
