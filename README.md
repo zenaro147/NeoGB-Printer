@@ -84,6 +84,7 @@ PushButton Schematic
 - [ ] Fix Palette issue with some games
 - [ ] Update documetation (wiring, compatible devices, etc)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
+- [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
 
 # Based on:
 * [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
