@@ -2,7 +2,7 @@
 
 Yes, it's another Game Boy Printer emulator! The idea is just plug an SD card, print your images using a game compatible with Gameboy Printer and save as BMP image.
 
-Currently you need a push a button (pin G34) to parse the images
+Currently, you need a push a button (pin G34 or any other GPIO avaliable. Scroll down to see how to use it) to convert the data to BMP image.
 
 You can check the compatibility list here: [Game Boy Printer Emulator - Games Support](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
 
