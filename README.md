@@ -83,8 +83,8 @@ The display will show the current wifi-config while in server mode, as well as t
 - [x] Use the original BMP library from Mofosyne C decompiler
 - [X] Write the BMP file on SD
 - [X] Fix Palette issue with some games
-- [ ] Handle with storage % instead number of files
-- [ ] Parse the Output directory too, to return the next image ID
+- [X] Handle with storage % instead number of files
+- [X] Parse the Output directory too, to return the next image ID
 - [ ] Update documetation (wiring, compatible devices, etc)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
