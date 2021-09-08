@@ -35,8 +35,10 @@ bool fs_setup() {
         Serial.println("UNKNOWN");
     }
   
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
+    Serial.printf("SD Card Size: %lluMB\n", FSYS.cardSize() / (1024 * 1024));
+    Serial.printf("Total space: %lluMB\n", FSYS.totalBytes() / (1024 * 1024));
+    Serial.printf("Used space: %lluMB\n", FSYS.usedBytes() / (1024 * 1024));
+    
 
 
     File root = FSYS.open("/dumps");
@@ -80,17 +82,30 @@ bool fs_setup() {
 unsigned int nextFreeFileIndex() {
   char path[31];
   int i = 1;
-  int x = 1;
   do {
-    sprintf(path, "/dumps/%05d.txt", i);
-    if (!FSYS.exists(path)) {
-      sprintf(path, "/dumps/%05d_%05d.txt", i, x);
-      if(!FSYS.exists(path)){
-        return i;
+    sprintf(path, "/output/%05d.bmp", i);
+    if(!FSYS.exists(path)){
+      sprintf(path, "/dumps/%05d.txt", i);
+      if (!FSYS.exists(path)) {
+        sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
+        if(!FSYS.exists(path)){
+          return i;
+        }
       }
     }
     i++;
   } while(true);
+}
+
+int fs_info() {
+  uint64_t totalBytes=0;
+  uint64_t usedBytes=0;
+  totalBytes = FSYS.totalBytes();
+  usedBytes = FSYS.usedBytes();   
+  
+  return (int)(
+    (((float)totalBytes - (float)usedBytes) / (float)totalBytes) * 100.0
+  );
 }
 
 /*******************************************************************************

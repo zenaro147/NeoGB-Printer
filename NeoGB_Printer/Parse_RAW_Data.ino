@@ -174,8 +174,9 @@ void storeData(void *pvParameters)
     Serial.printf("File /dumps/%05d.txt written in %lums\n", freeFileIndex, perf);
   }
 
-  //Need to handle with free space remaining
-  if (freeFileIndex < MAX_IMAGES) {
+  //Check how much space still have
+  uint8_t percUsed = fs_info();
+  if (percUsed > 10) {
     if(!setMultiPrint){
       freeFileIndex++;
     }else{    
@@ -184,8 +185,7 @@ void storeData(void *pvParameters)
     resetValues();
     vTaskDelete(NULL); 
   } else {
-    Serial.println("no more space on printer\nrebooting...");
-    full();
+    ESP.restart();
   }
 }
 

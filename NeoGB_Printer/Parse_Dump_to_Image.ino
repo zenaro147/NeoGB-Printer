@@ -32,10 +32,23 @@ void ConvertFilesBMP(void *pvParameters)
   //Create some vars to use in the process
   char path[20];
   int numfiles = 0;
-  uint8_t palettebyte = 0x00;
+  //uint8_t palettebyte = 0x00;  
 
+  //Get the first dump ID
+  char pathcheck1[20];
+  char pathcheck2[20];
+  int firstDumpID = 1;
+  do {
+    sprintf(pathcheck1, "/dumps/%05d.txt", firstDumpID);
+    sprintf(pathcheck2, "/dumps/%05d_%05d.txt", firstDumpID, 1);
+    if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
+      break;
+    }
+    firstDumpID++;
+  } while(true);
+  
   //Loop to check only the availables files based on nextFreeFileIndex function
-  for(int i = 1; i < freeFileIndex; i++){
+  for(int i = firstDumpID; i < freeFileIndex; i++){
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
@@ -66,6 +79,8 @@ void ConvertFilesBMP(void *pvParameters)
         sprintf(path, "/dumps/%05d_%05d.txt", i, z);
       }
       sprintf(fileBMPPath, "/output/%05d.bmp", i);
+
+      
       Serial.print("Parsing File: ");
       Serial.print(path);
       Serial.print(" to ");
@@ -164,6 +179,9 @@ void ConvertFilesBMP(void *pvParameters)
   #else
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
+
+  nextFreeFileIndex();
+  resetValues();
   
   vTaskDelete(NULL);   
 }

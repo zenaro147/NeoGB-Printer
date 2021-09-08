@@ -99,8 +99,13 @@ void setup(void)
   delay(3000);
 
   isFileSystemMounted = fs_setup();
-//  fs_setup();
-//  isFileSystemMounted = true;
+
+  uint8_t percUsed = fs_info();
+  if (percUsed <= 10) {
+    isFileSystemMounted=false;
+    full();
+  }
+
   if(isFileSystemMounted){
     freeFileIndex = nextFreeFileIndex();
 
