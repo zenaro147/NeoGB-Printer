@@ -7,6 +7,7 @@ Currently you need a push a button (pin G34) to parse the images
 You can check the compatibility list here: [Game Boy Printer Emulator - Games Support](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
 
 ## Hardware Setup
+First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
 Gameboy Original/Color Link Cable Pinout
 ```
  __________
