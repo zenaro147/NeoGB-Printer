@@ -8,6 +8,7 @@ You can check the compatibility list here: [Game Boy Printer Emulator - Games Su
 
 ## Hardware Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
+
 Gameboy Original/Color Link Cable Pinout
 ```
  __________
