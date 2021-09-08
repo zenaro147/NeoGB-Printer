@@ -1,4 +1,4 @@
-# Yet Another GBP Emulator (NeoGB Printer)
+# NeoGB Printer
 
 Yes, it's another Game Boy Printer emulator! The idea is just plug an SD card, print your images using a game compatible with Gameboy Printer and save as BMP image.
 
