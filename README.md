@@ -40,20 +40,6 @@ To use it, connect the pins following this schema
 
 ```
 
-
-## OLED Display
-You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
-The display will show the current wifi-config while in server mode, as well as the number of printed images when in printer mode 
-```
-| OLED DISPLAY|   ESP32   |
-|-------------|-----------|
-| GND         | GND       | 
-| VIN         | 5v or 3v3 |
-| SCL         | G22       | <-- YOU CAN USE ANY GPIO AVAILABLE
-| SDA         | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
-
-```
-
 ## Push Button to Manual Merge Files/Reset printer
 You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to manually merge the files. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
@@ -74,6 +60,19 @@ PushButton Schematic
 |--------|-------|
 | 1 or 2 |  3v3  | 
 | 3 or 4 |  G34  | <-- I recommend to coonect a 10K resistor to the GND together, to act as a Pull Down.
+
+```
+
+## OLED Display (optional)
+You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
+The display will show the current wifi-config while in server mode, as well as the number of printed images when in printer mode 
+```
+| OLED DISPLAY|   ESP32   |
+|-------------|-----------|
+| GND         | GND       | 
+| VIN         | 5v or 3v3 |
+| SCL         | G22       | <-- YOU CAN USE ANY GPIO AVAILABLE
+| SDA         | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
 
 ```
 
