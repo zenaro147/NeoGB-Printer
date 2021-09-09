@@ -13,7 +13,7 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
 * It's a Dual Core module (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3);
-* Have, at least, 2 SPI pins gourps [like this example] (https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
+* Have, at least, 2 SPI pins gourps [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
 
 Some boards already have a SD Card slot built in. I never tested using this kind of board, but IN THEORY should works fine (as long as it has SPI pins available). If you want to use this type of board, DO IT AT YOUR OWN RISK!
 
