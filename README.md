@@ -48,11 +48,11 @@ To use it, connect the pins following this schema
 ```
 
 ## Push Button to Manual Merge Files/Reset printer
-You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to manually merge the files. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
+You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
-* Single press: Force to merge files when a long print is detected
-* Long Press: Convert all dumps to BMP
+* Single press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`)
+* Long Press: Convert all RAW data to BMP
 
 ```
 PushButton Schematic
