@@ -1,10 +1,12 @@
 # NeoGB Printer
 
-Yes, it's another Game Boy Printer emulator! The idea is just plug an SD card, print your images using a game compatible with Gameboy Printer and save as BMP image.
+The main goal of Neo Printer is keep many simple as possible to the end user. Since the building to it's use.
 
-Currently, you need a push a button (pin G34 or any other GPIO avaliable. Scroll down to see how to use it) to convert the data to BMP image.
+You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image from [any game compatible with the original Game Boy Printer](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
 
-You can check the compatibility list here: [Game Boy Printer Emulator - Games Support](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
+Once you finish to print all your images, hold the button (see below) for a few seconds and all your images will be converted to BMP
+
+This project is very similar to a popular solution available to buy. But this project is open source and have compatibility with all 107 games available with support for the Original Gameboy Printer.
 
 ## Hardware Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
