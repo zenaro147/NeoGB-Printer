@@ -47,7 +47,7 @@ To use it, connect the pins following this schema
 
 ```
 
-## Push Button to Manual Merge Files/Reset printer
+## Push Button
 You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
