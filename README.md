@@ -26,12 +26,12 @@ Gameboy Original/Color Link Cable Pinout
 
 | Link Cable |  ESP32  |
 |------------|---------|
-| Pin 1      | Any pin | 
-| Pin 2      | G19     |
-| Pin 3      | G23     |
-| Pin 4      |   N/A   |
-| Pin 5      | G18     |
-| Pin 6      | G       |
+| Pin 1      |   N/A   | <- 5v 
+| Pin 2      | G19     | <- Serial Out (Serial In at the other end of the cable)
+| Pin 3      | G23     | <- Serial In (Serial Out at the other end of the cable)
+| Pin 4      |   N/A   | <- Serial Data
+| Pin 5      | G18     | <- Clock Out
+| Pin 6      | G       | <- GND
 
 ```
 
