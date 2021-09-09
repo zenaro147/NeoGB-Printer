@@ -9,11 +9,11 @@ Once you finish to print all your images, hold the button (see below) for a few 
 This project is very similar to a popular solution available to buy. But this project is open source and have compatibility with all 107 games available with support for the Original Gameboy Printer.
 
 ## Software Setup
+First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
+
 (TO DO)
 
 ## Hardware Setup
-First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
-
 Gameboy Original/Color Link Cable Pinout
 ```
  __________
