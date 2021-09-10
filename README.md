@@ -13,7 +13,7 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 
 This file contains all the options that can be changed in the emulator. Customize it according to the board and modules you are using.
 
-It's all you need.
+To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended follow the instructions to install via Boards Manager.
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
