@@ -2,15 +2,20 @@
 
 The main goal of Neo Printer is keep many simple as possible to the end user. Since the building to it's use.
 
-You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image from [any game compatible with the original Game Boy Printer](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0)
+This project is very similar to a popular solution available to buy, but the NeoGB Printer is an open-source and standalone Gameboy Printer emulator 100% compatible with [all officially released games (110 in total)](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer)
 
-Once you finish to print all your images, hold the button (see below) for a few seconds and all your images will be converted to BMP
+You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game
 
-This project is very similar to a popular solution available to buy. But this project is open source and have compatibility with all official released games available with support for the Original Gameboy Printer.
+Once you finish to print all your images you want, hold the button (see below) for a few seconds and all your images will be converted to BMP
 
 ## Software Setup
-First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings
+First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings.
 
+This file contains all the options that can be changed in the emulator. Customize it according to the board and modules you are using.
+
+It's all you need.
+
+## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
 * The number of total pins available in the board doesn't matter (Could be with 30 pins, 36 pins, 38 pins, whatever)
 * It's a Dual Core module (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
@@ -99,6 +104,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Handle with storage % instead number of files
 - [X] Parse the Output directory too, to return the next image ID
 - [X] Update documetation (wiring, compatible devices, etc)
+- [ ] Make a LED Status
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
 
