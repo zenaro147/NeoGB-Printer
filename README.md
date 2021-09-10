@@ -98,7 +98,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Fix Palette issue with some games
 - [X] Handle with storage % instead number of files
 - [X] Parse the Output directory too, to return the next image ID
-- [ ] Update documetation (wiring, compatible devices, etc)
+- [X] Update documetation (wiring, compatible devices, etc)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
 
