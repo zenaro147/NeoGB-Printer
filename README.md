@@ -88,6 +88,9 @@ The display will show the current wifi-config while in server mode, as well as t
 
 ```
 
+### ⚠ Take care ⚠
+You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
+
 # ToDo List:
 - [x] Update the code to support all games
 - [x] Use the original BMP library from Mofosyne C decompiler
