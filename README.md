@@ -6,7 +6,7 @@ This project is very similar to a popular solution available to buy, but the Neo
 
 You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game
 
-Once you finish to print all your images you want, hold the button (see below) for a few seconds and all your images will be converted to BMP
+Once you finish to print all your images you want, hold the button (see below) for a few seconds and all your images will be converted to BMP image
 
 ## Software Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings.
