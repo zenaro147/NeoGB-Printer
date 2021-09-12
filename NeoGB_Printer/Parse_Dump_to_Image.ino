@@ -32,7 +32,6 @@ void ConvertFilesBMP(void *pvParameters)
   //Create some vars to use in the process
   char path[20];
   int numfiles = 0;
-  //uint8_t palettebyte = 0x00;  
 
   //Get the first dump ID
   char pathcheck1[20];
@@ -97,61 +96,7 @@ void ConvertFilesBMP(void *pvParameters)
       }
       file.close();
       FSYS.remove(path);
-      
-      //Find the Palette value present in PRINT command
-//      for(int bytePos=0; bytePos < img_index; bytePos++){
-//        if(image_data[bytePos] == B10001000 && image_data[bytePos+1] == B00110011 && image_data[bytePos+2] == B00000010){
-//          palettebyte = ((int)image_data[bytePos+8]);
-//          Serial.println(palettebyte);
-//          break; //After find, exit from this loop
-//        }
-//      }
-      
-      //Parse the palette byte found previously from int to binary (as char array)
-//      uint8_t bitsCount = sizeof(palettebyte) * 8;
-//      char str[ bitsCount + 1 ];
-//      uint8_t strcount = 0;
-//      while ( bitsCount-- )
-//          str[strcount++] = bitRead( palettebyte, bitsCount ) + '0';
-//      str[strcount] = '\0';
-
-      //Update the palletColor with the palette values
-//      for(int palPos=0; palPos <= 3; palPos++){
-//        char resultbytes[2];
-//        switch (palPos) {
-//          case 0:
-//            sprintf(resultbytes, "%c%c", str[0],str[1]);
-//            break;
-//          case 1:
-//            sprintf(resultbytes, "%c%c", str[2],str[3]);
-//            break;
-//          case 2:
-//            sprintf(resultbytes, "%c%c", str[4],str[5]);
-//            break;
-//          case 3:
-//            sprin tf(resultbytes, "%c%c", str[6],str[7]);
-//            break;
-//          default:
-//            break;
-//        }
-//        switch (atoi(resultbytes)) {
-//          case 0:
-//            palletColor[palPos] = {0x000000};
-//            break;
-//          case 1:
-//            palletColor[palPos] = {0x555555};
-//            break;
-//          case 10:
-//            palletColor[palPos] = {0xAAAAAA};
-//            break;
-//          case 11:
-//            palletColor[palPos] = {0xFFFFFF};
-//            break;
-//          default:
-//            break;
-//        }    
-//      }
-      
+           
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){
         gbpdecoder_gotByte(image_data[bytePos]);       
@@ -171,6 +116,7 @@ void ConvertFilesBMP(void *pvParameters)
   numfiles=0; 
   isConverting = false;
   #ifdef USE_OLED
+    isShowingSplash = true;
     oled_drawSplashScreen();
   #endif
 
@@ -179,8 +125,8 @@ void ConvertFilesBMP(void *pvParameters)
   #else
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
-
-  nextFreeFileIndex();
+  
+  callNextFile();
   resetValues();
   
   vTaskDelete(NULL);   
@@ -207,20 +153,6 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
         // Dev Note: Done this way to allow for streaming writes to file without a large buffer
   
         // Open New File
-        /*
-         * Precisa criar um arquivo BMP para receber os dados da imagem. (checa antes se o arquivo já existe, para fecha-lo         
-         * ofilenameBuf - Nome do arquivo
-         * GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE - Define a Largura (Valores pre definidos, sempre será 8*20=160)
-         * 
-         * Reserva 54 bytes(espaço) no começo do arquivo
-         * 
-         * Atualiza a Struct gbp_bmp_t (variavel gbp_bmp) com 
-         * bmpSizeWidth = 160
-         * bmpSizeHeight = 0 (será atualizado no fim do processo todo)
-         * soma +1 no fileCounter (acho que não irá precisar disso)
-         * 
-         * AINDA NÃO FECHA O ARQUIVO, SÓ FECHA NO FIM DO PROCESSO TODO... (talvez de para usar o append para escrever os dados da imagem?)
-         */
         if(!FSYS.exists(fileBMPPath))
         {
           fileBMP = FSYS.open(fileBMPPath, "w");
@@ -243,14 +175,6 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
         }
   
          // Write Decode Data Buffer Into BMP
-         /*
-         * Envia a Struct, uma linha de tiles, largura fixa (160), o o quanto se deve adicionar na altura, paleta de cores
-         * 
-         * Verifica se a Largura é igual a pre-definida (deve ser 160)
-         * Loop traduz uma linha de tiles em pixels
-         * Escreve no BMP
-         * Soma 8 na altura
-         */
         for (int j = 0; j < gbp_tiles.tileRowOffset; j++)
         {
           const long int tileHeightIncrement = GBP_TILE_PIXEL_HEIGHT*GBP_BMP_MAX_TILE_HEIGHT;
@@ -270,8 +194,7 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
                   bmp_set(gbp_bmp.bmpBuffer, (GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), x, y, encodedColor);
               }
           }
-      
-          //fwrite(gbp_bmp.bmpBuffer, BMP_PIXEL_BUFF_SIZE((GBP_TILE_PIXEL_WIDTH*GBP_TILES_PER_LINE), tileHeightIncrement), 1, gbp_bmp.f);
+
           gbp_bmp.bmpSizeHeight += tileHeightIncrement;
                     
           fileBMP = FSYS.open(fileBMPPath, "a");
@@ -285,14 +208,8 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
   
         // Print finished and cut requested        
         // Rewind and write header with the now known image size
-         if (cutPaper)
+        if (cutPaper)
         {
-          /*
-           * Começa a escrever do começo do arquivo
-           * Gera o cabeçalho do BMP (com altura negativa)
-           * Escreve o buffer (cabeçalho fixo), com tamanho 54 bytes, 1 item, no arquivo
-           * Fecha o arquivo
-           */
           bmp_header(gbp_bmp.bmpBuffer, gbp_bmp.bmpSizeWidth, gbp_bmp.bmpSizeHeight);
           
           fileBMP = FSYS.open(fileBMPPath, "r+");

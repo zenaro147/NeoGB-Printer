@@ -82,6 +82,8 @@ bool fs_setup() {
 unsigned int nextFreeFileIndex() {
   char path[31];
   int i = 1;
+  dumpCount=0;
+  imgCount=0;
   do {
     sprintf(path, "/output/%05d.bmp", i);
     if(!FSYS.exists(path)){
@@ -90,13 +92,22 @@ unsigned int nextFreeFileIndex() {
         sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
         if(!FSYS.exists(path)){
           return i;
+        }else{
+          dumpCount++;
         }
+      }else{
+        dumpCount++;
       }
+    }else{
+      imgCount++;
     }
     i++;
   } while(true);
 }
 
+/*******************************************************************************
+  Get the store usage
+*******************************************************************************/
 int fs_info() {
   uint64_t totalBytes=0;
   uint64_t usedBytes=0;

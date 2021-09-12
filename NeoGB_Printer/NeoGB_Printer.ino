@@ -45,6 +45,9 @@ bool isFileSystemMounted = false;
 unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
 
+unsigned int dumpCount = 0;
+unsigned int imgCount = 0;
+
 bool setMultiPrint = false;
 unsigned int totalMultiImages = 1;
 
@@ -99,15 +102,16 @@ void setup(void)
   delay(3000);
 
   isFileSystemMounted = fs_setup();
-
   uint8_t percUsed = fs_info();
   if (percUsed <= 10) {
     isFileSystemMounted=false;
     full();
   }
-
+ 
   if(isFileSystemMounted){
     freeFileIndex = nextFreeFileIndex();
+    Serial.printf("RAW Files: %u files\n", dumpCount);
+    Serial.printf("BMP Files: %u files\n", imgCount);
 
     /* Pins from gameboy link cable */
     pinMode(GBP_SC_PIN, INPUT);
@@ -151,15 +155,9 @@ void loop(){
         // Timeout code
         Serial.println("Printer Timeout");
         digitalWrite(LED_STATUS_PIN, LOW);
-  
-          if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-//            #ifdef USE_OLED
-//              oled_msg("Long Print detected","Merging Files...");
-//            #endif
-            isWriting = true;
-            callFileMerger();
-//            gpb_mergeMultiPrint(); 
-          }
+        if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
+          callNextFile();
+        }
       }
     }
     last_millis = curr_millis;  
@@ -174,19 +172,19 @@ void loop(){
         if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {  
           longPressActive = true;
           //Long press to convert to BMP
-          if (!isConverting && (freeFileIndex-1) > 0){
+          if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
             Serial.println("Converting to BMP");
             isConverting = true;              
             #ifdef USE_OLED
               oled_msg("Saving BMP Image...");
             #endif
-              xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
-                                      "ConvertFilesBMP",      // name of task. 
-                                      20000,                  // Stack size of task 
-                                      NULL,                   // parameter of the task 
-                                      1,                      // priority of the task 
-                                      &TaskWriteImage,        // Task handle to keep track of created task 
-                                      0);                     // pin task to core 0         
+            xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
+                                    "ConvertFilesBMP",      // name of task. 
+                                    20000,                  // Stack size of task 
+                                    NULL,                   // parameter of the task 
+                                    1,                      // priority of the task 
+                                    &TaskWriteImage,        // Task handle to keep track of created task 
+                                    0);                     // pin task to core 0         
           }
         }  
       } else {  
@@ -195,53 +193,17 @@ void loop(){
             longPressActive = false;  
           } else {
             if((totalMultiImages-1) > 1){
-//              Serial.println("Force File Merger");
-//              #ifdef USE_OLED
-//                oled_msg("Force Merging Files...");
-//              #endif
-              isWriting = true;
-//              totalMultiImages--;
-              callFileMerger();
-//              gpb_mergeMultiPrint();
+              Serial.println("Get next file ID");
+              #ifdef USE_OLED
+                oled_msg("Getting next file ID");
+              #endif
+              callNextFile();
             }
           }  
           buttonActive = false;  
         }  
       }
     }
+    
   }
-  
-
-  // Diagnostics Console
-  while (Serial.available() > 0)
-  {
-    switch (Serial.read())
-    {
-      case 'd':
-        clearDumps();
-        break;
-    }
-  };
-} // loop()
-
-
-/*******************************************************************************
-   DEBUG
-*******************************************************************************/
-void clearDumps() {
-  unsigned int dumpcount = 0;
-  File dumpDir = FSYS.open("/dumps");    
-  File file = dumpDir.openNextFile();
-
-  char filename[12]; 
-
-  while(file) {
-    sprintf(filename, "/dumps/%s", file.name());
-    dumpcount++;    
-    file = dumpDir.openNextFile();
-    FSYS.remove(filename);
-  } 
-  Serial.println(((String)dumpcount) + " images deleted on DUMPS");
-  
-  nextFreeFileIndex();
 }
