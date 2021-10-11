@@ -25,7 +25,6 @@ void resetValues() {
   dtpck = 0x00;
   inqypck = 0x00;
   
-  isPrinting = false;
   isWriting = false;
 }
 
@@ -51,12 +50,9 @@ inline void gbp_packet_capture_loop() {
       if (pktByteIndex == 0) {
         pktDataLength = gbp_serial_io_dataBuff_getByte_Peek(4);
         pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5) << 8) & 0xFF00;
-
+        
         #ifdef USE_OLED
-          if (!isPrinting) {
-            isPrinting = true;
-            oled_msg("Receiving Data...");
-          }
+          oledStateChange(4); //HEX to TXT
         #endif
 
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
@@ -149,10 +145,6 @@ void storeData(void *pvParameters)
   
   digitalWrite(LED_STATUS_PIN, LOW);
 
-  #ifdef USE_OLED
-    oled_msg("Saving RAW file...");
-  #endif
-
   if(setMultiPrint || totalMultiImages > 1){
     sprintf(fileName, "/dumps/%05d_%05d.txt", freeFileIndex,totalMultiImages);
   }else{
@@ -185,7 +177,7 @@ void storeData(void *pvParameters)
     resetValues();
     vTaskDelete(NULL); 
   } else {
-    ESP.restart();
+    full();
   }
 }
 
@@ -199,9 +191,4 @@ void callNextFile(){
   
   memset(image_data, 0x00, sizeof(image_data));
   img_index = 0;
-  
-  #ifdef USE_OLED
-    isShowingSplash = true;
-    oled_drawSplashScreen();
-  #endif  
 }

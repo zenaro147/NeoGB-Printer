@@ -115,19 +115,21 @@ void ConvertFilesBMP(void *pvParameters)
 
   numfiles=0; 
   isConverting = false;
-  #ifdef USE_OLED
-    isShowingSplash = true;
-    oled_drawSplashScreen();
-  #endif
-
+  
+  callNextFile();
+  resetValues();
+  
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
   #else
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
   
-  callNextFile();
-  resetValues();
+  #ifdef USE_OLED
+    delay(1000);
+    oledStateChange(1); //Printer Idle
+    delay(1000);
+  #endif
   
   vTaskDelete(NULL);   
 }

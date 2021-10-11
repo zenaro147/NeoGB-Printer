@@ -36,7 +36,6 @@ boolean longPressActive = false;
 byte image_data[6000] = {}; // 1GBC Picute (5.874)
 uint32_t img_index = 0x00;
 
-bool isPrinting = false;
 bool isWriting = false;
 bool isConverting = false;
 
@@ -50,8 +49,6 @@ unsigned int imgCount = 0;
 
 bool setMultiPrint = false;
 unsigned int totalMultiImages = 1;
-
-bool isShowingSplash = false;
 
 TaskHandle_t TaskWriteImage;
 
@@ -98,17 +95,17 @@ void setup(void)
   /* Setup File System and OLED*/
 #ifdef USE_OLED
   oled_setup();
+  oledStateChange(0); //Splash Screen
 #endif
   delay(3000);
 
   isFileSystemMounted = fs_setup();
-  uint8_t percUsed = fs_info();
-  if (percUsed <= 10) {
-    isFileSystemMounted=false;
-    full();
-  }
- 
   if(isFileSystemMounted){
+    uint8_t percUsed = fs_info();
+    if (percUsed <= 10) {
+      isFileSystemMounted=false;
+      full();
+    }
     freeFileIndex = nextFreeFileIndex();
     Serial.printf("RAW Files: %u files\n", dumpCount);
     Serial.printf("BMP Files: %u files\n", imgCount);
@@ -139,6 +136,14 @@ void setup(void)
     #endif
   
     gbp_pkt_init(&gbp_pktBuff);
+
+    #ifdef USE_OLED
+      oledStateChange(1); //Printer Idle
+    #endif
+  }else{
+    #ifdef USE_OLED
+      oledStateChange(2); //SD Init Error
+    #endif
   }
 }
 
@@ -158,6 +163,9 @@ void loop(){
         if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
           callNextFile();
         }
+        #ifdef USE_OLED
+          oledStateChange(1); //Printer Idle
+        #endif  
       }
     }
     last_millis = curr_millis;  
@@ -176,7 +184,7 @@ void loop(){
             Serial.println("Converting to BMP");
             isConverting = true;              
             #ifdef USE_OLED
-              oled_msg("Saving BMP Image...");
+              oledStateChange(5); //Converting to Image
             #endif
             xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
                                     "ConvertFilesBMP",      // name of task. 
@@ -195,7 +203,8 @@ void loop(){
             if((totalMultiImages-1) > 1){
               Serial.println("Get next file ID");
               #ifdef USE_OLED
-                oled_msg("Getting next file ID");
+                oledStateChange(7); //Force Next File
+                delay(2000);
               #endif
               callNextFile();
             }

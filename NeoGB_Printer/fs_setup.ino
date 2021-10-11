@@ -9,19 +9,12 @@ bool fs_setup() {
   FSYS.begin(SD_CS, spiSD);
   if (!FSYS.begin(true)) {
     Serial.println("SD Card Mount Failed");
-    #ifdef USE_OLED
-      oled_msg("ERROR", "Can't init FileSystem");
-    #endif
     return false;
   }else{
     uint8_t cardType = SD.cardType();
     if(cardType == CARD_NONE){
         Serial.println("No SD card attached");
-        #ifdef USE_OLED
-          oled_msg("No SD Card","Rebooting...");
-        #endif
-        delay(3000);
-        ESP.restart();
+        return false;
     }
   
     Serial.print("SD Card Type: ");
@@ -39,8 +32,6 @@ bool fs_setup() {
     Serial.printf("Total space: %lluMB\n", FSYS.totalBytes() / (1024 * 1024));
     Serial.printf("Used space: %lluMB\n", FSYS.usedBytes() / (1024 * 1024));
     
-
-
     File root = FSYS.open("/dumps");
     if(!root){
         Serial.println("- failed to open Dump directory");
@@ -126,6 +117,6 @@ void full() {
   Serial.println("no more space on printer");
   digitalWrite(LED_STATUS_PIN, HIGH);
 #ifdef USE_OLED
-  oled_msg("Printer is full!");
+  oledStateChange(3); //Printer Full
 #endif
 }
