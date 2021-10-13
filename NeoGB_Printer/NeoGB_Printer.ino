@@ -180,19 +180,21 @@ void loop(){
         if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {  
           longPressActive = true;
           //Long press to convert to BMP
+          delay(500);
           if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
             Serial.println("Converting to BMP");
             isConverting = true;              
             #ifdef USE_OLED
               oledStateChange(5); //Converting to Image
             #endif
-            xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
-                                    "ConvertFilesBMP",      // name of task. 
-                                    20000,                  // Stack size of task 
-                                    NULL,                   // parameter of the task 
-                                    1,                      // priority of the task 
-                                    &TaskWriteImage,        // Task handle to keep track of created task 
-                                    0);                     // pin task to core 0         
+            ConvertFilesBMP();
+//            xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
+//                                    "ConvertFilesBMP",      // name of task. 
+//                                    20000,                  // Stack size of task 
+//                                    NULL,                   // parameter of the task 
+//                                    1,                      // priority of the task 
+//                                    &TaskWriteImage,        // Task handle to keep track of created task 
+//                                    0);                     // pin task to core 0         
           }
         }  
       } else {  
@@ -200,6 +202,7 @@ void loop(){
           if (longPressActive == true) {
             longPressActive = false;  
           } else {
+            delay(500);
             if((totalMultiImages-1) > 1){
               Serial.println("Get next file ID");
               #ifdef USE_OLED
@@ -207,6 +210,9 @@ void loop(){
                 delay(2000);
               #endif
               callNextFile();
+              #ifdef USE_OLED
+                oledStateChange(1); //Printer Idle
+              #endif
             }
           }  
           buttonActive = false;  

@@ -56,6 +56,10 @@ inline void gbp_packet_capture_loop() {
         #endif
 
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
+//        Serial.print("Get Header: ");
+//        Serial.print(chkHeader);      
+//        Serial.print(" - ");
+//        Serial.println(isWriting);
 
         switch (chkHeader) {
           case 1:
@@ -86,12 +90,17 @@ inline void gbp_packet_capture_loop() {
           default:
             break;
         } 
-        
+//        Serial.print("// ");
+//        Serial.print(pktTotalCount);
+//        Serial.print(" : ");
+//        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
 
       // Print Hex Byte
       data_8bit = gbp_serial_io_dataBuff_getByte();
+//      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
+//      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
 
       if (!isWriting){
         if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
@@ -102,12 +111,16 @@ inline void gbp_packet_capture_loop() {
           } 
         }
       }
-
+      
       if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
         digitalWrite(LED_STATUS_PIN, LOW);
+//        Serial.print(chkHeader);
+//        Serial.print(" - ");
+//        Serial.println(isWriting);
         if (chkHeader == 2 && !isWriting) {
+//          Serial.println("Enter Here");
           isWriting=true;
-          if((cmdPRNT == 0 || ((cmdPRNT == 3 && dtpck == 1) || (cmdPRNT == 1 && dtpck == 6))) && !setMultiPrint){
+          if((cmdPRNT == 0 || ((cmdPRNT == 3 && dtpck == 1) || (cmdPRNT == 1 && dtpck == 1) || (cmdPRNT == 1 && dtpck == 6))) && !setMultiPrint){
             setMultiPrint=true;
             dtpck=0x00;
           }else if(cmdPRNT > 0 && setMultiPrint){
@@ -123,9 +136,11 @@ inline void gbp_packet_capture_loop() {
                                   0);                   // pin task to core 0 
           memset(image_data, 0x00, sizeof(image_data));
         }
+//        Serial.println("");
         pktByteIndex = 0;
         pktTotalCount++;
       } else {
+//        Serial.print((char)' ');
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }
@@ -138,10 +153,12 @@ inline void gbp_packet_capture_loop() {
 *******************************************************************************/
 void storeData(void *pvParameters)
 {
+//  Serial.println("Enter StoreFile");
   unsigned long perf = millis();
   byte *image_data2 = ((byte*)pvParameters);
   int img_index2=img_index;
   char fileName[31];
+  byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};
   
   digitalWrite(LED_STATUS_PIN, LOW);
 
@@ -156,6 +173,7 @@ void storeData(void *pvParameters)
     Serial.println("file creation failed");
   }
   file.write(image_data2, img_index2);
+  file.write(inqypck, 10);
   file.close();
 
   perf = millis() - perf;

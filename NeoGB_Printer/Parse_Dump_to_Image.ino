@@ -17,10 +17,14 @@ static void gbpdecoder_gotByte(const uint8_t bytgb);
 File fileBMP;
 char fileBMPPath[40];
 
+uint8_t numfiles = 0;
+uint8_t actualfile = 0;
+
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
-void ConvertFilesBMP(void *pvParameters)
+void ConvertFilesBMP()
+//void ConvertFilesBMP(void *pvParameters)
 {
   //Remove the interrupt to prevent receive data from Gameboy
   detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
@@ -31,7 +35,6 @@ void ConvertFilesBMP(void *pvParameters)
 
   //Create some vars to use in the process
   char path[20];
-  int numfiles = 0;
 
   //Get the first dump ID
   char pathcheck1[20];
@@ -71,6 +74,7 @@ void ConvertFilesBMP(void *pvParameters)
 
     // Loop to parse the files based on the previous results
     for (int z = 1; z <= numfiles; z++){
+      actualfile = z;
       //Check if is a single file or a long print
       if (numfiles == 1){
         sprintf(path, "/dumps/%05d.txt", i);
@@ -95,7 +99,7 @@ void ConvertFilesBMP(void *pvParameters)
         img_index++;
       }
       file.close();
-      FSYS.remove(path);
+      //FSYS.remove(path);
            
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){
@@ -111,13 +115,18 @@ void ConvertFilesBMP(void *pvParameters)
     }
     //Reset the counter for the number of files 
     numfiles=0;
+    actualfile=0;
   }
 
   numfiles=0; 
+  actualfile=0;
   isConverting = false;
   
   callNextFile();
-  resetValues();
+
+  #ifdef USE_OLED
+    oledStateChange(1); //Printer Idle
+  #endif
   
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
@@ -125,13 +134,7 @@ void ConvertFilesBMP(void *pvParameters)
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
   #endif
   
-  #ifdef USE_OLED
-    delay(1000);
-    oledStateChange(1); //Printer Idle
-    delay(1000);
-  #endif
-  
-  vTaskDelete(NULL);   
+//  vTaskDelete(NULL);   
 }
   
 /*******************************************************************************
@@ -143,9 +146,7 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
     {
       pktCounter++;
       if (gbp_pktBuff.command == GBP_COMMAND_PRINT)
-      {
-        const bool cutPaper = ((gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED]&0xF) != 0) ? true : false;  ///< if lower margin is zero, then new pic
-        
+      {        
         gbp_tiles_print(&gbp_tiles,
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_SHEETS],
             gbp_pktbuff[GBP_PRINT_INSTRUCT_INDEX_NUM_OF_LINEFEED],
@@ -210,7 +211,7 @@ void gbpdecoder_gotByte(const uint8_t bytgb){
   
         // Print finished and cut requested        
         // Rewind and write header with the now known image size
-        if (cutPaper)
+        if (actualfile == numfiles)
         {
           bmp_header(gbp_bmp.bmpBuffer, gbp_bmp.bmpSizeWidth, gbp_bmp.bmpSizeHeight);
           
