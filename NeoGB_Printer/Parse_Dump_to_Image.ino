@@ -99,7 +99,7 @@ void ConvertFilesBMP()
         img_index++;
       }
       file.close();
-      //FSYS.remove(path);
+      FSYS.remove(path);
            
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){
