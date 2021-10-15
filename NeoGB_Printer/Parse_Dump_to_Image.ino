@@ -20,6 +20,8 @@ char fileBMPPath[40];
 uint8_t numfiles = 0;
 uint8_t actualfile = 0;
 
+uint8_t palettebyte = 0x00;
+
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
@@ -100,6 +102,73 @@ void ConvertFilesBMP()
       }
       file.close();
       FSYS.remove(path);
+
+      //Find the Palette value present in PRINT command
+      for(int bytePos=0; bytePos < img_index; bytePos++){
+        if(image_data[bytePos] == B10001000 && image_data[bytePos+1] == B00110011 && image_data[bytePos+2] == B00000010){
+          palettebyte = ((int)image_data[bytePos+8]);
+          //Force default palatte when palette is 0
+          if (palettebyte == 0){
+            palettebyte = 228;
+          }
+          break; //After find, exit from this loop
+        }
+      }
+
+      //Parse the palette byte found previously from int to binary (as char array)
+      uint8_t bitsCount = sizeof(palettebyte) * 8;
+      char str[ bitsCount + 1 ];
+      uint8_t strcount = 0;
+      while ( bitsCount-- )
+          str[strcount++] = bitRead( palettebyte, bitsCount ) + '0';
+      str[strcount] = '\0';
+
+      //Update the palletColor with the palette values
+      for(int palPos=0; palPos <= 3; palPos++){
+        char resultbytes[2];
+        switch (palPos) {
+          case 0:
+            sprintf(resultbytes, "%c%c", str[0],str[1]);
+            break;
+          case 1:
+            sprintf(resultbytes, "%c%c", str[2],str[3]);
+            break;
+          case 2:
+            sprintf(resultbytes, "%c%c", str[4],str[5]);
+            break;
+          case 3:
+            sprintf(resultbytes, "%c%c", str[6],str[7]);
+            break;
+          default:
+            break;
+        }
+        switch (atoi(resultbytes)) {
+          case 0:
+            palletColor[palPos] = {0x000000};
+            break;
+          case 1:
+            palletColor[palPos] = {0x555555};
+            break;
+          case 10:
+            palletColor[palPos] = {0xAAAAAA};
+            break;
+          case 11:
+            palletColor[palPos] = {0xFFFFFF};
+            break;
+          default:
+            break;
+        }    
+      }
+      
+      Serial.print("Palette to Apply");
+      Serial.println(palettebyte);
+      Serial.print(palletColor[0]);
+      Serial.print(" - ");
+      Serial.print(palletColor[1]);
+      Serial.print(" - ");
+      Serial.print(palletColor[2]);
+      Serial.print(" - ");
+      Serial.println(palletColor[3]); 
            
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){

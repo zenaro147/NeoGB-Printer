@@ -180,10 +180,10 @@ void loop(){
         if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {  
           longPressActive = true;
           //Long press to convert to BMP
-          delay(500);
           if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
             Serial.println("Converting to BMP");
-            isConverting = true;              
+            isConverting = true;
+            delay(2000);              
             #ifdef USE_OLED
               oledStateChange(5); //Converting to Image
             #endif
