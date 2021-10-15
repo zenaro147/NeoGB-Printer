@@ -160,8 +160,9 @@ void ConvertFilesBMP()
         }    
       }
       
-      Serial.print("Palette to Apply");
+      Serial.print("Palette to Apply: ");
       Serial.println(palettebyte);
+      Serial.println(str);
       Serial.print(palletColor[0]);
       Serial.print(" - ");
       Serial.print(palletColor[1]);
