@@ -56,10 +56,10 @@ inline void gbp_packet_capture_loop() {
         #endif
 
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
-//        Serial.print("Get Header: ");
-//        Serial.print(chkHeader);      
-//        Serial.print(" - ");
-//        Serial.println(isWriting);
+        Serial.print("Get Header: ");
+        Serial.print(chkHeader);      
+        Serial.print(" - ");
+        Serial.println(isWriting);
 
         switch (chkHeader) {
           case 1:
@@ -90,17 +90,17 @@ inline void gbp_packet_capture_loop() {
           default:
             break;
         } 
-//        Serial.print("// ");
-//        Serial.print(pktTotalCount);
-//        Serial.print(" : ");
-//        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
+        Serial.print("// ");
+        Serial.print(pktTotalCount);
+        Serial.print(" : ");
+        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
 
       // Print Hex Byte
       data_8bit = gbp_serial_io_dataBuff_getByte();
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
+      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
+      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
 
       if (!isWriting){
         if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
@@ -114,11 +114,8 @@ inline void gbp_packet_capture_loop() {
       
       if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
         digitalWrite(LED_STATUS_PIN, LOW);
-//        Serial.print(chkHeader);
-//        Serial.print(" - ");
-//        Serial.println(isWriting);
         if (chkHeader == 2 && !isWriting) {
-//          Serial.println("Enter Here");
+          Serial.println("Enter Here to Write");
           isWriting=true;
           if((cmdPRNT == 0 || ((cmdPRNT == 3 && dtpck == 1) || (cmdPRNT == 1 && dtpck == 1) || (cmdPRNT == 1 && dtpck == 6))) && !setMultiPrint){
             setMultiPrint=true;
@@ -136,11 +133,11 @@ inline void gbp_packet_capture_loop() {
                                   0);                   // pin task to core 0 
           memset(image_data, 0x00, sizeof(image_data));
         }
-//        Serial.println("");
+        Serial.println("");
         pktByteIndex = 0;
         pktTotalCount++;
       } else {
-//        Serial.print((char)' ');
+        Serial.print((char)' ');
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }

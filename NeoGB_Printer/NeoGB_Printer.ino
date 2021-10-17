@@ -183,11 +183,24 @@ void loop(){
           if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
             Serial.println("Converting to BMP");
             isConverting = true;
-            delay(2000);              
+            
             #ifdef USE_OLED
               oledStateChange(5); //Converting to Image
             #endif
+            digitalWrite(LED_STATUS_PIN, HIGH);
+            delay(100);
+            digitalWrite(LED_STATUS_PIN, LOW);
+            delay(100);
+            digitalWrite(LED_STATUS_PIN, HIGH);
+
+            delay(2000);
             ConvertFilesBMP();
+
+            digitalWrite(LED_STATUS_PIN, LOW);
+            delay(100);
+            digitalWrite(LED_STATUS_PIN, HIGH);
+            delay(100);
+            digitalWrite(LED_STATUS_PIN, LOW);
 //            xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
 //                                    "ConvertFilesBMP",      // name of task. 
 //                                    20000,                  // Stack size of task 
@@ -219,6 +232,5 @@ void loop(){
         }  
       }
     }
-    
   }
 }

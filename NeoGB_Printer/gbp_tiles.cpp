@@ -25,6 +25,7 @@
 #include <stdint.h> // uint8_t
 #include <stddef.h> // size_t
 #include <stdbool.h> // bool
+
 #include "gameboy_printer_protocol.h"
 #include "gbp_tiles.h"
 
@@ -92,10 +93,11 @@ void gbp_tiles_reset(gbp_tile_t *gbp_tiles)
     (void)gbp_tiles;
     gbp_tiles->tileLineOffset = 0;
     gbp_tiles->tileRowOffset  = 0;
+    gbp_tiles->tileRowOffsetHarmonised = 0;
 }
 
 void gbp_tiles_print(gbp_tile_t *gbp_tiles, uint8_t sheet, uint8_t linefeed, uint8_t pallet, uint8_t density)
-{
+{ 
     (void)gbp_tiles;
     (void)sheet;
     (void)linefeed;
@@ -129,5 +131,3 @@ void gbp_tiles_print(gbp_tile_t *gbp_tiles, uint8_t sheet, uint8_t linefeed, uin
     }
     gbp_tiles->tileRowOffsetHarmonised = gbp_tiles->tileRowOffset;
 }
-
-
