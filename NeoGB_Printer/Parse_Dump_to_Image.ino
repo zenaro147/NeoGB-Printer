@@ -26,7 +26,7 @@ uint8_t palettebyte = 0x00;
 *******************************************************************************/
 void ConvertFilesBMP()
 //void ConvertFilesBMP(void *pvParameters)
-{
+{  
   //Remove the interrupt to prevent receive data from Gameboy
   detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
 
@@ -52,6 +52,7 @@ void ConvertFilesBMP()
   
   //Loop to check only the availables files based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
+    digitalWrite(LED_STATUS_PIN, HIGH);
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
@@ -180,11 +181,13 @@ void ConvertFilesBMP()
       img_index = 0;
       
       Serial.println("Done");
-      delay(1000);
+      delay(500);
     }
     //Reset the counter for the number of files 
     numfiles=0;
     actualfile=0;
+    digitalWrite(LED_STATUS_PIN, LOW);
+    delay(100);
   }
 
   numfiles=0; 
