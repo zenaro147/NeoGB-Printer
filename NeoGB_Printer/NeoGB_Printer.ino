@@ -34,6 +34,7 @@ boolean buttonActive = false;
 boolean longPressActive = false;
 
 byte image_data[6000] = {}; // 1GBC Picute (5.874)
+uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
 
 bool isWriting = false;
@@ -157,15 +158,20 @@ void loop(){
     if (curr_millis > last_millis){
       uint32_t elapsed_ms = curr_millis - last_millis;
       if (gbp_serial_io_timeout_handler(elapsed_ms)) {
-        // Timeout code
+        //Printer Timeout
         Serial.println("Printer Timeout");
+        
+        //Reset Values
+        chkHeader=99;
+        memset(image_data, 0x00, sizeof(image_data)); 
+        
+        #ifdef USE_OLED
+          oledStateChange(1); //Printer Idle
+        #endif  
         digitalWrite(LED_STATUS_PIN, LOW);
         if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
           callNextFile();
         }
-        #ifdef USE_OLED
-          oledStateChange(1); //Printer Idle
-        #endif  
       }
     }
     last_millis = curr_millis;  
