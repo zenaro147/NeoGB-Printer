@@ -82,7 +82,7 @@ PushButton Schematic
 
 ## OLED Display Setup (optional)
 You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
-The display will show the current wifi-config while in server mode, as well as the number of printed images when in printer mode 
+The display will show the current status of the printer.
 ```
 | OLED DISPLAY|   ESP32   |
 |-------------|-----------|
@@ -113,6 +113,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Parse the Output directory too, to return the next image ID
 - [X] Update documetation (wiring, compatible devices, etc)
 - [ ] Add support to PNG instead BMP
+- [ ] Add a message to display the number of images printed
 - [ ] Make a LED Status (Power and Status)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
