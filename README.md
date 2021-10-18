@@ -24,7 +24,7 @@ This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](http
 Some boards already have a SD Card slot built in. I never tested using this kind of board, but IN THEORY should works fine (as long as it has SPI pins available). If you want to use this type of board, DO IT AT YOUR OWN RISK!
 
 ## Gameboy Link Cable Setup
-Gameboy Original/Color Link Cable Pinout
+Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safe! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj)
 ```
  __________
 |  6  4  2 |
