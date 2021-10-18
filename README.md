@@ -76,7 +76,7 @@ PushButton Schematic
 | Button | ESP32 |
 |--------|-------|
 | 1 or 2 |  3v3  | 
-| 3 or 4 |  G34  | <-- I recommend to connect a 10K resistor to the GND together, to act as a Pull Down.
+| 3 or 4 |  G34  | <-- I recommend to connect a 10K or 6K resistor to the GND together, to act as a Pull Down.
 
 ```
 
