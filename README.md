@@ -95,6 +95,7 @@ The display will show the current status of the printer.
 
 # Builds Showcases:
 ![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
+![Setup by Raphaël BOICHOTy](/showcase/RaphaelBOICHOT.jpg)
 
 ## ⚠ Take care ⚠
 You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
