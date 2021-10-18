@@ -96,6 +96,14 @@ The display will show the current wifi-config while in server mode, as well as t
 ### ⚠ Take care ⚠
 You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
 
+# Based on existing projects:
+* [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
+* [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
+* [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
+
+# Builds Showcases:
+![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
+
 # ToDo List:
 - [x] Update the code to support all games
 - [x] Use the original BMP library from Mofosyne C decompiler
@@ -108,8 +116,3 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [ ] Make a LED Status (Power and Status)
 - [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
 - [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
-
-# Based on:
-* [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
-* [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
-* [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
