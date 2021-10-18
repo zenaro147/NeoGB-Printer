@@ -33,7 +33,7 @@ long longPressTime = 2000;
 boolean buttonActive = false;
 boolean longPressActive = false;
 
-byte image_data[6000] = {}; // 1GBC Picute (5.874)
+byte image_data[6000] = {}; // 1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
 
@@ -91,7 +91,10 @@ void setup(void)
 {
   // Config Serial
   // Has to be fast or it will not transfer the image fast enough to the computer
-  Serial.begin(115200);
+  Serial.begin(115200);  
+  //Force CPU Frequency to 160MHz instead the default 240MHz. This fix the Mc Donalds game issue.
+  //In case of erros, change to 80
+  setCpuFrequencyMhz(160); 
 
   /* Setup File System and OLED*/
 #ifdef USE_OLED
@@ -206,14 +209,7 @@ void loop(){
             delay(100);
             digitalWrite(LED_STATUS_PIN, HIGH);
             delay(100);
-            digitalWrite(LED_STATUS_PIN, LOW);
-//            xTaskCreatePinnedToCore(ConvertFilesBMP,        // Task function. 
-//                                    "ConvertFilesBMP",      // name of task. 
-//                                    20000,                  // Stack size of task 
-//                                    NULL,                   // parameter of the task 
-//                                    1,                      // priority of the task 
-//                                    &TaskWriteImage,        // Task handle to keep track of created task 
-//                                    0);                     // pin task to core 0         
+            digitalWrite(LED_STATUS_PIN, LOW);        
           }
         }  
       } else {  
@@ -226,8 +222,8 @@ void loop(){
               Serial.println("Get next file ID");
               #ifdef USE_OLED
                 oledStateChange(7); //Force Next File
-                delay(2000);
               #endif
+              delay(1000);
               callNextFile();
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle

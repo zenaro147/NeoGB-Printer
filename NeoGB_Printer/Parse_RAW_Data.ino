@@ -34,10 +34,6 @@ inline void gbp_packet_capture_loop() {
           oledStateChange(4); //HEX to TXT
         #endif     
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
-        Serial.print("Get Header: ");
-        Serial.print(chkHeader);      
-        Serial.print(" - ");
-        Serial.println(isWriting);
 
         switch (chkHeader) {
           case 1:
@@ -54,48 +50,29 @@ inline void gbp_packet_capture_loop() {
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
             break;
           case 15:
-            ////////////////////////////////////////////// FIX for Tales of Phantasia //////////////////////////////////////////////
-            if (totalMultiImages > 1 && !isWriting && !setMultiPrint){
-              inqypck++;
-              if(inqypck > 20){
-                //Force to write the saves images
-                callNextFile();              
-                inqypck=0;
-              }
-            }
-            ////////////////////////////////////////////// FIX for Tales of Phantasia //////////////////////////////////////////////
             break;
           default:
             break;
         } 
-        Serial.print("// ");
-        Serial.print(pktTotalCount);
-        Serial.print(" : ");
-        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
         digitalWrite(LED_STATUS_PIN, HIGH);
       }
 
       // Print Hex Byte
       data_8bit = gbp_serial_io_dataBuff_getByte();
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
 
-      if (!isWriting){
-        if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
-          image_data[img_index] = (byte)data_8bit;
-          img_index++;
-          Serial.println("Record 1, 2, 4");
-          if (chkHeader == 2 && pktByteIndex == 7) { 
-            chkMargin = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
-            Serial.println("Get Margin");
-          } 
-        }
+      if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
+        image_data[img_index] = (byte)data_8bit;
+        img_index++;
+        if (chkHeader == 2 && pktByteIndex == 7) { 
+          chkMargin = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
+        } 
       }
       
       if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
         digitalWrite(LED_STATUS_PIN, LOW);
         if (chkHeader == 2 && !isWriting) {
-          Serial.println("Enter Here to Write");
+          memcpy(img_tmp,image_data,6000);
+          memset(image_data, 0x00, sizeof(image_data)); 
           isWriting=true;
           if((chkMargin == 0 || ((chkMargin == 3 && dtpck == 1) || (chkMargin == 1 && dtpck == 1) || (chkMargin == 1 && dtpck == 6))) && !setMultiPrint){
             setMultiPrint=true;
@@ -103,7 +80,6 @@ inline void gbp_packet_capture_loop() {
           }else if(chkMargin > 0 && setMultiPrint){
             setMultiPrint=false;
           }
-          memcpy(img_tmp,image_data,6000);
           xTaskCreatePinnedToCore(storeData,        // Task function. 
                                   "storeData",      // name of task. 
                                   10000,            // Stack size of task 
@@ -111,16 +87,12 @@ inline void gbp_packet_capture_loop() {
                                   1,                // priority of the task 
                                   &TaskWriteDump,   // Task handle to keep track of created task 
                                   0);               // pin task to core 0 
-          memset(image_data, 0x00, sizeof(image_data)); 
-                 
           dtpck = 0x00;
           inqypck = 0x00;          
         }
-//        Serial.println("");
         pktByteIndex = 0;
         pktTotalCount++;
       } else {
-//        Serial.print((char)' ');
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }
@@ -133,7 +105,6 @@ inline void gbp_packet_capture_loop() {
 *******************************************************************************/
 void storeData(void *pvParameters)
 {
-  Serial.println("Enter Store File");
   unsigned long perf = millis();
   int img_index2=img_index;
   byte *image_data2 = ((byte*)pvParameters);
@@ -186,15 +157,17 @@ void storeData(void *pvParameters)
   }
 }
 
-
-
+/*******************************************************************************
+  Force to call the next file 
+  (fix for Mary-Kate and Ashley Pocket Planner / E.T.: Digital Companion
+  McDonald's Monogatari : Honobono Tenchou Ikusei Game)
+*******************************************************************************/
 void callNextFile(){
   setMultiPrint = false;
   totalMultiImages = 1;
 
   freeFileIndex = nextFreeFileIndex();
   //Reset Variables
-  // Turn LED ON
   digitalWrite(LED_STATUS_PIN, LOW);
   Serial.println("Printer ready.");
   img_index = 0x00;
