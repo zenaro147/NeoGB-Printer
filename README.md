@@ -113,8 +113,6 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Handle with storage % instead number of files
 - [X] Parse the Output directory too, to return the next image ID
 - [X] Update documetation (wiring, compatible devices, etc)
+- [ ] Improve the LED status using a RGB LED
 - [ ] Add support to PNG instead BMP
 - [ ] Add a message to display the number of images printed
-- [ ] Make a LED Status (Power and Status)
-- [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
-- [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
