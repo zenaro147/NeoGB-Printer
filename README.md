@@ -93,6 +93,9 @@ The display will show the current status of the printer.
 
 ```
 
+# Builds Showcases:
+![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
+
 ### ⚠ Take care ⚠
 You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
 
@@ -100,9 +103,6 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
 * [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
 * [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
-
-# Builds Showcases:
-![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
 
 # ToDo List:
 - [x] Update the code to support all games
