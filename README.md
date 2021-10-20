@@ -6,7 +6,7 @@ This project is very similar to a popular solution available to buy, but the Neo
 
 You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game
 
-Once you finish to print all your images you want, hold the button (see below) for a few seconds and all your images will be converted to BMP image
+Once you finish to print all your images you want, hold the [button](#push-button-setup) (see below) for a few seconds and all your images will be converted to BMP image
 
 ## Software Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings.
@@ -24,7 +24,7 @@ This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](http
 Some boards already have a SD Card slot built in. I never tested using this kind of board, but IN THEORY should works fine (as long as it has SPI pins available). If you want to use this type of board, DO IT AT YOUR OWN RISK!
 
 ## Gameboy Link Cable Setup
-Gameboy Original/Color Link Cable Pinout
+Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safe! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj)
 ```
  __________
 |  6  4  2 |
@@ -42,7 +42,7 @@ Gameboy Original/Color Link Cable Pinout
 ```
 
 ## SD Card Reader Setup
-You need to use a [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html) or a [SD Card Module](https://pt.aliexpress.com/item/32523666863.html) to save the data. I highly recommend to get one, especially the [SD Card Module](https://pt.aliexpress.com/item/32523666863.html), It's more stable than [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html).
+You need to use a [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html) or a [SD Card Module](https://pt.aliexpress.com/item/32523666863.html) to save the data. I highly recommend to get one, especially the [SD Card Module](https://pt.aliexpress.com/item/32523666863.html), It's more stable than [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html), at least during my tests.
 To use it, connect the pins following this schema
 ```
 | SD ADAPTER |  ESP32  |
@@ -76,13 +76,13 @@ PushButton Schematic
 | Button | ESP32 |
 |--------|-------|
 | 1 or 2 |  3v3  | 
-| 3 or 4 |  G34  | <-- I recommend to connect a 10K resistor to the GND together, to act as a Pull Down.
+| 3 or 4 |  G34  | <-- I recommend to connect a 10K or 6K resistor to the GND together, to act as a Pull Down.
 
 ```
 
 ## OLED Display Setup (optional)
 You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
-The display will show the current wifi-config while in server mode, as well as the number of printed images when in printer mode 
+The display will show the current status of the printer.
 ```
 | OLED DISPLAY|   ESP32   |
 |-------------|-----------|
@@ -93,8 +93,17 @@ The display will show the current wifi-config while in server mode, as well as t
 
 ```
 
-### ⚠ Take care ⚠
+# Builds Showcases:
+![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
+![Setup by Raphaël BOICHOTy](/showcase/RaphaelBOICHOT.jpg)
+
+## ⚠ Take care ⚠
 You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
+
+# Based on existing projects:
+* [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
+* [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
+* [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
 
 # ToDo List:
 - [x] Update the code to support all games
@@ -104,12 +113,6 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Handle with storage % instead number of files
 - [X] Parse the Output directory too, to return the next image ID
 - [X] Update documetation (wiring, compatible devices, etc)
+- [ ] Improve the LED status using a RGB LED
 - [ ] Add support to PNG instead BMP
-- [ ] Make a LED Status (Power and Status)
-- [ ] Create the file automatically when the emulator finishes to receive all the data (If possible)
-- [ ] Add some kind of "FTP File Server" to download the images using a PC or Smartphone, without remove the SD card
-
-# Based on:
-* [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
-* [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
-* [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
+- [ ] Add a message to display the number of images printed
