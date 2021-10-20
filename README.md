@@ -80,16 +80,28 @@ PushButton Schematic
 
 ```
 
+## RGB LED to display the Status (optional)
+You can add [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html). To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE`, based on your LED. This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
+Connect the Cathode/Anode based on your LED. You need to use at least a 220Ohm Resistor on each RGB leg.
+```
+| LED | ESP32 |
+|-----|-------|
+|  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
+|  G  |   4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
+|  B  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
+
+```
+
 ## OLED Display Setup (optional)
 You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
 The display will show the current status of the printer.
 ```
-| OLED DISPLAY|   ESP32   |
-|-------------|-----------|
-| GND         | GND       | 
-| VIN         | 5v or 3v3 |
-| SCL         | G22       | <-- YOU CAN USE ANY GPIO AVAILABLE
-| SDA         | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
+| OLED DISPLAY |   ESP32   |
+|--------------|-----------|
+| GND          | GND       | 
+| VIN          | 5v or 3v3 |
+| SCL          | G22       | <-- YOU CAN USE ANY GPIO AVAILABLE
+| SDA          | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
 
 ```
 
@@ -113,6 +125,6 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Handle with storage % instead number of files
 - [X] Parse the Output directory too, to return the next image ID
 - [X] Update documetation (wiring, compatible devices, etc)
-- [ ] Improve the LED status using a RGB LED
+- [X] Improve the LED status using a RGB LED
 - [ ] Add support to PNG instead BMP
 - [ ] Add a message to display the number of images printed
