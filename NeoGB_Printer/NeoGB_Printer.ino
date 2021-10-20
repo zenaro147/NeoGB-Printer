@@ -36,6 +36,7 @@ boolean longPressActive = false;
 byte image_data[6000] = {}; // 1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
+bool testmode = false;
 
 bool isWriting = false;
 bool isConverting = false;
@@ -95,12 +96,24 @@ void setup(void)
   //Force CPU Frequency to 160MHz instead the default 240MHz. This fix the Mc Donalds game issue.
   //In case of erros, change to 80
   setCpuFrequencyMhz(160); 
+  
+  /* LED Indicator */
+  pinMode(LED_STATUS_PIN, OUTPUT);
+  digitalWrite(LED_STATUS_PIN, LOW);
+  /* Pin for pushbutton */ 
+  pinMode(BTN_PUSH, INPUT);
 
   /* Setup File System and OLED*/
 #ifdef USE_OLED
   oled_setup();
   oledStateChange(0); //Splash Screen
 #endif
+  if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
+    testmode = true;
+    #ifdef USE_OLED
+      oledStateChange(99); //Test
+    #endif
+  }
   delay(3000);
 
   isFileSystemMounted = fs_setup();
@@ -118,16 +131,8 @@ void setup(void)
     pinMode(GBP_SC_PIN, INPUT);
     pinMode(GBP_SO_PIN, INPUT);
     pinMode(GBP_SI_PIN, OUTPUT);
-  
     /* Default link serial out pin state */
     digitalWrite(GBP_SI_PIN, LOW);
-  
-    /* LED Indicator */
-    pinMode(LED_STATUS_PIN, OUTPUT);
-    digitalWrite(LED_STATUS_PIN, LOW);
-     
-    /* Pin for pushbutton */ 
-    pinMode(BTN_PUSH, INPUT);
   
     /* Setup */
     gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);

@@ -1,5 +1,4 @@
 uint8_t dtpck = 0;
-uint8_t inqypck = 0;
 
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte img_tmp[6000] = {}; // 1GBC Picute (5.874)
@@ -87,8 +86,7 @@ inline void gbp_packet_capture_loop() {
                                   1,                // priority of the task 
                                   &TaskWriteDump,   // Task handle to keep track of created task 
                                   0);               // pin task to core 0 
-          dtpck = 0x00;
-          inqypck = 0x00;          
+          dtpck = 0x00;         
         }
         pktByteIndex = 0;
         pktTotalCount++;
