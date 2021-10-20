@@ -117,7 +117,7 @@ int fs_info() {
 *******************************************************************************/
 void full() {
   Serial.println("no more space on printer");
-  digitalWrite(LED_STATUS_PIN, HIGH);
+  RGB_led_ON(LED_STATUS_RED);
 #ifdef USE_OLED
   oledStateChange(3); //Printer Full
 #endif

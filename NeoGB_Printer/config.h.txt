@@ -25,6 +25,13 @@
 // You can rotate the display by 180°
 //#define OLED_ROTATE
 
+// RGB LED Definitions
+#define LED_STATUS_GREEN   4
+#define LED_STATUS_RED    16
+#define LED_STATUS_BLUE   17
+//#define COMMON_ANODE
+//#define COMMON_CATHODE
+
 
 /* Gameboy Link Cable Mapping to Arduino Pin */
 // Note: Serial Clock Pin must be attached to an interrupt pin of the arduino
@@ -41,4 +48,4 @@
 #define GBP_SD_PIN                // Pin 4            : Serial Data  (Unused)
 #define GBP_SC_PIN       18       // Pin 5            : ESP-pin 18 CLK  (Serial Clock)
 #define GBP_GND_PIN               // Pin 6            : GND (Attach to GND Pin)
-#define LED_STATUS_PIN    4       // LED blink on packet reception (2 is internal LED)
+//#define LED_STATUS_PIN    2       // LED blink on packet reception (2 is internal LED)

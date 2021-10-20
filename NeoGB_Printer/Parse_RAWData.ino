@@ -53,7 +53,7 @@ inline void gbp_packet_capture_loop() {
           default:
             break;
         } 
-        digitalWrite(LED_STATUS_PIN, HIGH);
+        RGB_led_ON(LED_STATUS_GREEN);
       }
 
       // Print Hex Byte
@@ -68,7 +68,7 @@ inline void gbp_packet_capture_loop() {
       }
       
       if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
-        digitalWrite(LED_STATUS_PIN, LOW);
+        RGB_led_OFF(LED_STATUS_GREEN);
         if (chkHeader == 2 && !isWriting) {
           memcpy(img_tmp,image_data,6000);
           memset(image_data, 0x00, sizeof(image_data)); 
@@ -111,8 +111,6 @@ void storeData(void *pvParameters)
   char fileName[31];
   byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};  
   
-  digitalWrite(LED_STATUS_PIN, LOW);
-
   if(setMultiPrint || totalMultiImages > 1){
     sprintf(fileName, "/dumps/%05d_%05d.txt", freeFileIndex,totalMultiImages);
   }else{
@@ -145,7 +143,6 @@ void storeData(void *pvParameters)
     }
     
     //Reset Variables
-    digitalWrite(LED_STATUS_PIN, LOW);
     Serial.println("Printer ready.");
     isWriting = false;
   
@@ -166,7 +163,6 @@ void callNextFile(){
 
   freeFileIndex = nextFreeFileIndex();
   //Reset Variables
-  digitalWrite(LED_STATUS_PIN, LOW);
   Serial.println("Printer ready.");
   img_index = 0x00;
   chkHeader = 99;

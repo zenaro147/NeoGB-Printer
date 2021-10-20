@@ -2,10 +2,10 @@
 #include <stddef.h> // size_t
 
 #include "config.h"
-
 #include "gameboy_printer_protocol.h"
 #include "gbp_pkt.h"
 #include "gbp_serial_io.h"
+#include "RGB_LED.h"
 
 /*******************************************************************************
 *******************************************************************************/
@@ -98,16 +98,20 @@ void setup(void)
   setCpuFrequencyMhz(160); 
   
   /* LED Indicator */
-  pinMode(LED_STATUS_PIN, OUTPUT);
-  digitalWrite(LED_STATUS_PIN, LOW);
+  pinMode(LED_STATUS_RED, OUTPUT);
+  pinMode(LED_STATUS_GREEN, OUTPUT);
+  pinMode(LED_STATUS_BLUE, OUTPUT);
+  RGB_init();
+  RGB_blink_white(3, 50, 50);
+  
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
 
   /* Setup File System and OLED*/
-#ifdef USE_OLED
-  oled_setup();
-  oledStateChange(0); //Splash Screen
-#endif
+  #ifdef USE_OLED
+    oled_setup();
+    oledStateChange(0); //Splash Screen
+  #endif
   if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
     testmode = true;
     #ifdef USE_OLED
@@ -145,11 +149,13 @@ void setup(void)
     #endif
   
     gbp_pkt_init(&gbp_pktBuff);
-
+    
+    RGB_blink(LED_STATUS_GREEN, 3,100,100);
     #ifdef USE_OLED
       oledStateChange(1); //Printer Idle
     #endif
   }else{
+    RGB_blink(LED_STATUS_RED, 3,200,200);
     #ifdef USE_OLED
       oledStateChange(2); //SD Init Error
     #endif
@@ -176,7 +182,7 @@ void loop(){
         #ifdef USE_OLED
           oledStateChange(1); //Printer Idle
         #endif  
-        digitalWrite(LED_STATUS_PIN, LOW);
+        RGB_led_OFF(LED_STATUS_GREEN);
         if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
           callNextFile();
         }
@@ -201,20 +207,11 @@ void loop(){
             #ifdef USE_OLED
               oledStateChange(5); //Converting to Image
             #endif
-            digitalWrite(LED_STATUS_PIN, HIGH);
-            delay(100);
-            digitalWrite(LED_STATUS_PIN, LOW);
-            delay(100);
-            digitalWrite(LED_STATUS_PIN, HIGH);
-
+                        
+            RGB_blink(LED_STATUS_BLUE, 3,100,100);
             delay(2000);
             ConvertFilesBMP();
-
-            digitalWrite(LED_STATUS_PIN, LOW);
-            delay(100);
-            digitalWrite(LED_STATUS_PIN, HIGH);
-            delay(100);
-            digitalWrite(LED_STATUS_PIN, LOW);        
+            RGB_blink(LED_STATUS_BLUE, 3,100,100);        
           }
         }  
       } else {  
@@ -225,6 +222,7 @@ void loop(){
             delay(500);
             if((totalMultiImages-1) > 1){
               Serial.println("Get next file ID");
+              RGB_blink_magenta(3, 100, 100);
               #ifdef USE_OLED
                 oledStateChange(7); //Force Next File
               #endif

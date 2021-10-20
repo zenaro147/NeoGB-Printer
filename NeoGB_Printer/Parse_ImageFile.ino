@@ -63,7 +63,6 @@ void ConvertFilesBMP()
   
   //Loop to check only the availables files based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
-    digitalWrite(LED_STATUS_PIN, HIGH);
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
@@ -124,12 +123,13 @@ void ConvertFilesBMP()
       img_index = 0;
       
       Serial.println("Done");
-      delay(500);
+      RGB_led_ON(LED_STATUS_BLUE);
+      delay(100);
+      RGB_led_OFF(LED_STATUS_BLUE);
     }
     //Reset the counter for the number of files 
     numfiles=0;
     actualfile=0;
-    digitalWrite(LED_STATUS_PIN, LOW);
     delay(100);
   }
 
