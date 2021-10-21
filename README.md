@@ -81,14 +81,17 @@ PushButton Schematic
 ```
 
 ## RGB LED to display the Status (optional)
-You can add [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html). To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE`, based on your LED. This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
-Connect the Cathode/Anode based on your LED. You need to use at least a 220Ohm Resistor on each RGB leg.
+You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html). This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
+
+To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE`, based on your LED. Edit the other legs in the `config.h` based on your setup.
+If your LED uses common Anode, connect it to the 3.3v Pin. If it's common Cathode, connect it to the GND.
+For the other legs, you need to use at least a 22Oohm Resistor on each RGB leg. Connect then following the example schema below (always based on your `config.h` file
 ```
 | LED | ESP32 |
 |-----|-------|
-|  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
-|  G  |   4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
-|  B  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220Ohm Resistor with it.
+|  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
+|  G  |   4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
+|  B  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
 
 ```
 
