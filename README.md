@@ -120,6 +120,11 @@ The display will show the current status of the printer.
 ## ⚠ Take care ⚠
 You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
 
+# Posts about:
+* [Hack a Day Article](https://hackaday.com/2021/10/22/an-open-source-game-boy-printer-that-doesnt-print/)
+* [Reddit post](https://www.reddit.com/r/Gameboy/comments/qdfoys/the_first_opensource_and_fully_standalone_game/)
+
+
 # Based on existing projects:
 * [Mofosyne - Arduino Gameboy Printer Emulator](https://github.com/mofosyne/arduino-gameboy-printer-emulator)
 * [HerrZatacke - WiFi Game Boy Printer Emulator](https://github.com/HerrZatacke/wifi-gbp-emulator)
