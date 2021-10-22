@@ -25,20 +25,25 @@ Some boards already have a SD Card slot built in. I never tested using this kind
 
 ## Gameboy Link Cable Setup
 Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safe! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj)
+
+Different from Arduino, that's operate in 5v like the GameBoy, the ESP32 operate in 3.3v in his pins. You will need a [tiny Level Shifter like this](https://pt.aliexpress.com/item/1005001839292815.html) to handle with this communication and prevent any overvoltage from any side. 
+
+Connect then following this schema:
 ```
  __________
 |  6  4  2 |
  \_5__3__1_/ (at cable)
 
-| Link Cable |  ESP32  |
-|------------|---------|
-| Pin 1      |   N/A   | <- 5v 
-| Pin 2      | G19     | <- Serial Out (Serial In at the other end of the cable)
-| Pin 3      | G23     | <- Serial In (Serial Out at the other end of the cable)
-| Pin 4      |   N/A   | <- Serial Data
-| Pin 5      | G18     | <- Clock Out
-| Pin 6      | G       | <- GND
-
+| Link Cable |Level Shifter|  ESP32  |
+|------------|-------------|---------|
+| Pin 1      |             |  N/A    | <- 5v from Game Boy (unreliable voltage source)
+| Pin 2      |  HV1<->LV1  |  G19    | <- Serial Out (Serial In at the other end of the cable)
+| Pin 3      |  HV2<->LV2  |  G23    | <- Serial In (Serial Out at the other end of the cable)
+| Pin 4      |             |  N/A    | <- Serial Data
+| Pin 5      |  HV3<->LV3  |  G18    | <- Clock Out
+| Pin 6      |  GND<->GND  |  GND    | <- GND
+|            |      LV     |  +3.3V  | <- +3.3 volts from ESP32
+|            |      HV     |  +5V    | <- +5 volts from ESP32 or USB
 ```
 
 ## SD Card Reader Setup
