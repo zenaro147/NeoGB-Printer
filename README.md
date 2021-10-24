@@ -110,7 +110,8 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 ```
 
 ## Powering the beast
-Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, Lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA.
+Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, Lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
+
 
 # Builds Showcases:
 ![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
