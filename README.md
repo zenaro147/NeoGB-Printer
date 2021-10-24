@@ -134,18 +134,6 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * Brian Khuu: architect of the Matrix (Game Boy Printer emulator core, BMP image decoder core).
 * Raphaël Boichot: protocol debugging, monkey coding for PNG conversion, Japanese games hacking.
 
-# ToDo List:
-- [x] Update the code to support all games
-- [x] Use the original BMP library from Mofosyne C decompiler
-- [X] Write the BMP file on SD
-- [X] Fix Palette issue with some games
-- [X] Handle with storage % instead number of files
-- [X] Parse the Output directory too, to return the next image ID
-- [X] Update documetation (wiring, compatible devices, etc)
-- [X] Improve the LED status using a RGB LED
-- [ ] Add support to PNG in addition to BMP
-- [ ] Add a message to display the number of images printed
-
 # List of games fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
 - *Alice in Wonderland (never released in Japan)*
@@ -258,3 +246,14 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - *Tsuri Sensei 2 (釣り先生2)*
 - *VS Lemmings (VS.レミングス)*
 
+# ToDo List:
+- [x] Update the code to support all games
+- [x] Use the original BMP library from Mofosyne C decompiler
+- [X] Write the BMP file on SD
+- [X] Fix Palette issue with some games
+- [X] Handle with storage % instead number of files
+- [X] Parse the Output directory too, to return the next image ID
+- [X] Update documetation (wiring, compatible devices, etc)
+- [X] Improve the LED status using a RGB LED
+- [ ] Add support to PNG in addition to BMP
+- [ ] Add a message to display the number of images printed
