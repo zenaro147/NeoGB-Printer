@@ -1,19 +1,15 @@
 # NeoGB Printer
 
-The main goal of Neo Printer is keep many simple as possible to the end user. Since the building to it's use.
+The NeoGB Printer is intended to be a standalone Game Boy Printer emulator very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash. Using it is straigthforward and intuitive.
 
-This project is very similar to a popular solution available to buy, but the NeoGB Printer is an open-source and standalone Gameboy Printer emulator 100% compatible with [all officially released games (110 in total)](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer)
+This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is an open-source, cheap and and tested with success with [all officially released games (110 in total)](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer).
 
-You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game
-
-Once you finish to print all your images you want, hold the [button](#push-button-setup) (see below) for a few seconds and all your images will be converted to BMP image
+You just need upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and PNG images in separated folders, ready to use with social media.
 
 ## Software Setup
-First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings.
+First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings. This file contains all the options that can be changed in the emulator (pinout, oled and LEDS features for example). Customize it according to the board and modules you are using.
 
-This file contains all the options that can be changed in the emulator. Customize it according to the board and modules you are using.
-
-To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended follow the instructions to install via Boards Manager.
+To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
