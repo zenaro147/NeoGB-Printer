@@ -130,9 +130,9 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
 
 # Authors contribution:
-* Rafael Zenaro: main code, hardware setting, ideas, concept art and technical innovations.
+* Rafael Zenaro: main code, hardware setting, new ideas, concept art and technical innovations.
 * Brian Khuu: architect of the Matrix (Game Boy Printer emulator core, BMP image decoder core).
-* Raphaël Boichot: debugging, monkey coding for PNG conversion, Japanese games hacking.
+* Raphaël Boichot: protocol debugging, monkey coding for PNG conversion, Japanese games hacking.
 
 # ToDo List:
 - [x] Update the code to support all games
