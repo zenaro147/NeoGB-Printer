@@ -146,7 +146,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [ ] Add support to PNG in addition to BMP
 - [ ] Add a message to display the number of images printed
 
-# List games fully compatible with the NeoGB Printer:
+# List of games fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
 - *Alice in Wonderland (never released in Japan)*
 - *Animal Breeder 3 (あにまるぶりーだー3)*
