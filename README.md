@@ -14,17 +14,17 @@ To install the ESP32 board for the Arduino IDE, follow the [instructions here](h
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
 * The number of total pins available in the board doesn't matter (Could be with 30 pins, 36 pins, 38 pins, whatever)
-* It's a Dual Core module (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
-* Have, at least, 2 SPI pins gourps [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
+* It's a **Dual Core module** (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
+* Have, at least, **2 SPI pins gourps** [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
 
-Some boards already have a SD Card slot built in. I never tested using this kind of board, but IN THEORY should works fine (as long as it has SPI pins available). If you want to use this type of board, DO IT AT YOUR OWN RISK!
+Some boards already have a SD Card slot built in. I've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you want to use this type of board, **DO IT AT YOUR OWN RISK!**
 
 ## Gameboy Link Cable Setup
-Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safe! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj)
+Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safely ! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj). A bit of do-it-yourself is necessary at this step if you do not use a breakout board.
 
-Different from Arduino, that's operate in 5v like the GameBoy, the ESP32 operate in 3.3v in his pins. You will need a [tiny Level Shifter like this](https://pt.aliexpress.com/item/1005001839292815.html) to handle with this communication and prevent any overvoltage from any side. 
+Different from Arduino that operates in 5V like the GameBoy, the ESP32 operate is in 3.3V on its pins by default. You will need a [tiny bidirectionnal Level Shifter like this](https://pt.aliexpress.com/item/1005001839292815.html) to handle the communication protocol and prevent any overvoltage/undervoltage from any side. Direct connection between Game Boy and ESP pins without level shifter may work but we do not recommand this for reliability reasons.
 
-Connect then following this schema:
+Connect the Game Boy serial pins to the ESP pins following this scheme:
 ```
  __________
 |  6  4  2 |
@@ -44,7 +44,7 @@ Connect then following this schema:
 
 ## SD Card Reader Setup
 You need to use a [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html) or a [SD Card Module](https://pt.aliexpress.com/item/32523666863.html) to save the data. I highly recommend to get one, especially the [SD Card Module](https://pt.aliexpress.com/item/32523666863.html), It's more stable than [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html), at least during my tests.
-To use it, connect the pins following this schema
+To use it, connect the pins following this scheme:
 ```
 | SD ADAPTER |  ESP32  |
 |------------|---------|
@@ -59,7 +59,7 @@ To use it, connect the pins following this schema
 ```
 
 ## Push Button Setup
-You need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
+You will need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP and PNG. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
 * Single press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`)
@@ -77,7 +77,7 @@ PushButton Schematic
 | Button | ESP32 |
 |--------|-------|
 | 1 or 2 |  3v3  | 
-| 3 or 4 |  G34  | <-- I recommend to connect a 10K or 6K resistor to the GND together, to act as a Pull Down.
+| 3 or 4 |  G34  | <-- I recommend to connect a 5K to 10K resistor to the GND together, to act as a Pull Down.
 
 ```
 
@@ -85,20 +85,20 @@ PushButton Schematic
 You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html). This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
 
 To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE`, based on your LED. Edit the other legs in the `config.h` based on your setup.
-If your LED uses common Anode, connect it to the 3.3v Pin. If it's common Cathode, connect it to the GND.
-For the other legs, you need to use at least a 22Oohm Resistor on each RGB leg. Connect then following the example schema below (always based on your `config.h` file)
+ If your LED uses a Common Anode, connect it to the 3.3v Pin. If it's Common Cathode, connect it to the GND.
+For the other legs, you need to use at least a 22O Ohm Resistor on each RGB leg. Connect them following the example scheme below (always based on your `config.h` file)
 ```
 | LED | ESP32 |
 |-----|-------|
-|  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
-|  G  |   4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
-|  B  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220ohm Resistor with it.
+|  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  G  |   4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  B  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
 
 ```
 
 ## OLED Display Setup (optional)
-You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines   
-The display will show the current status of the printer.
+You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines. The display will show the current status of the printer.
+
 ```
 | OLED DISPLAY |   ESP32   |
 |--------------|-----------|
