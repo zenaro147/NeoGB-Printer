@@ -110,7 +110,7 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 ```
 
 ## Powering the beast
-Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, Lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
+Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 
 # Builds Showcases:
@@ -130,9 +130,9 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * [Raphaël BOICHOT - Gameboy Printer Paper Simulation](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)
 
 # Authors contribution:
-* Rafael Zenaro: main code, hardware setting, new ideas, concept art and technical innovations.
-* Brian Khuu: architect of the Matrix (Game Boy Printer emulator core, BMP image decoder core).
-* Raphaël Boichot: protocol and code debugging, monkey coder for PNG conversion and RGB led support, Japanese games hacking.
+* Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
+* Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
+* Raphaël Boichot: protocol and code debugging, PNG format and RGB led support, hardcore playing with Japanese games for full support.
 
 # List of games fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
