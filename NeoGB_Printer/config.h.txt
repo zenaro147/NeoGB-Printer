@@ -15,6 +15,8 @@
 
 // Total of images supported
 #define MAX_IMAGES 400
+#define UPSCALE_FACTOR 4
+//#define ENABLE_PNG_OUTPUT //ENABLE PNG OUTPUT SUPPORT - EXPERIMENTAL FEATURE
 
 //Using OLED Display
 //#define USE_OLED
@@ -26,9 +28,9 @@
 //#define OLED_ROTATE
 
 // RGB LED Definitions
-#define LED_STATUS_GREEN   4
-#define LED_STATUS_RED    16
-#define LED_STATUS_BLUE   17
+//#define LED_STATUS_BLUE   4
+//#define LED_STATUS_RED    16
+//#define LED_STATUS_GREEN  17
 //#define COMMON_ANODE
 //#define COMMON_CATHODE
 

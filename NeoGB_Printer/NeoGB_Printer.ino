@@ -201,15 +201,12 @@ void loop(){
           longPressActive = true;
           //Long press to convert to BMP
           if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
-            Serial.println("Converting to BMP");
-            isConverting = true;
-            
+            Serial.println("Converting to Image File");
+            isConverting = true;            
             #ifdef USE_OLED
               oledStateChange(5); //Converting to Image
-            #endif
-                        
+            #endif                        
             RGB_blink(LED_STATUS_BLUE, 3,100,100);
-            delay(2000);
             ConvertFilesBMP();
             RGB_blink(LED_STATUS_BLUE, 3,100,100);        
           }
@@ -224,7 +221,7 @@ void loop(){
               Serial.println("Get next file ID");
               RGB_blink_magenta(3, 100, 100);
               #ifdef USE_OLED
-                oledStateChange(7); //Force Next File
+                oledStateChange(8); //Force Next File
               #endif
               delay(1000);
               callNextFile();

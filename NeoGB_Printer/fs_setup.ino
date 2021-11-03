@@ -34,14 +34,26 @@ bool fs_setup() {
     
     File root = FSYS.open("/dumps");
     if(!root){
-        Serial.println("- failed to open Dump directory");
+        Serial.println("- failed to open Dumps directory");
         if(FSYS.mkdir("/dumps")){
-            Serial.println("Dump Dir created");
+            Serial.println("Dumps Dir created");
         } else {
             Serial.println("mkdir failed");
         }
     }else{
-      Serial.println("Dump folder already exist.");
+      Serial.println("Dumps folder already exist.");
+    }
+    
+    root = FSYS.open("/temp");
+    if(!root){
+        Serial.println("- failed to open Temp directory");
+        if(FSYS.mkdir("/temp")){
+            Serial.println("Temp Dir created");
+        } else {
+            Serial.println("mkdir failed");
+        }
+    }else{
+      Serial.println("Temp folder already exist.");
     }
   
     root = FSYS.open("/output");
@@ -54,6 +66,30 @@ bool fs_setup() {
         }
     }else{
       Serial.println("Output folder already exist.");
+    }
+    
+    root = FSYS.open("/output/bmp");
+    if(!root){
+        Serial.println("- failed to open Output BMP directory");
+        if(FSYS.mkdir("/output/bmp")){
+            Serial.println("Output BMP Dir created");
+        } else {
+            Serial.println("mkdir failed");
+        }
+    }else{
+      Serial.println("Output BMP folder already exist.");
+    }
+    
+    root = FSYS.open("/output/png");
+    if(!root){
+        Serial.println("- failed to open Output PNG directory");
+        if(FSYS.mkdir("/output/png")){
+            Serial.println("Output PNG Dir created");
+        } else {
+            Serial.println("mkdir failed");
+        }
+    }else{
+      Serial.println("Output PNG folder already exist.");
     }
 
     for (int i = 0; i < 100; i++) {
@@ -76,7 +112,7 @@ unsigned int nextFreeFileIndex() {
   dumpCount=0;
   imgCount=0;
   do {
-    sprintf(path, "/output/%05d.bmp", i);
+    sprintf(path, "/output/bmp/%05d.bmp", i);
     if(!FSYS.exists(path)){
       sprintf(path, "/dumps/%05d.txt", i);
       if (!FSYS.exists(path)) {

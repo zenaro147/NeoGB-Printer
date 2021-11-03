@@ -113,6 +113,12 @@ void oled_drawTxt2Png() {
   display.display();
 }
 
+void oled_drawUpsalingImage() {
+  display.clearDisplay();
+  display.drawBitmap(0, 0, upscalingImage, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
+  display.display();
+}
+
 void oled_drawForceNewFile() {
   display.clearDisplay();
   display.drawBitmap(0, 0, forceFile, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
@@ -152,6 +158,9 @@ void oledStateChange(uint8_t lcdStatus){
         oled_drawTxt2Png();
         break;
       case 7:
+        oled_drawUpsalingImage();
+        break;
+      case 8:
         oled_drawForceNewFile();
         break;
       case 99:
