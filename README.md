@@ -256,4 +256,5 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Update documetation (wiring, compatible devices, etc)
 - [X] Improve the LED status using a RGB LED
 - [ ] Add support to PNG in addition to BMP
+- [ ] Add a web interface
 - [ ] Add a message to display the number of images printed
