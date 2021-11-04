@@ -134,7 +134,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
 * Raphaël Boichot: protocol and code debugging, PNG format and RGB led support, hardcore gaming with Japanese kusoge.
 
-# List of games fully compatible with the NeoGB Printer:
+# List of games tested and fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
 - *Alice in Wonderland (never released in Japan)*
 - *Animal Breeder 3 (あにまるぶりーだー3)*
