@@ -4,7 +4,7 @@ The NeoGB Printer is a standalone Game Boy Printer emulator very easy to build w
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts is below $15.
 
-You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and PNG images, ready to use with social media.
+You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and/or PNG images, ready to use with social media.
 
 ## Software Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings. This file contains all the options that can be changed in the emulator (pinout, OLED and LEDs features for example). Customize it according to the board and modules you are using.
@@ -12,7 +12,7 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
 You need to install some Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
-* PNGenc
+* PNGenc (If you want do output the images as PNG)
 * Adafruit SSD1306 (If you want to use the OLED Display)
 * Adafruit GFX Library (If you want to use the OLED Display)
 
@@ -64,7 +64,7 @@ To use it, connect the pins following this scheme:
 ```
 
 ## Push Button Setup
-You will need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP and PNG. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
+You will need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP and/or PNG. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
 * Single press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`)
@@ -261,5 +261,5 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Update documetation (wiring, compatible devices, etc)
 - [X] Improve the LED status using a RGB LED
 - [X] Add support to PNG in addition to BMP
+- [X] Add a message to display the number of images printed
 - [ ] Add a web interface
-- [ ] Add a message to display the number of images printed
