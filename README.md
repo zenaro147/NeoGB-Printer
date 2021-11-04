@@ -4,12 +4,17 @@ The NeoGB Printer is a standalone Game Boy Printer emulator very easy to build w
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts is below $15.
 
-You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and/or PNG images, ready to use with social media.
+You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and PNG images, ready to use with social media.
 
 ## Software Setup
 First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings. This file contains all the options that can be changed in the emulator (pinout, OLED and LEDs features for example). Customize it according to the board and modules you are using.
 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
+
+You need to install some Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
+* PNGenc
+* Adafruit SSD1306 (If you want to use the OLED Display)
+* Adafruit GFX Library (If you want to use the OLED Display)
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
