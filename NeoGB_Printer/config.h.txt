@@ -14,18 +14,17 @@
 #define BTN_PUSH 34
 
 // Total of images supported
-#define MAX_IMAGES 400
-#define UPSCALE_FACTOR 4
-//#define ENABLE_PNG_OUTPUT //ENABLE PNG OUTPUT SUPPORT - EXPERIMENTAL FEATURE
+#define BMP_OUTPUT //Enable BMP image as output
+#define BMP_UPSCALE_FACTOR 4
+//#define PNG_OUTPUT //Enable PNG image as output
+//#define PNG_UPSCALE_FACTOR 4
 
 //Using OLED Display
 //#define USE_OLED
 //#define OLED_SDA 21
 //#define OLED_SCL 22
-// you can invert the display to easily spot the actual dimensions
-//#define OLED_INVERT
-// You can rotate the display by 180°
-//#define OLED_ROTATE
+//#define OLED_INVERT //You can invert the display to easily spot the actual dimensions
+//#define OLED_ROTATE //You can rotate the display by 180°
 
 // RGB LED Definitions
 //#define LED_STATUS_BLUE   4

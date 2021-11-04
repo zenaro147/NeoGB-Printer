@@ -49,23 +49,27 @@ void ConvertFilesBMP()
         gbpdecoder_gotByte(image_test[bytePos]);       
       }
     }
-    //Create a 4bits BMP and resize the image
-    sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
-    if(UPSCALE_FACTOR < 1){
-      bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-    }else{
-      bmp_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
-    }
+    #ifdef BMP_OUTPUT
+      //Create a 4bits BMP and resize the image
+      sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
+      if(BMP_UPSCALE_FACTOR < 1){
+        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+      }else{
+        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
+      }
+    #endif
 
-    sprintf(pathOutput, "/output/png/%05d.png", 0);
-    if(UPSCALE_FACTOR < 1){
-      png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-    }else{
-      png_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
-    }
-    png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+    #ifdef PNG_OUTPUT
+      sprintf(pathOutput, "/output/png/%05d.png", 0);
+      if(PNG_UPSCALE_FACTOR < 1){
+        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+      }else{
+        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
+      }
+      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images    
+    #endif
     FSYS.remove(fileBMPPath);
-    
+      
     testmode = false;
   }
   
@@ -152,23 +156,27 @@ void ConvertFilesBMP()
     delay(100);
 
     //Create a 4bits BMP and resize the image
-    sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
-    if(UPSCALE_FACTOR < 1){
-      bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-    }else{
-      bmp_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
-    }
-
-    #ifdef USE_OLED
-      oledStateChange(6); //TXT to PNG
+    #ifdef BMP_OUTPUT
+      sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
+      if(BMP_UPSCALE_FACTOR < 1){
+        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+      }else{
+        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
+      }
     #endif
-    sprintf(pathOutput, "/output/png/%05d.png", i);
-    if(UPSCALE_FACTOR < 1){
-      png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-    }else{
-      png_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
-    }
-    png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+    
+    #ifdef PNG_OUTPUT
+      #ifdef USE_OLED
+        oledStateChange(6); //TXT to PNG
+      #endif
+      sprintf(pathOutput, "/output/png/%05d.png", i);
+      if(PNG_UPSCALE_FACTOR < 1){
+        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+      }else{
+        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
+      }
+      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+    #endif
     FSYS.remove(fileBMPPath);
   }
 

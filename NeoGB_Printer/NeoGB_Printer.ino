@@ -121,6 +121,22 @@ void setup(void)
       oledStateChange(0); //Splash Screen
     #endif 
   }
+
+  //Force BMP output if no one was defined and the Upscale Factor
+  #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
+      #define BMP_OUTPUT
+  #endif
+  #ifdef BMP_OUTPUT
+      #ifndef BMP_UPSCALE_FACTOR
+        #define BMP_UPSCALE_FACTOR
+      #endif
+  #endif
+  #ifdef PNG_OUTPUT
+      #ifndef PNG_UPSCALE_FACTOR
+        #define PNG_UPSCALE_FACTOR
+      #endif
+  #endif
+  
   delay(3000);
 
   isFileSystemMounted = fs_setup();

@@ -68,29 +68,33 @@ bool fs_setup() {
       Serial.println("Output folder already exist.");
     }
     
-    root = FSYS.open("/output/bmp");
-    if(!root){
-        Serial.println("- failed to open Output BMP directory");
-        if(FSYS.mkdir("/output/bmp")){
-            Serial.println("Output BMP Dir created");
-        } else {
-            Serial.println("mkdir failed");
-        }
-    }else{
-      Serial.println("Output BMP folder already exist.");
-    }
-    
-    root = FSYS.open("/output/png");
-    if(!root){
-        Serial.println("- failed to open Output PNG directory");
-        if(FSYS.mkdir("/output/png")){
-            Serial.println("Output PNG Dir created");
-        } else {
-            Serial.println("mkdir failed");
-        }
-    }else{
-      Serial.println("Output PNG folder already exist.");
-    }
+    #ifdef BMP_OUTPUT
+      root = FSYS.open("/output/bmp");
+      if(!root){
+          Serial.println("- failed to open Output BMP directory");
+          if(FSYS.mkdir("/output/bmp")){
+              Serial.println("Output BMP Dir created");
+          } else {
+              Serial.println("mkdir failed");
+          }
+      }else{
+        Serial.println("Output BMP folder already exist.");
+      }
+    #endif 
+
+    #ifdef PNG_OUTPUT
+      root = FSYS.open("/output/png");
+      if(!root){
+          Serial.println("- failed to open Output PNG directory");
+          if(FSYS.mkdir("/output/png")){
+              Serial.println("Output PNG Dir created");
+          } else {
+              Serial.println("mkdir failed");
+          }
+      }else{
+        Serial.println("Output PNG folder already exist.");
+      }
+    #endif
 
     for (int i = 0; i < 100; i++) {
       if (i % 10 == 0) {
