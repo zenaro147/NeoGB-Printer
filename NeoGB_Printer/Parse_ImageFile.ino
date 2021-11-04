@@ -2,7 +2,7 @@
 #include "gbp_tiles.h"
 #include "gbp_bmp.h"
 #include "./image/bmp/bmp_FixedWidthStream.h"
-#include "./image/png/bmp2png.h"
+#include "./image/png/Upscalerlib.h"
 
 uint8_t pktCounter = 0; // Dev Varible
 
@@ -20,8 +20,6 @@ char fileBMPPath[30];
 uint8_t numfiles = 0;
 uint8_t actualfile = 0;
 
-uint8_t palettebyte = 0x00;
-
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
@@ -36,13 +34,7 @@ void ConvertFilesBMP()
 
   //Create some vars to use in the process
   char path[30];
-  char path1[30];
-  char path2[30];
-  #ifdef ENABLE_PNG_OUTPUT
-    char path3[30];
-    char path4[30];
-  #endif
-  
+  char pathOutput[30];  
 
   //Get the first dump ID
   char pathcheck1[30];
@@ -57,18 +49,23 @@ void ConvertFilesBMP()
         gbpdecoder_gotByte(image_test[bytePos]);       
       }
     }
-    //Create a 4bits BMP
-    sprintf(path1, "/temp/%05d.bmp", 0);
-    sprintf(path2, "/output/bmp/%05d.bmp", 0);
-    create_buffer(path1,path2,UPSCALE_FACTOR);
+    //Create a 4bits BMP and resize the image
+    sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
+    if(UPSCALE_FACTOR < 1){
+      bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+    }else{
+      bmp_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
+    }
 
-    //EXPERIMENTAL - Generates the PNG image (UPSCALE_FACTOR must set to 1. Very long images will get memory error when parse) 
-    #ifdef ENABLE_PNG_OUTPUT
-      sprintf(path3, "/sd/output/bmp/%05d.bmp", 0);
-      sprintf(path4, "/sd/output/png/%05d.png", 0);   
-      bmp_2_png_encoder(path3, path4);
-    #endif
-    FSYS.remove(path1);
+    sprintf(pathOutput, "/output/png/%05d.png", 0);
+    if(UPSCALE_FACTOR < 1){
+      png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+    }else{
+      png_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
+    }
+    png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+    FSYS.remove(fileBMPPath);
+    
     testmode = false;
   }
   
@@ -83,6 +80,11 @@ void ConvertFilesBMP()
   
   //Loop to check only the availables files based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
+    
+    #ifdef USE_OLED
+      oledStateChange(5); //TXT to BMP
+    #endif
+    
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.txt", i);
     if(FSYS.exists(path)) {
@@ -114,13 +116,12 @@ void ConvertFilesBMP()
         sprintf(path, "/dumps/%05d_%05d.txt", i, z);
       }
       sprintf(fileBMPPath, "/temp/%05d.bmp", i);
-
       
       Serial.print("Parsing File: ");
       Serial.print(path);
       Serial.print(" to ");
-      Serial.println(fileBMPPath);
-
+      Serial.print(fileBMPPath);
+      
       //Open the file and copy it to the memory
       File file = FSYS.open(path);
       if(!file){
@@ -142,10 +143,8 @@ void ConvertFilesBMP()
       memset(image_data, 0x00, sizeof(image_data));
       img_index = 0;
       
-      Serial.println("RAW file done");
-      RGB_led_ON(LED_STATUS_BLUE);
-      delay(100);
-      RGB_led_OFF(LED_STATUS_BLUE);
+      Serial.println("... Done!");
+      RGB_blink(LED_STATUS_BLUE,1,100,50);
     }
     //Reset the counter for the number of files 
     numfiles=0;
@@ -153,40 +152,31 @@ void ConvertFilesBMP()
     delay(100);
 
     //Create a 4bits BMP and resize the image
-    #ifdef USE_OLED
-      if (UPSCALE_FACTOR > 1){
-        oledStateChange(7); //Upscaling Image
-      }
-    #endif
-    sprintf(path1, "/temp/%05d.bmp", i);
-    sprintf(path2, "/output/bmp/%05d.bmp", i);
+    sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
     if(UPSCALE_FACTOR < 1){
-      create_buffer(path1,path2,1); //Force upscale to 1 if less or equal to 0
-    }else{      
-      create_buffer(path1,path2,UPSCALE_FACTOR);
+      bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+    }else{
+      bmp_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
     }
 
-    //EXPERIMENTAL - Generates the PNG image (UPSCALE_FACTOR must set to 1. Very long images will get memory error when parse) 
-    #ifdef ENABLE_PNG_OUTPUT
-      #ifdef USE_OLED
-        oledStateChange(6); //TXT to PNG
-      #endif
-      sprintf(path3, "/sd/output/bmp/%05d.bmp", i);
-      sprintf(path4, "/sd/output/png/%05d.png", i);   
-      bmp_2_png_encoder(path3, path4);
+    #ifdef USE_OLED
+      oledStateChange(6); //TXT to PNG
     #endif
-    FSYS.remove(path1);
+    sprintf(pathOutput, "/output/png/%05d.png", i);
+    if(UPSCALE_FACTOR < 1){
+      png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
+    }else{
+      png_upscaler(fileBMPPath,pathOutput,UPSCALE_FACTOR);
+    }
+    png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+    FSYS.remove(fileBMPPath);
   }
 
   numfiles=0; 
   actualfile=0;
   isConverting = false;
   
-  callNextFile();
-
-  #ifdef USE_OLED
-    oledStateChange(1); //Printer Idle
-  #endif
+  callNextFile(); // Get Next ID available
   
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
@@ -195,9 +185,10 @@ void ConvertFilesBMP()
   #endif
   
 }
+
   
 /*******************************************************************************
-   Decode the Image
+   Decode the Image to a 24bits BMP
 *******************************************************************************/
 void gbpdecoder_gotByte(const uint8_t bytgb){
   if (gbp_pkt_processByte(&gbp_pktBuff, bytgb, gbp_pktbuff, &gbp_pktbuffSize, sizeof(gbp_pktbuff))){

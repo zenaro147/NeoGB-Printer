@@ -38,32 +38,17 @@ void oled_setup() {
   #endif
 }
 
-void oled_msg(String message) {
-  display.clearDisplay();
-  oled_msg(message, 12);
-}
-
-void oled_msg(String message1, String message2) {
-  display.clearDisplay();
-  oled_msg(message1 + "\n" + message2, 8);
-}
-
-void oled_msg(String message1, String message2, String message3) {
-  display.clearDisplay();
-  oled_msg(message1 + "\n" + message2 + "\n" + message3, 4);
-}
-
-void oled_msg(String message1, String message2, String message3, String message4) {
-  display.clearDisplay();
-  oled_msg(message1 + "\n" + message2 + "\n" + message3 + "\n" + message4, 0);
-}
-
-void oled_msg(String message, byte y) {
-  display.clearDisplay();
+void oled_writeNumImages(int numTotDump, int numTotImages) { 
+  char textshow[10];
+  
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0, y);
-  display.println(message);
+  sprintf(textshow, "%d Dumps", numTotDump);
+  display.setCursor(56, 15);
+  display.println(textshow);
+  sprintf(textshow, "%d Images", numTotImages);  
+  display.setCursor(56, 23);
+  display.println(textshow);
   display.display();
   #ifdef OLED_INVERT
     display.invertDisplay(true);
@@ -71,63 +56,9 @@ void oled_msg(String message, byte y) {
 }
 
 
-void oled_drawSplashScreen() {
+void oled_drawStatus(const unsigned char statusName[]) {
   display.clearDisplay();
-  display.drawBitmap(0, 0, splashScreen, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawSdInitError() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, sdInitError, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawSdFull() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, sdFull, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawIdleScreen() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, idlePrinter, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawHex2Txt() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, hex2txt, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawTxt2Bmp() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, txt2bmp, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawTxt2Png() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, txt2png, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawUpsalingImage() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, upscalingImage, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawForceNewFile() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, forceFile, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
-}
-
-void oled_drawTestOlED() {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, oledTest, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
+  display.drawBitmap(0, 0, statusName, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
   display.display();
 }
 
@@ -137,34 +68,34 @@ void oledStateChange(uint8_t lcdStatus){
     switch (lcdStatus)
     {
       case 0:
-        oled_drawSplashScreen();
+        oled_drawStatus(splashScreen);
         break;
-      case 1:
-        oled_drawIdleScreen();
+      case 1:      
+        oled_drawStatus(idlePrinter);
         break;
       case 2:
-        oled_drawSdInitError();
+        oled_drawStatus(sdInitError);
         break;
       case 3:
-        oled_drawSdFull();
+        oled_drawStatus(sdFull);
         break;
       case 4:
-        oled_drawHex2Txt();
+        oled_drawStatus(hex2txt);
         break;
       case 5:
-        oled_drawTxt2Bmp();
+        oled_drawStatus(txt2bmp);
         break;
       case 6:
-        oled_drawTxt2Png();
+        oled_drawStatus(txt2png);
         break;
       case 7:
-        oled_drawUpsalingImage();
+        oled_drawStatus(idlePrinter2);
         break;
       case 8:
-        oled_drawForceNewFile();
+        oled_drawStatus(forceFile);
         break;
       case 99:
-        oled_drawTestOlED();
+        oled_drawStatus(oledTest);
         break;
       default:
         display.clearDisplay();

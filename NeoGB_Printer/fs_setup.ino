@@ -110,7 +110,6 @@ unsigned int nextFreeFileIndex() {
   char path[31];
   int i = 1;
   dumpCount=0;
-  imgCount=0;
   do {
     sprintf(path, "/output/bmp/%05d.bmp", i);
     if(!FSYS.exists(path)){
@@ -127,8 +126,6 @@ unsigned int nextFreeFileIndex() {
       }else{
         dumpCount++;
       }
-    }else{
-      imgCount++;
     }
     i++;
   } while(true);
@@ -147,6 +144,63 @@ int fs_info() {
     (((float)totalBytes - (float)usedBytes) / (float)totalBytes) * 100.0
   );
 }
+
+#ifdef USE_OLED
+/*******************************************************************************
+  Get the number of images and dumps to show
+*******************************************************************************/
+void GetNumberFiles() {
+  char dirname[31];
+  char path[31];
+  char path2[31];
+  int i = 0;
+  int totalDumps=0;
+  int totalImages=0;
+  
+  sprintf(dirname, "/dumps");
+  File root = FSYS.open(dirname);
+  File file = root.openNextFile();
+  while(file){
+    i++;
+    file = root.openNextFile();
+  }
+  for(int x = 1; x <= i; x++){
+    sprintf(path, "/dumps/%05d.txt", x);
+    sprintf(path2, "/dumps/%05d_00001.txt", x);
+    if(FSYS.exists(path) || FSYS.exists(path2)){
+      totalDumps++;
+    }
+  }  
+
+  i=0;
+  sprintf(dirname, "/output/bmp");
+  root = FSYS.open(dirname);
+  file = root.openNextFile();
+  while(file){
+    i++;
+    file = root.openNextFile();
+  }
+  sprintf(dirname, "/output/png");
+  root = FSYS.open(dirname);
+  file = root.openNextFile();
+  while(file){
+    i++;
+    file = root.openNextFile();
+  }
+  for(int x = 1; x <= i; x++){
+    sprintf(path, "/output/bmp/%05d.bmp", x);
+    sprintf(path2, "/output/png/%05d.png", x);
+    if(FSYS.exists(path) || FSYS.exists(path2)){
+      totalImages++;
+    }
+  }
+  
+  Serial.printf("RAW Files: %d files\n", totalDumps);
+  Serial.printf("BMP/PNG Files: %d files\n", totalImages);
+  oled_writeNumImages(totalDumps,totalImages);
+  
+}
+#endif
 
 /*******************************************************************************
   "Printer Full" function

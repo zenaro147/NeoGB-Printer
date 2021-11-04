@@ -1,4 +1,4 @@
-#include <stdint.h> // uint8_t
+ #include <stdint.h> // uint8_t
 #include <stddef.h> // size_t
 
 #include "config.h"
@@ -29,11 +29,11 @@ uint8_t gbp_pktbuff[GBP_PKT_PAYLOAD_BUFF_SIZE_IN_BYTE] = {0};
 *******************************************************************************/
 // Button Variables
 long buttonTimer = 0;
-long longPressTime = 2000;
+long longPressTime = 2000; //2 seconds
 boolean buttonActive = false;
 boolean longPressActive = false;
 
-byte image_data[6000] = {}; // 1 GBC Picute (5.874)
+byte image_data[6000] = {}; //1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
 bool testmode = false;
@@ -47,7 +47,6 @@ unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
 
 unsigned int dumpCount = 0;
-unsigned int imgCount = 0;
 
 bool setMultiPrint = false;
 unsigned int totalMultiImages = 1;
@@ -110,13 +109,17 @@ void setup(void)
   /* Setup File System and OLED*/
   #ifdef USE_OLED
     oled_setup();
-    oledStateChange(0); //Splash Screen
   #endif
+  
   if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
     testmode = true;
     #ifdef USE_OLED
       oledStateChange(99); //Test
     #endif
+  }else{
+    #ifdef USE_OLED
+      oledStateChange(0); //Splash Screen
+    #endif 
   }
   delay(3000);
 
@@ -128,8 +131,6 @@ void setup(void)
       full();
     }
     freeFileIndex = nextFreeFileIndex();
-    Serial.printf("RAW Files: %u files\n", dumpCount);
-    Serial.printf("BMP Files: %u files\n", imgCount);
 
     /* Pins from gameboy link cable */
     pinMode(GBP_SC_PIN, INPUT);
@@ -153,6 +154,7 @@ void setup(void)
     RGB_blink(LED_STATUS_GREEN, 3,100,100);
     #ifdef USE_OLED
       oledStateChange(1); //Printer Idle
+      GetNumberFiles();
     #endif
   }else{
     RGB_blink(LED_STATUS_RED, 3,200,200);
@@ -180,7 +182,7 @@ void loop(){
         memset(image_data, 0x00, sizeof(image_data)); 
         
         #ifdef USE_OLED
-          oledStateChange(1); //Printer Idle
+          oledStateChange(7); //Printer Idle (without show number of files - for safity reasons)
         #endif  
         RGB_led_OFF(LED_STATUS_GREEN);
         if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
@@ -204,11 +206,15 @@ void loop(){
             Serial.println("Converting to Image File");
             isConverting = true;            
             #ifdef USE_OLED
-              oledStateChange(5); //Converting to Image
+              oledStateChange(5); //TXT to BMP
             #endif                        
             RGB_blink(LED_STATUS_BLUE, 3,100,100);
             ConvertFilesBMP();
-            RGB_blink(LED_STATUS_BLUE, 3,100,100);        
+            RGB_blink(LED_STATUS_BLUE, 3,100,100);   
+            #ifdef USE_OLED
+              oledStateChange(1); //Printer Idle
+              GetNumberFiles();
+            #endif     
           }
         }  
       } else {  
@@ -227,6 +233,7 @@ void loop(){
               callNextFile();
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
+                GetNumberFiles();
               #endif
             }
           }  
