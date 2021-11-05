@@ -71,7 +71,7 @@ void ConvertFilesBMP()
   
   do {
     sprintf(pathcheck1, "/dumps/%05d.txt", firstDumpID);
-    sprintf(pathcheck2, "/dumps/%05d_%05d.txt", firstDumpID, 1);
+    sprintf(pathcheck2, "/dumps/%05d_00001.txt", firstDumpID);
     if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
       break;
     }

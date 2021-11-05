@@ -162,37 +162,27 @@ void GetNumberFiles() {
   int i = 0;
   int totalDumps=0;
   int totalImages=0;
+  File root;
+  File file;
   
-  sprintf(dirname, "/dumps");
-  File root = FSYS.open(dirname);
-  File file = root.openNextFile();
-  while(file){
-    i++;
-    file = root.openNextFile();
-  }
-  for(int x = 1; x <= i; x++){
-    sprintf(path, "/dumps/%05d.txt", x);
-    sprintf(path2, "/dumps/%05d_00001.txt", x);
-    if(FSYS.exists(path) || FSYS.exists(path2)){
-      totalDumps++;
-    }
-  }  
-
-  i=0;
   sprintf(dirname, "/output/bmp");
   root = FSYS.open(dirname);
-  file = root.openNextFile();
-  while(file){
-    i++;
+  if(root.isDirectory()){
     file = root.openNextFile();
-  }
-  sprintf(dirname, "/output/png");
+    while(file){
+      i++;
+      file = root.openNextFile();
+    }
+  }    
+  sprintf(dirname, "/output/png");  
   root = FSYS.open(dirname);
-  file = root.openNextFile();
-  while(file){
-    i++;
-    file = root.openNextFile();
-  }
+  if(root.isDirectory()){
+    File file = root.openNextFile();
+    while(file){
+      i++;
+      file = root.openNextFile();
+    }
+  }  
   for(int x = 1; x <= i; x++){
     sprintf(path, "/output/bmp/%05d.bmp", x);
     sprintf(path2, "/output/png/%05d.png", x);
@@ -200,11 +190,39 @@ void GetNumberFiles() {
       totalImages++;
     }
   }
+
+  int firstDumpID=1;
+  sprintf(dirname, "/dumps");
+  root = FSYS.open(dirname);
+  file = root.openNextFile();
+  i=0;
+  while(file){
+    i++;
+    file = root.openNextFile();
+  }
+  if(i>0){
+    do{
+      sprintf(path, "/dumps/%05d.txt", firstDumpID);
+      sprintf(path2, "/dumps/%05d_00001.txt", firstDumpID);
+      if (FSYS.exists(path) || FSYS.exists(path2)) {
+        break;
+      }
+      firstDumpID++;
+    }while(true);
+  }
+  
+  for(int x = 1; x <= i; x++){
+    sprintf(path, "/dumps/%05d.txt", firstDumpID);
+    sprintf(path2, "/dumps/%05d_00001.txt", firstDumpID);
+    if(FSYS.exists(path) || FSYS.exists(path2)){
+      totalDumps++;
+    }
+    firstDumpID++;
+  }
   
   Serial.printf("Dump Files: %d files\n", totalDumps);
   Serial.printf("Image Files: %d files\n", totalImages);
   oled_writeNumImages(totalDumps,totalImages);
-  
 }
 #endif
 
