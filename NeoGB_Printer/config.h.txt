@@ -1,52 +1,58 @@
-//Include the SD libraries 
+/*****************************
+ * SD CARD MODULE DEFINITIONS 
+ *****************************/
+//SD libraries 
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
 #define FSYS SD
-
 //Define the SD Card Module Pins
-#define SD_CS 15
-#define SD_SCK 14
+#define SD_CS   15
+#define SD_SCK  14
 #define SD_MOSI 13
 #define SD_MISO 26
 
-// Define a PushButton to use to Reset the emulator/Force merge files.
-#define BTN_PUSH 34
+/************************************
+ * PUSH BUTTON AND IMAGE DEFINITIONS 
+ ************************************/
+#define BTN_PUSH 34             // Define a PushButton to use to Force a new file/Generate the images.
+#define BMP_OUTPUT            //Enable BMP image as output
+#define BMP_UPSCALE_FACTOR 4  //Set the Upsace factor for the BMP output
+//#define PNG_OUTPUT              //Enable PNG image as output
+//#define PNG_UPSCALE_FACTOR 4    //Set the Upsace factor for the PNG output
 
-// Total of images supported
-#define BMP_OUTPUT //Enable BMP image as output
-#define BMP_UPSCALE_FACTOR 4
-//#define PNG_OUTPUT //Enable PNG image as output
-//#define PNG_UPSCALE_FACTOR 4
-
-//Using OLED Display
-//#define USE_OLED
+/***************************
+ * OLED DISPLAY DEFINITIONS
+ ***************************/
+//#define USE_OLED        //Enable OLED
 //#define OLED_SDA 21
 //#define OLED_SCL 22
-//#define OLED_INVERT //You can invert the display to easily spot the actual dimensions
-//#define OLED_ROTATE //You can rotate the display by 180°
+//#define OLED_INVERT   //Invert the display colors to easily spot the actual dimensions
+
+//#define OLED_ROTATE   //Rotate the display by 180°
+
+/*************************
+ * LED STATUS DEFINITIONS
+ *************************/
+// Standard LED Definitions
+//#define LED_STATUS_PIN    4       // LED blink on packet reception (2 is internal LED)
 
 // RGB LED Definitions
-//#define LED_STATUS_BLUE   4
-//#define LED_STATUS_RED    16
-//#define LED_STATUS_GREEN  17
+//#define LED_STATUS_BLUE  4
+//#define LED_STATUS_RED   16
+//#define LED_STATUS_GREEN 17
 //#define COMMON_ANODE
 //#define COMMON_CATHODE
 
-
-/* Gameboy Link Cable Mapping to Arduino Pin */
-// Note: Serial Clock Pin must be attached to an interrupt pin of the arduino
+/*********************************
+ * GAMEBOY LINK CABLE DEFINITIONS
+ *********************************/
+// Note: Serial Clock Pin must be attached to an interrupt pin of the arduino (Pins 1 and 4 are not used)
 //  ___________
 // |  6  4  2  |
 //  \_5__3__1_/   (at cable)
 //
 
-// Pin Setup for ESP32 Devices
-//                  | Arduino Pin | Gameboy Link Pin  |
-#define GBP_VCC_PIN               // Pin 1            : 5.0V (Unused)
-#define GBP_SO_PIN       23       // Pin 2            : ESP-pin 23 MOSI (Serial OUTPUT in GB)
-#define GBP_SI_PIN       19       // Pin 3            : ESP-pin 19 MISO (Serial INPUT in GB)
-#define GBP_SD_PIN                // Pin 4            : Serial Data  (Unused)
-#define GBP_SC_PIN       18       // Pin 5            : ESP-pin 18 CLK  (Serial Clock)
-#define GBP_GND_PIN               // Pin 6            : GND (Attach to GND Pin)
-//#define LED_STATUS_PIN    2       // LED blink on packet reception (2 is internal LED)
+#define GBP_SI_PIN  23  // Pin 2 : ESP-pin 23 MOSI (Serial Out at the other end of the cable)
+#define GBP_SO_PIN  19  // Pin 3 : ESP-pin 19 MISO (Serial In at the other end of the cable)
+#define GBP_SC_PIN  18  // Pin 5 : ESP-pin 18 CLK  (Serial Clock)

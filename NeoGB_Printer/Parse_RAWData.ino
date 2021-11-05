@@ -38,8 +38,6 @@ inline void gbp_packet_capture_loop() {
           case 1:
             chkMargin = 0x00;
             break;
-          case 2:          
-            break;
           case 4:
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
             if (pktDataLength > 0){
@@ -48,12 +46,15 @@ inline void gbp_packet_capture_loop() {
             }
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
             break;
-          case 15:
-            break;
           default:
             break;
-        } 
-        RGB_led_ON(LED_STATUS_GREEN);
+        }        
+        #ifdef LED_STATUS_PIN 
+          LED_led_ON(LED_STATUS_PIN);
+        #endif
+        #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+          LED_led_ON(LED_STATUS_GREEN);
+        #endif 
       }
 
       // Print Hex Byte
@@ -64,11 +65,16 @@ inline void gbp_packet_capture_loop() {
         img_index++;
         if (chkHeader == 2 && pktByteIndex == 7) { 
           chkMargin = (int)((char)nibbleToCharLUT[(data_8bit>>0)&0xF])-'0';
-        } 
+        }
       }
       
       if ((pktByteIndex > 5) && (pktByteIndex >= (9 + pktDataLength))) {
-        RGB_led_OFF(LED_STATUS_GREEN);
+        #ifdef LED_STATUS_PIN 
+          LED_led_OFF(LED_STATUS_PIN);
+        #endif
+        #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+          LED_led_OFF(LED_STATUS_GREEN);
+        #endif 
         if (chkHeader == 2 && !isWriting) {
           memcpy(img_tmp,image_data,6000);
           memset(image_data, 0x00, sizeof(image_data)); 

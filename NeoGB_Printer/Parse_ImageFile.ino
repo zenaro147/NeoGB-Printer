@@ -1,4 +1,3 @@
-
 #include "gbp_tiles.h"
 #include "gbp_bmp.h"
 #include "./image/bmp/bmp_FixedWidthStream.h"
@@ -58,7 +57,6 @@ void ConvertFilesBMP()
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
     #endif
-
     #ifdef PNG_OUTPUT
       sprintf(pathOutput, "/output/png/%05d.png", 0);
       if(PNG_UPSCALE_FACTOR < 1){
@@ -68,8 +66,7 @@ void ConvertFilesBMP()
       }
       png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images    
     #endif
-    FSYS.remove(fileBMPPath);
-      
+    FSYS.remove(fileBMPPath);      
     testmode = false;
   }
   
@@ -84,7 +81,6 @@ void ConvertFilesBMP()
   
   //Loop to check only the availables files based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
-    
     #ifdef USE_OLED
       oledStateChange(5); //TXT to BMP
     #endif
@@ -112,6 +108,13 @@ void ConvertFilesBMP()
 
     // Loop to parse the files based on the previous results
     for (int z = 1; z <= numfiles; z++){
+      #ifdef LED_STATUS_PIN 
+        LED_led_ON(LED_STATUS_PIN);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_led_ON(LED_STATUS_BLUE);
+      #endif 
+      
       actualfile = z;
       //Check if is a single file or a long print
       if (numfiles == 1){
@@ -148,8 +151,20 @@ void ConvertFilesBMP()
       img_index = 0;
       
       Serial.println("... Done!");
-      RGB_blink(LED_STATUS_BLUE,1,100,50);
+      #ifdef LED_STATUS_PIN 
+        LED_led_OFF(LED_STATUS_PIN);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_led_OFF(LED_STATUS_BLUE);
+      #endif 
     }
+    #ifdef LED_STATUS_PIN
+      LED_led_ON(LED_STATUS_PIN);
+    #endif
+    #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+      LED_led_ON(LED_STATUS_BLUE);
+    #endif
+    
     //Reset the counter for the number of files 
     numfiles=0;
     actualfile=0;
@@ -165,6 +180,7 @@ void ConvertFilesBMP()
       }
     #endif
     
+    //Create a PNG and resize the image
     #ifdef PNG_OUTPUT
       #ifdef USE_OLED
         oledStateChange(6); //TXT to PNG
@@ -194,7 +210,6 @@ void ConvertFilesBMP()
   
 }
 
-  
 /*******************************************************************************
    Decode the Image to a 24bits BMP
 *******************************************************************************/

@@ -2,7 +2,6 @@
   Initialize File System and SD Card
 *******************************************************************************/
 bool fs_setup() {
-//void fs_setup() {
   pinMode(SD_CS, OUTPUT);
   spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
 
@@ -211,8 +210,13 @@ void GetNumberFiles() {
 *******************************************************************************/
 void full() {
   Serial.println("no more space on printer");
-  RGB_led_ON(LED_STATUS_RED);
-#ifdef USE_OLED
-  oledStateChange(3); //Printer Full
-#endif
+  #ifdef LED_STATUS_PIN 
+    LED_led_ON(LED_STATUS_PIN);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_led_ON(LED_STATUS_RED);
+  #endif
+  #ifdef USE_OLED
+    oledStateChange(3); //Printer Full
+  #endif
 }

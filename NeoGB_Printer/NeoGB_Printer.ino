@@ -5,7 +5,7 @@
 #include "gameboy_printer_protocol.h"
 #include "gbp_pkt.h"
 #include "gbp_serial_io.h"
-#include "RGB_LED.h"
+#include "LED_status.h"
 
 /*******************************************************************************
 *******************************************************************************/
@@ -96,12 +96,13 @@ void setup(void)
   //In case of erros, change to 80
   setCpuFrequencyMhz(160); 
   
-  /* LED Indicator */
-  pinMode(LED_STATUS_RED, OUTPUT);
-  pinMode(LED_STATUS_GREEN, OUTPUT);
-  pinMode(LED_STATUS_BLUE, OUTPUT);
-  RGB_init();
-  RGB_blink_white(3, 50, 50);
+  LED_init();
+  #ifdef LED_STATUS_PIN 
+    LED_blink(LED_STATUS_PIN, 3, 50, 50);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_RED, LED_STATUS_BLUE, LED_STATUS_GREEN, 3, 50, 50);
+  #endif
   
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
@@ -166,14 +167,25 @@ void setup(void)
     #endif
   
     gbp_pkt_init(&gbp_pktBuff);
+        
+    #ifdef LED_STATUS_PIN 
+      LED_blink(LED_STATUS_PIN, 3, 100, 100);
+    #endif
+    #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+      LED_blink(LED_STATUS_GREEN, 3,100,100);
+    #endif
     
-    RGB_blink(LED_STATUS_GREEN, 3,100,100);
     #ifdef USE_OLED
       oledStateChange(1); //Printer Idle
       GetNumberFiles();
     #endif
   }else{
-    RGB_blink(LED_STATUS_RED, 3,200,200);
+    #ifdef LED_STATUS_PIN 
+      LED_blink(LED_STATUS_PIN, 3, 200, 200);
+    #endif
+    #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+      LED_blink(LED_STATUS_RED, 3,200,200);
+    #endif
     #ifdef USE_OLED
       oledStateChange(2); //SD Init Error
     #endif
@@ -199,8 +211,13 @@ void loop(){
         
         #ifdef USE_OLED
           oledStateChange(7); //Printer Idle (without show number of files - for safity reasons)
-        #endif  
-        RGB_led_OFF(LED_STATUS_GREEN);
+        #endif
+        #ifdef LED_STATUS_PIN 
+          LED_led_OFF(LED_STATUS_PIN);
+        #endif
+        #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+          LED_led_OFF(LED_STATUS_GREEN);
+        #endif
         if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
           callNextFile();
         }
@@ -223,10 +240,26 @@ void loop(){
             isConverting = true;            
             #ifdef USE_OLED
               oledStateChange(5); //TXT to BMP
-            #endif                        
-            RGB_blink(LED_STATUS_BLUE, 3,100,100);
+            #endif
+            
+            #ifdef LED_STATUS_PIN
+              LED_blink(LED_STATUS_PIN, 3,100,100);
+              LED_led_ON(LED_STATUS_PIN);
+            #endif
+            #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+              LED_blink(LED_STATUS_BLUE, 3,100,100);
+              LED_led_ON(LED_STATUS_BLUE);
+            #endif
+            
             ConvertFilesBMP();
-            RGB_blink(LED_STATUS_BLUE, 3,100,100);   
+            
+            #ifdef LED_STATUS_PIN 
+              LED_blink(LED_STATUS_PIN, 3,100,100);
+            #endif
+            #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+              LED_blink(LED_STATUS_BLUE, 3,100,100);
+            #endif
+            
             #ifdef USE_OLED
               oledStateChange(1); //Printer Idle
               GetNumberFiles();
@@ -241,16 +274,33 @@ void loop(){
             delay(500);
             if((totalMultiImages-1) > 1){
               Serial.println("Get next file ID");
-              RGB_blink_magenta(3, 100, 100);
+              
+              #ifdef LED_STATUS_PIN 
+                LED_blink(LED_STATUS_PIN, 3,100,100);
+                LED_led_ON(LED_STATUS_PIN);
+              #endif
+              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+                LED_blink(LED_STATUS_RED, LED_STATUS_BLUE, 3,100,100);
+                LED_led_ON(LED_STATUS_RED, LED_STATUS_BLUE);
+              #endif      
+                      
               #ifdef USE_OLED
                 oledStateChange(8); //Force Next File
               #endif
-              delay(1000);
+              delay(500);
               callNextFile();
+              
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
                 GetNumberFiles();
               #endif
+              
+              #ifdef LED_STATUS_PIN 
+                LED_led_OFF(LED_STATUS_PIN);
+              #endif
+              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+                LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
+              #endif 
             }
           }  
           buttonActive = false;  
