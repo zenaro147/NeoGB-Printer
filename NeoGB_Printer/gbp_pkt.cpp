@@ -25,9 +25,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "gameboy_printer_protocol.h"
-#include "gbp_serial_io.h"
-#include "gbp_pkt.h"
+#include "./includes/gblink/gameboy_printer_protocol.h"
+#include "./includes/gblink/gbp_serial_io.h"
+#include "./includes/gblink/gbp_pkt.h"
 
 bool gbp_pkt_init(gbp_pkt_t *_pkt)
 {

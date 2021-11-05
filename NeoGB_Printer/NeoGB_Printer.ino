@@ -2,10 +2,10 @@
 #include <stddef.h> // size_t
 
 #include "config.h"
-#include "gameboy_printer_protocol.h"
-#include "gbp_pkt.h"
-#include "gbp_serial_io.h"
-#include "LED_status.h"
+#include "./includes/gblink/gameboy_printer_protocol.h"
+#include "./includes/gblink/gbp_pkt.h"
+#include "./includes/gblink/gbp_serial_io.h"
+#include "./includes/led/LED_status.h"
 
 /*******************************************************************************
 *******************************************************************************/

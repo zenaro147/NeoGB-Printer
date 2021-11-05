@@ -30,9 +30,9 @@
 #include <stdint.h> // uint8_t
 #include <stddef.h> // size_t
 
-#include "gameboy_printer_protocol.h"
-#include "gbp_serial_io.h"
-#include "gbp_cbuff.h"
+#include "./includes/gblink/gameboy_printer_protocol.h"
+#include "./includes/gblink/gbp_serial_io.h"
+#include "./includes/gblink/gbp_cbuff.h"
 
 /******************************************************************************/
 #define GBP_PKT10_TIMEOUT_MS 400 //500

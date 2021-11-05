@@ -26,8 +26,8 @@
 #include <stddef.h> // size_t
 #include <stdbool.h> // bool
 
-#include "gameboy_printer_protocol.h"
-#include "gbp_tiles.h"
+#include "./includes/gblink/gameboy_printer_protocol.h"
+#include "./includes/gblink/gbp_tiles.h"
 
 static void gbp_tiles_toBuff(
                         uint8_t *buff,

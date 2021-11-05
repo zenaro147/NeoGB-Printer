@@ -1,7 +1,6 @@
-#include "gbp_tiles.h"
-#include "gbp_bmp.h"
-#include "./image/bmp/bmp_FixedWidthStream.h"
-#include "./image/png/Upscalerlib.h"
+#include "./includes/gblink/gbp_tiles.h"
+#include "./includes/image/gbp_bmp.h"
+#include "./includes/image/Upscalerlib.h"
 
 uint8_t pktCounter = 0; // Dev Varible
 

@@ -116,18 +116,21 @@ unsigned int nextFreeFileIndex() {
   do {
     sprintf(path, "/output/bmp/%05d.bmp", i);
     if(!FSYS.exists(path)){
-      sprintf(path, "/dumps/%05d.txt", i);
-      if (!FSYS.exists(path)) {
-        sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
-        if(!FSYS.exists(path)){
-          Serial.print("Next File: ");
-          Serial.println(i);
-          return i;
+      sprintf(path, "/output/png/%05d.png", i);
+      if(!FSYS.exists(path)){
+        sprintf(path, "/dumps/%05d.txt", i);
+        if (!FSYS.exists(path)) {
+          sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
+          if(!FSYS.exists(path)){
+            Serial.print("Next File: ");
+            Serial.println(i);
+            return i;
+          }else{
+            dumpCount++;
+          }
         }else{
           dumpCount++;
         }
-      }else{
-        dumpCount++;
       }
     }
     i++;
@@ -198,8 +201,8 @@ void GetNumberFiles() {
     }
   }
   
-  Serial.printf("RAW Files: %d files\n", totalDumps);
-  Serial.printf("BMP/PNG Files: %d files\n", totalImages);
+  Serial.printf("Dump Files: %d files\n", totalDumps);
+  Serial.printf("Image Files: %d files\n", totalImages);
   oled_writeNumImages(totalDumps,totalImages);
   
 }

@@ -5,7 +5,7 @@
 //
 
 
-#include "patch_CRC32.h"
+#include "./includes/image/patch_CRC32.h"
 
 // Conditionally use pgm memory if it is available.
 

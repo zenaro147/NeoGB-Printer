@@ -4,7 +4,7 @@
 // SPDX-License-Identifier:  MIT
 //
 
-#include "patch_CRC32.h"
+#include "./includes/image/patch_CRC32.h"
 
 void png_patcher(char input[])
 {
