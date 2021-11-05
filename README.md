@@ -2,7 +2,7 @@
 
 The NeoGB Printer is a standalone Game Boy Printer emulator very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
-This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts is below $15.
+This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts bougth new is below $15. All parts can be easily exchanged with other projects or harvested from dead electronics as they are all very common.
 
 You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and/or PNG images, ready to use with social media.
 
@@ -17,12 +17,12 @@ You need to install some Libraries from the Arduino Library Manager - `Tools > M
 * Adafruit GFX Library (If you want to use the OLED Display).
 
 ## Hardware Setup
-This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
+This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
 * The number of total pins available in the board doesn't matter (Could be with 30 pins, 36 pins, 38 pins, whatever)
 * It's a **Dual Core module** (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
 * Have, at least, **2 SPI pins gourps** [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
 
-Some boards already have a SD Card slot built in. I've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you want to use this type of board, **DO IT AT YOUR OWN RISK!**
+Some boards already have a SD Card slot built in. We've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you choose to use this type of board, **we however won't be able to provide any support in case of bug.**
 
 ## Gameboy Link Cable Setup
 Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safely ! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj). A bit of do-it-yourself is necessary at this step if you do not use a breakout board.
@@ -67,8 +67,8 @@ To use it, connect the pins following this scheme:
 You will need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP and/or PNG. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
-* Single press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`)
-* Long Press: Convert all RAW data to BMP
+* Single short press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`).
+* Long Press: Convert all RAW data to BMP.
 
 ```
 PushButton Schematic
