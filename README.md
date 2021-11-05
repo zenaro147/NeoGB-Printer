@@ -91,7 +91,7 @@ You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/10050025
 
 To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE` for RGB LED (based on your LED) or `#define LED_STATUS_PIN` to use the standard one. Edit the pins in the `config.h` based on your setup.
 If your RGB LED uses a Common Anode, connect it to the 3.3v Pin. If it's Common Cathode, connect it to the GND.
-For the other legs, you need to use at least a 22O Ohm Resistor on each RGB leg. Connect them following the example scheme below (always based on your `config.h` file)
+For the other legs, you need to use at least a 220 Ohm Resistor on each RGB leg. Connect them following the example scheme below (always based on your `config.h` file)
 ```
 | RGB | ESP32 |
 |-----|-------|
