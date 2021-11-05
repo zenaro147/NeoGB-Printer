@@ -12,9 +12,9 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
 You need to install some Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
-* PNGenc (If you want do output the images as PNG)
-* Adafruit SSD1306 (If you want to use the OLED Display)
-* Adafruit GFX Library (If you want to use the OLED Display)
+* PNGenc (If you want to output the images as PNG).
+* Adafruit SSD1306 (If you want to use the OLED Display).
+* Adafruit GFX Library (If you want to use the OLED Display).
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:\
@@ -101,7 +101,7 @@ For the other legs, you need to use at least a 220 Ohm Resistor on each RGB leg.
 
 ```
 
-If you are using a standard single color LED, connect following the example scheme below (always based on your `config.h` file)
+If you are using a standard single color LED, connect it by following the example scheme below (always based on your `config.h` file). Using a single color LED in combination with OLED display is an interesting setup.
 ```
 | LED | ESP32 |
 |-----|-------|
@@ -126,11 +126,11 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ?
-* Power the beast, white LED flashes 3 times immediately, wait for the next 3 green flashes;
-* Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .txt files called "dumps" on the SD cards. Batch printing with Game Boy Camera is of course possible;
+* Power the beast, white LED flashes 3 times immediately, wait for the next 3 green flashes indicating that the system is ready for printing.
+* Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .txt files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led flashes 3 times to indicate that command have been acknowledged.
-* In the same session or later, press the pushbutton for about 2 seconds to convert .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and/or be patient.
-* Remove the SD card and enjoy your images !
+* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and/or be patient.
+* Remove the SD card and enjoy your images ready to be published online !
 * Additionnaly, remote connection with WIFI is under development.
 * There is an easter egg in the printer, will you find it ?
 
@@ -142,7 +142,7 @@ Any 5 Volts source available will do the job as the device consumes less than 1 
 ![Setup by Raphaël BOICHOTy](/showcase/RaphaelBOICHOT.jpg)
 
 ## ⚠ Take care ⚠
-You should not power the ESP from the GameBoy, as this might damage the GameBoy itself.
+You should not power the ESP from the GameBoy, as this might damage the GameBoy itself. The +5 volts from Game Boy serial is not a reliable power source.
 
 # Posts about:
 * [Hack a Day Article](https://hackaday.com/2021/10/22/an-open-source-game-boy-printer-that-doesnt-print/)
