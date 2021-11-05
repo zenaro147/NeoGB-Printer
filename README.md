@@ -114,6 +114,13 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 
 ```
 ## How to use it ?
+* Power the beast, wait for the 3 green flashes;
+* Print as with the real Game Boy Printer, as many prints as you wish in a single sessions. Data are stored in binaries txt files on the SD cards;
+* Some games require a short press button to separate the files as they do not have a margin indication in the print command. If button is pressed short, magenta led flashes 3 times to indicate that command have been acknowledged.
+* In the same session or later, press the pushbutton long to convert binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly.
+* Remove the SD card and enjoy your images !
+* Additionnaly, remote connection with WIFI is under development.
+
 ![user_manual](/Supplementary_images/User_manual.png)
 
 ## Powering the beast
