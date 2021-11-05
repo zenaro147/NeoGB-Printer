@@ -148,6 +148,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
 * Raphaël Boichot: protocol and code debugging, PNG format and RGB led support, hardcore gaming with Japanese kusoge.
+
 ![credits](/Supplementary_images/credits.png)
 
 # List of games tested and fully compatible with the NeoGB Printer:
