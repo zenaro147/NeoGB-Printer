@@ -101,7 +101,7 @@ For the other legs, you need to use at least a 220 Ohm Resistor on each RGB leg.
 
 ```
 
-If you are using a standard single color LED, connect following the example scheme below (always based on your `config.h` file)
+If you are using a standard single color LED, connect it by following the example scheme below (always based on your `config.h` file). Using a single color LED in combination with OLED display is an interesting setup.
 ```
 | LED | ESP32 |
 |-----|-------|
