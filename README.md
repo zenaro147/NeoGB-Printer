@@ -120,6 +120,7 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 * In the same session or later, press the pushbutton for about 2 seconds to convert .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and be patient.
 * Remove the SD card and enjoy your images !
 * Additionnaly, remote connection with WIFI is under development.
+* There is an easter egg in the device, will you find it ?
 
 ![user_manual](/Supplementary_images/User_manual.png)
 
