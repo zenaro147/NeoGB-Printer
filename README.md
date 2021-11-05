@@ -37,14 +37,14 @@ Connect the Game Boy serial pins to the ESP pins following this scheme:
 
 | Link Cable |Level Shifter|  ESP32  |
 |------------|-------------|---------|
-| Pin 1      |             |  N/A    | <- 5v from Game Boy (unreliable voltage source)
-| Pin 2      |  HV1<->LV1  |  G19    | <- Serial Out (Serial In at the other end of the cable that connect to the Game Boy)
-| Pin 3      |  HV2<->LV2  |  G23    | <- Serial In (Serial Out at the other end of the cable that connect to the Game Boy)
-| Pin 4      |             |  N/A    | <- Serial Data
-| Pin 5      |  HV3<->LV3  |  G18    | <- Clock Out
-| Pin 6      |  GND<->GND  |  GND    | <- GND
+| Pin 1      |             |   N/A   | <- 5v from Game Boy (unreliable voltage source)
+| Pin 2      |  HV1<->LV1  |   G19   | <- Serial Out (Serial In at the other end of the cable that connect to the Game Boy)
+| Pin 3      |  HV2<->LV2  |   G23   | <- Serial In (Serial Out at the other end of the cable that connect to the Game Boy)
+| Pin 4      |             |   N/A   | <- Serial Data
+| Pin 5      |  HV3<->LV3  |   G18   | <- Clock Out
+| Pin 6      |  GND<->GND  |   GND   | <- GND
 |            |      LV     |  +3.3V  | <- +3.3 volts from ESP32
-|            |      HV     |  +5V    | <- +5 volts from ESP32 or USB
+|            |      HV     |   +5V   | <- +5 volts from ESP32 or USB
 ```
 
 ## SD Card Reader Setup
@@ -53,12 +53,12 @@ To use it, connect the pins following this scheme:
 ```
 | SD ADAPTER |  ESP32  |
 |------------|---------|
-| CS         | G15     | 
-| SCK        | G14     |
-| MISO       | G27     | <-- DON'T USE THE G12... YOU CAN USE ANY OTHER PIN AVAILABLE
-| MOSI       | G13     |
-| GND        | G       |
-| VCC/5v     | VIN     |
+| CS         |   G15   | 
+| SCK        |   G14   |
+| MISO       |   G27   | <-- DON'T USE THE G12! YOU CAN USE ANY OTHER PIN AVAILABLE
+| MOSI       |   G13   |
+| GND        |    G    |
+| VCC/5v     |   VIN   |
 | 3v3        |   N/A   |
 
 ```
@@ -87,13 +87,13 @@ PushButton Schematic
 ```
 
 ## RGB LED to display the Status (optional)
-You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html). This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
+You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html) and/or a [standard one](https://pt.aliexpress.com/item/1936218827.html). This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
 
-To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE`, based on your LED. Edit the other legs in the `config.h` based on your setup.
- If your LED uses a Common Anode, connect it to the 3.3v Pin. If it's Common Cathode, connect it to the GND.
+To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE` for RGB LED (based on your LED) or `#define LED_STATUS_PIN` to use the standard one. Edit the pins in the `config.h` based on your setup.
+If your RGB LED uses a Common Anode, connect it to the 3.3v Pin. If it's Common Cathode, connect it to the GND.
 For the other legs, you need to use at least a 22O Ohm Resistor on each RGB leg. Connect them following the example scheme below (always based on your `config.h` file)
 ```
-| LED | ESP32 |
+| RGB | ESP32 |
 |-----|-------|
 |  R  |  16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
 |  G  |  17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
@@ -101,16 +101,25 @@ For the other legs, you need to use at least a 22O Ohm Resistor on each RGB leg.
 
 ```
 
+If you are using a standard one, connect following the example scheme below (always based on your `config.h` file)
+```
+| LED | ESP32 |
+|-----|-------|
+|  +  |   4   | <-- ANODE LED (the long one) - YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  -  |  GND  | <-- CATHODE LED (the short one)
+```
+
+
 ## OLED Display Setup (optional)
 You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines. The display will show the current status of the printer.
 
 ```
 | OLED DISPLAY |   ESP32   |
 |--------------|-----------|
-| GND          | GND       | 
+| GND          |    GND    | 
 | VIN          | 5v or 3v3 |
-| SCL          | G22       | <-- YOU CAN USE ANY GPIO AVAILABLE
-| SDA          | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
+| SCL          |    G22    | <-- YOU CAN USE ANY GPIO AVAILABLE
+| SDA          |    G21    | <-- YOU CAN USE ANY GPIO AVAILABLE
 
 ```
 ## How to use it ?
