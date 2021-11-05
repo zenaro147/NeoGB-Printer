@@ -86,7 +86,7 @@ PushButton Schematic
 
 ```
 
-## RGB LED to display the Status (optional)
+## LED to display the Status (optional)
 You can add a [simple RGB LED like this](https://pt.aliexpress.com/item/1005002535018824.html) and/or a [standard one](https://pt.aliexpress.com/item/1936218827.html). This LED will be very useful to display the printer status, like Idle, Converting, Receiving Data, etc.
 
 To use it, you need to uncomment `#define COMMON_ANODE` or `#define COMMON_CATHODE` for RGB LED (based on your LED) or `#define LED_STATUS_PIN` to use the standard one. Edit the pins in the `config.h` based on your setup.
