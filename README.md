@@ -38,8 +38,8 @@ Connect the Game Boy serial pins to the ESP pins following this scheme:
 | Link Cable |Level Shifter|  ESP32  |
 |------------|-------------|---------|
 | Pin 1      |             |  N/A    | <- 5v from Game Boy (unreliable voltage source)
-| Pin 2      |  HV1<->LV1  |  G19    | <- Serial Out (Serial In at the other end of the cable)
-| Pin 3      |  HV2<->LV2  |  G23    | <- Serial In (Serial Out at the other end of the cable)
+| Pin 2      |  HV1<->LV1  |  G19    | <- Serial Out (Serial In at the other end of the cable that connect to the Game Boy)
+| Pin 3      |  HV2<->LV2  |  G23    | <- Serial In (Serial Out at the other end of the cable that connect to the Game Boy)
 | Pin 4      |             |  N/A    | <- Serial Data
 | Pin 5      |  HV3<->LV3  |  G18    | <- Clock Out
 | Pin 6      |  GND<->GND  |  GND    | <- GND
