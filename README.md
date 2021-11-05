@@ -126,11 +126,11 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ?
-* Power the beast, white LED flashes 3 times immediately, wait for the next 3 green flashes;
-* Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .txt files called "dumps" on the SD cards. Batch printing with Game Boy Camera is of course possible;
+* Power the beast, white LED flashes 3 times immediately, wait for the next 3 green flashes indicating that the system is ready for printing.
+* Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .txt files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led flashes 3 times to indicate that command have been acknowledged.
-* In the same session or later, press the pushbutton for about 2 seconds to convert .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and/or be patient.
-* Remove the SD card and enjoy your images !
+* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and/or be patient.
+* Remove the SD card and enjoy your images ready to be published online !
 * Additionnaly, remote connection with WIFI is under development.
 * There is an easter egg in the printer, will you find it ?
 
