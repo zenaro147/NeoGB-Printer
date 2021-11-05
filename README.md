@@ -113,6 +113,8 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 | SDA          | G21       | <-- YOU CAN USE ANY GPIO AVAILABLE
 
 ```
+## How to use it ?
+![user_manual](/Supplementary_images/User_manual.png)
 
 ## Powering the beast
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
