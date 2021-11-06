@@ -287,7 +287,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Add a message to display the number of images printed
 - [ ] Add a web interface
 
-## Thinks that can be improved in the future (feel free to contribute)
+## Things that can be improved in the future (feel free to contribute)
 * RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode.
 * The file conversion to PNG uses dependencies and uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today.
 * The PNG library used, PNGenc, have a bug on the calculation of crc of the IDAT chunck for big files when used on ESP32. We chose to fix this crc issue onboard with an image patcher so that the PNG files generated can strictly match with the PNG specifications. We did not dig far into PNGenc to see wether the bug was easy to fix or not as patching individually each image was easy and fast.
