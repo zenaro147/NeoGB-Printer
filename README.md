@@ -127,7 +127,7 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ?
-* Power the ESP, white LED flashes 3 times immediately, followed by an RGB test, wait for the next 3 green flashes indicating that the filesystem is ready for printing.
+* Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
 * In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires very short time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
