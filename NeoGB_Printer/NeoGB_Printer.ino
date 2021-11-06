@@ -77,11 +77,11 @@ void ICACHE_RAM_ATTR serialClock_ISR(void)
 {
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-  const bool txBit = gpb_serial_io_OnRising_ISR(digitalRead(GBP_SO_PIN));
+  const bool txBit = gpb_serial_io_OnRising_ISR(digitalRead(GBP_SI_PIN));
 #else
-  const bool txBit = gpb_serial_io_OnChange_ISR(digitalRead(GBP_SC_PIN), digitalRead(GBP_SO_PIN));
+  const bool txBit = gpb_serial_io_OnChange_ISR(digitalRead(GBP_SC_PIN), digitalRead(GBP_SI_PIN));
 #endif
-  digitalWrite(GBP_SI_PIN, txBit ? HIGH : LOW);
+  digitalWrite(GBP_SO_PIN, txBit ? HIGH : LOW);
 }
 
 /*******************************************************************************
@@ -96,17 +96,10 @@ void setup(void)
   //In case of erros, change to 80
   setCpuFrequencyMhz(160); 
   
-  LED_init();
-  #ifdef LED_STATUS_PIN 
-    LED_blink(LED_STATUS_PIN, 3, 50, 50);
-  #endif
-  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-    LED_blink(LED_STATUS_RED, LED_STATUS_BLUE, LED_STATUS_GREEN, 3, 50, 50);
-  #endif
-  
+  LED_init();  
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
-
+  
   /* Setup File System and OLED*/
   #ifdef USE_OLED
     oled_setup();
@@ -122,6 +115,16 @@ void setup(void)
       oledStateChange(0); //Splash Screen
     #endif 
   }
+  #ifdef LED_STATUS_PIN 
+    LED_blink(LED_STATUS_PIN, 3, 50, 50);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_RED, LED_STATUS_BLUE, LED_STATUS_GREEN, 3, 50, 50);
+    LED_blink(LED_STATUS_RED, 1, 300, 50);
+    LED_blink(LED_STATUS_GREEN, 1, 300, 50);
+    LED_blink(LED_STATUS_BLUE, 1, 300, 50);
+  #endif
+  
 
   //Force BMP output if no one was defined and the Upscale Factor
   #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
@@ -151,10 +154,10 @@ void setup(void)
 
     /* Pins from gameboy link cable */
     pinMode(GBP_SC_PIN, INPUT);
-    pinMode(GBP_SO_PIN, INPUT);
-    pinMode(GBP_SI_PIN, OUTPUT);
+    pinMode(GBP_SI_PIN, INPUT);
+    pinMode(GBP_SO_PIN, OUTPUT);
     /* Default link serial out pin state */
-    digitalWrite(GBP_SI_PIN, LOW);
+    digitalWrite(GBP_SO_PIN, LOW);
   
     /* Setup */
     gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
@@ -244,11 +247,9 @@ void loop(){
             
             #ifdef LED_STATUS_PIN
               LED_blink(LED_STATUS_PIN, 3,100,100);
-              LED_led_ON(LED_STATUS_PIN);
             #endif
             #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
               LED_blink(LED_STATUS_BLUE, 3,100,100);
-              LED_led_ON(LED_STATUS_BLUE);
             #endif
             
             ConvertFilesBMP();
@@ -276,31 +277,28 @@ void loop(){
               Serial.println("Get next file ID");
               
               #ifdef LED_STATUS_PIN 
-                LED_blink(LED_STATUS_PIN, 3,100,100);
                 LED_led_ON(LED_STATUS_PIN);
               #endif
               #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-                LED_blink(LED_STATUS_RED, LED_STATUS_BLUE, 3,100,100);
                 LED_led_ON(LED_STATUS_RED, LED_STATUS_BLUE);
-              #endif      
-                      
+              #endif                      
               #ifdef USE_OLED
                 oledStateChange(8); //Force Next File
               #endif
-              delay(500);
+
               callNextFile();
               
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
                 GetNumberFiles();
               #endif
-              
               #ifdef LED_STATUS_PIN 
                 LED_led_OFF(LED_STATUS_PIN);
               #endif
               #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
                 LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
-              #endif 
+              #endif  
+              
             }
           }  
           buttonActive = false;  

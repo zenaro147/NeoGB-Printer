@@ -1,11 +1,21 @@
 ////minimal RGB LED support by Raphaël BOICHOT
-void LED_led_ON(int COLOR1){
-  #ifdef COMMON_ANODE
-    digitalWrite(COLOR1, LOW);
+#include "./config.h"
+
+void LED_led_ON(int COLOR1)
+{
+  #ifndef LED_STATUS_PIN
+    int LED_STATUS_PIN = -1;
   #endif
-  #if defined(LED_STATUS_PIN) || defined(COMMON_CATHODE)
+  if(COLOR1 == LED_STATUS_PIN){
     digitalWrite(COLOR1, HIGH);
-  #endif
+  }else{
+    #ifdef COMMON_ANODE
+      digitalWrite(COLOR1, LOW);
+    #endif
+    #ifdef COMMON_CATHODE
+      digitalWrite(COLOR1, HIGH);
+    #endif
+  }
 }
 void LED_led_ON(int COLOR1, int COLOR2){
   #ifdef COMMON_ANODE
@@ -32,12 +42,19 @@ void LED_led_ON(int COLOR1, int COLOR2, int COLOR3){
 
 void LED_led_OFF(int COLOR1)
 {
-  #ifdef COMMON_ANODE
-    digitalWrite(COLOR1, HIGH);
+  #ifndef LED_STATUS_PIN
+    int LED_STATUS_PIN = -1;
   #endif
-  #if defined(LED_STATUS_PIN) || defined(COMMON_CATHODE)
+  if(COLOR1 == LED_STATUS_PIN){
     digitalWrite(COLOR1, LOW);
-  #endif
+  }else{
+    #ifdef COMMON_ANODE
+      digitalWrite(COLOR1, HIGH);
+    #endif
+    #ifdef COMMON_CATHODE
+      digitalWrite(COLOR1, LOW);
+    #endif
+  }
 }
 void LED_led_OFF(int COLOR1, int COLOR2)
 {
@@ -66,22 +83,35 @@ void LED_led_OFF(int COLOR1, int COLOR2, int COLOR3)
 
 void LED_blink(int COLOR1, int number, int delay_on, int delay_off)
 {
-  for (int j = 1; j <= number; j++) {
-    #ifdef COMMON_ANODE
-      digitalWrite(COLOR1, LOW);
-    #endif
-    #if defined(LED_STATUS_PIN) || defined(COMMON_CATHODE)
+  #ifndef LED_STATUS_PIN
+    int LED_STATUS_PIN = -1;
+  #endif
+  if(COLOR1 == LED_STATUS_PIN){
+    for (int j = 1; j <= number; j++) {
       digitalWrite(COLOR1, HIGH);
-    #endif
-    delay(delay_on);
-    #ifdef COMMON_ANODE
-      digitalWrite(COLOR1, HIGH);
-    #endif
-    #if defined(LED_STATUS_PIN) || defined(COMMON_CATHODE)
+      delay(delay_on);
       digitalWrite(COLOR1, LOW);
-    #endif
-    delay(delay_off);
+      delay(delay_off);
+    }
+  }else{
+    for (int j = 1; j <= number; j++) {
+      #ifdef COMMON_ANODE
+        digitalWrite(COLOR1, LOW);
+      #endif
+      #ifdef COMMON_CATHODE
+        digitalWrite(COLOR1, HIGH);
+      #endif
+      delay(delay_on);
+      #ifdef COMMON_ANODE
+        digitalWrite(COLOR1, HIGH);
+      #endif
+      #ifdef COMMON_CATHODE
+        digitalWrite(COLOR1, LOW);
+      #endif
+      delay(delay_off);
+    }
   }
+  
 }
 void LED_blink(int COLOR1, int COLOR2, int number, int delay_on, int delay_off)
 {

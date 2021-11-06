@@ -118,9 +118,9 @@ void storeData(void *pvParameters)
   byte inqypck[10] = {B10001000, B00110011, B00001111, B00000000, B00000000, B00000000, B00001111, B00000000, B10000001, B00000000};  
   
   if(setMultiPrint || totalMultiImages > 1){
-    sprintf(fileName, "/dumps/%05d_%05d.txt", freeFileIndex,totalMultiImages);
+    sprintf(fileName, "/dumps/%05d_%05d.bin", freeFileIndex,totalMultiImages);
   }else{
-    sprintf(fileName, "/dumps/%05d.txt", freeFileIndex);
+    sprintf(fileName, "/dumps/%05d.bin", freeFileIndex);
   }
   
   File file = FSYS.open(fileName, FILE_WRITE);
@@ -133,9 +133,9 @@ void storeData(void *pvParameters)
 
   perf = millis() - perf;
   if(setMultiPrint || totalMultiImages > 1){
-    Serial.printf("File /dumps/%05d_%05d.txt written in %lums\n", freeFileIndex,totalMultiImages,perf);
+    Serial.printf("File /dumps/%05d_%05d.bin written in %lums\n", freeFileIndex,totalMultiImages,perf);
   }else{
-    Serial.printf("File /dumps/%05d.txt written in %lums\n", freeFileIndex, perf);
+    Serial.printf("File /dumps/%05d.bin written in %lums\n", freeFileIndex, perf);
   }
 
   //Check how much space still have

@@ -21,8 +21,7 @@ uint8_t actualfile = 0;
 /*******************************************************************************
   Convert to BMP
 *******************************************************************************/
-void ConvertFilesBMP()
-{
+void ConvertFilesBMP(){
   //Remove the interrupt to prevent receive data from Gameboy
   detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
 
@@ -55,6 +54,12 @@ void ConvertFilesBMP()
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
+      #ifdef LED_STATUS_PIN 
+        LED_blink(LED_STATUS_PIN,1,100,50);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_blink(LED_STATUS_BLUE,1,100,50);
+      #endif
     #endif
     #ifdef PNG_OUTPUT
       sprintf(pathOutput, "/output/png/%05d.png", 0);
@@ -63,15 +68,21 @@ void ConvertFilesBMP()
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images    
+      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      #ifdef LED_STATUS_PIN 
+        LED_blink(LED_STATUS_PIN,1,100,50);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_blink(LED_STATUS_BLUE,1,100,50);
+      #endif
     #endif
-    FSYS.remove(fileBMPPath);      
+    FSYS.remove(fileBMPPath);             
     testmode = false;
   }
   
   do {
-    sprintf(pathcheck1, "/dumps/%05d.txt", firstDumpID);
-    sprintf(pathcheck2, "/dumps/%05d_00001.txt", firstDumpID);
+    sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
+    sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
     if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
       break;
     }
@@ -83,17 +94,17 @@ void ConvertFilesBMP()
     #ifdef USE_OLED
       oledStateChange(5); //TXT to BMP
     #endif
-    
+
     //Check if the file is a long print or a single file
-    sprintf(path, "/dumps/%05d.txt", i);
+    sprintf(path, "/dumps/%05d.bin", i);
     if(FSYS.exists(path)) {
       numfiles=1;
     }else{     
       //If is long print, count how many files exists
-      sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
+      sprintf(path, "/dumps/%05d_%05d.bin", i, 1);
       if(FSYS.exists(path)){
         for(int filecount=1; filecount <= 100; filecount++){
-          sprintf(path, "/dumps/%05d_%05d.txt", i, filecount);
+          sprintf(path, "/dumps/%05d_%05d.bin", i, filecount);
           if(!FSYS.exists(path)){
             break; //Exit from the loop to check the ammount of files in a multiprint
           }else{
@@ -104,22 +115,15 @@ void ConvertFilesBMP()
         break; //Exit from the loop, because don't have any more files
       }
     }
-
+    
     // Loop to parse the files based on the previous results
-    for (int z = 1; z <= numfiles; z++){
-      #ifdef LED_STATUS_PIN 
-        LED_led_ON(LED_STATUS_PIN);
-      #endif
-      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_led_ON(LED_STATUS_BLUE);
-      #endif 
-      
+    for (int z = 1; z <= numfiles; z++){      
       actualfile = z;
       //Check if is a single file or a long print
       if (numfiles == 1){
-        sprintf(path, "/dumps/%05d.txt", i);
+        sprintf(path, "/dumps/%05d.bin", i);
       }else{
-        sprintf(path, "/dumps/%05d_%05d.txt", i, z);
+        sprintf(path, "/dumps/%05d_%05d.bin", i, z);
       }
       sprintf(fileBMPPath, "/temp/%05d.bmp", i);
       
@@ -150,19 +154,14 @@ void ConvertFilesBMP()
       img_index = 0;
       
       Serial.println("... Done!");
+    
       #ifdef LED_STATUS_PIN 
-        LED_led_OFF(LED_STATUS_PIN);
+        LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_led_OFF(LED_STATUS_BLUE);
-      #endif 
+        LED_blink(LED_STATUS_BLUE,1,100,50);
+      #endif
     }
-    #ifdef LED_STATUS_PIN
-      LED_led_ON(LED_STATUS_PIN);
-    #endif
-    #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-      LED_led_ON(LED_STATUS_BLUE);
-    #endif
     
     //Reset the counter for the number of files 
     numfiles=0;
@@ -177,6 +176,12 @@ void ConvertFilesBMP()
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
+      #ifdef LED_STATUS_PIN 
+        LED_blink(LED_STATUS_PIN,1,100,50);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_blink(LED_STATUS_BLUE,1,100,50);
+      #endif
     #endif
     
     //Create a PNG and resize the image
@@ -191,6 +196,12 @@ void ConvertFilesBMP()
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
       png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      #ifdef LED_STATUS_PIN 
+        LED_blink(LED_STATUS_PIN,1,100,50);
+      #endif
+      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+        LED_blink(LED_STATUS_BLUE,1,100,50);
+      #endif
     #endif
     FSYS.remove(fileBMPPath);
   }

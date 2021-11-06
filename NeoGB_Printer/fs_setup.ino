@@ -118,9 +118,9 @@ unsigned int nextFreeFileIndex() {
     if(!FSYS.exists(path)){
       sprintf(path, "/output/png/%05d.png", i);
       if(!FSYS.exists(path)){
-        sprintf(path, "/dumps/%05d.txt", i);
+        sprintf(path, "/dumps/%05d.bin", i);
         if (!FSYS.exists(path)) {
-          sprintf(path, "/dumps/%05d_%05d.txt", i, 1);
+          sprintf(path, "/dumps/%05d_%05d.bin", i, 1);
           if(!FSYS.exists(path)){
             Serial.print("Next File: ");
             Serial.println(i);
@@ -202,8 +202,8 @@ void GetNumberFiles() {
   }
   if(i>0){
     do{
-      sprintf(path, "/dumps/%05d.txt", firstDumpID);
-      sprintf(path2, "/dumps/%05d_00001.txt", firstDumpID);
+      sprintf(path, "/dumps/%05d.bin", firstDumpID);
+      sprintf(path2, "/dumps/%05d_00001.bin", firstDumpID);
       if (FSYS.exists(path) || FSYS.exists(path2)) {
         break;
       }
@@ -212,8 +212,8 @@ void GetNumberFiles() {
   }
   
   for(int x = 1; x <= i; x++){
-    sprintf(path, "/dumps/%05d.txt", firstDumpID);
-    sprintf(path2, "/dumps/%05d_00001.txt", firstDumpID);
+    sprintf(path, "/dumps/%05d.bin", firstDumpID);
+    sprintf(path2, "/dumps/%05d_00001.bin", firstDumpID);
     if(FSYS.exists(path) || FSYS.exists(path2)){
       totalDumps++;
     }
