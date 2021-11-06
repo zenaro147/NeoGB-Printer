@@ -68,7 +68,7 @@ You will need to add a [little Push Button like this](https://pt.aliexpress.com/
 
 The function is simple:
 * Single short press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`).
-* Long Press: Convert all RAW data to BMP.
+* Long Press: Convert all RAW data to BMP/PNG images.
 
 ```
 PushButton Schematic
