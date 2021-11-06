@@ -86,7 +86,7 @@ void oledStateChange(uint8_t lcdStatus){
         oled_drawStatus(bin2bmp);
         break;
       case 6:
-        oled_drawStatus(bin2png);
+        oled_drawStatus(bmp2png);
         break;
       case 7:
         oled_drawStatus(idlePrinter2);
