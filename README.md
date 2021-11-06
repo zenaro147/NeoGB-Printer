@@ -22,7 +22,7 @@ This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](http
 * It's a **Dual Core module** (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
 * Have, at least, **2 SPI pins gourps** [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
 
-Some boards already have a SD Card slot built in. We've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you choose to use this type of board, **we however won't be able to provide any support in case of bug.**
+Some boards already have a SD Card slot built in. We've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you choose to use this type of board, we however won't be able to provide any support in case of bug...But feel free to experiment.
 
 ## Gameboy Link Cable Setup
 Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safely ! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj). A bit of do-it-yourself is necessary at this step if you do not use a breakout board.
@@ -126,10 +126,10 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ?
-* Power the beast, white LED flashes 3 times immediately, wait for the next 3 green flashes indicating that the system is ready for printing.
+* Power the ESP, white LED flashes 3 times immediately, wait for the next 3 green flashes indicating that the system is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .txt files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led flashes 3 times to indicate that command have been acknowledged.
-* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image require several seconds to be converted, so convert them regularly and/or be patient.
+* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .txt binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires very short time to seconds to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
 * Remove the SD card and enjoy your images ready to be published online !
 * Additionnaly, remote connection with WIFI is under development.
 * There is an easter egg in the printer, will you find it ?
