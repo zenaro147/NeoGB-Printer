@@ -46,6 +46,7 @@ Connect the Game Boy serial pins to the ESP pins following this scheme:
 |            |      LV     |  +3.3V  | <- +3.3 volts from ESP32
 |            |      HV     |   +5V   | <- +5 volts from ESP32 or USB
 ```
+**If the connection does not work, switch G19 anf G23 in config.h !**
 
 ## SD Card Reader Setup
 You need to use a [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html) or a [SD Card Module](https://pt.aliexpress.com/item/32523666863.html) to save the data. I highly recommend to get one, especially the [SD Card Module](https://pt.aliexpress.com/item/32523666863.html), It's more stable than [Micro SD Card Module](https://pt.aliexpress.com/item/4000002592780.html), at least during my tests.
