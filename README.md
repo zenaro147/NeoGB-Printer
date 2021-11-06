@@ -58,7 +58,7 @@ To use it, connect the pins following this scheme:
 | SCK        |   G14   |
 | MISO       |   G26   | <-- DON'T USE THE G12! YOU CAN USE ANY OTHER PIN AVAILABLE
 | MOSI       |   G13   |
-| GND        |    G    |
+| GND        |   GND   |
 | VCC/5v     |   VIN   |
 | 3v3        |   N/A   |
 
