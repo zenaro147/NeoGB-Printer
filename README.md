@@ -96,9 +96,9 @@ For the other legs, you need to use at least a 220 Ohm Resistor on each RGB leg.
 ```
 | RGB | ESP32 |
 |-----|-------|
-|  R  |  G16   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
-|  G  |  G17   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
-|  B  |  G4    | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  R  |  G16  | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  G  |  G17  | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
+|  B  |  G4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
 
 ```
 
