@@ -92,9 +92,8 @@ void setup(void)
   // Config Serial
   // Has to be fast or it will not transfer the image fast enough to the computer
   Serial.begin(115200);  
-  //Force CPU Frequency to 160MHz instead the default 240MHz. This fix the Mc Donalds game issue.
-  //In case of erros, change to 80
-  setCpuFrequencyMhz(160); 
+  //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
+  setCpuFrequencyMhz(80); 
   
   LED_init();  
   /* Pin for pushbutton */ 
@@ -251,9 +250,9 @@ void loop(){
             #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
               LED_blink(LED_STATUS_BLUE, 3,100,100);
             #endif
-            
+            setCpuFrequencyMhz(240); //File conversion at full speed !
             ConvertFilesBMP();
-            
+            setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz instead the default 240MHz. 
             #ifdef LED_STATUS_PIN 
               LED_blink(LED_STATUS_PIN, 3,100,100);
             #endif
