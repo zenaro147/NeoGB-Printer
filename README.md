@@ -160,7 +160,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
 * Cristofer Cruz: 3D model for the GB Printer shell.
 
-Want to discuss with the authors or share you art and projects with people fond of the Game Boy Camera and Printer ? **Join de Game Boy Camera Club Discord**:https://discord.gg/dKND7cFuqM
+Want to discuss with the authors or share you art and projects with people fond of the Game Boy Camera and Printer ? **Join the Game Boy Camera Club Discord**: https://discord.gg/dKND7cFuqM
 
 ![credits](/Supplementary_images/credits.png)
 
