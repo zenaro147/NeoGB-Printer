@@ -162,6 +162,8 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 
 ![credits](/Supplementary_images/credits.png)
 
+Want to discuss with the authors or share you art and projects with people fond of the Game Boy Camera and Printer ? **Join de Game Boy Camera Club Discord:**https://discord.gg/dKND7cFuqM
+
 # List of games tested and fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
 - *Alice in Wonderland (never released in Japan)*
@@ -276,7 +278,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 
 # ToDo List:
 - [x] Update the code to support all games
-- [x] Use the original BMP library from Mofosyne C decompiler
+- [x] Use the original BMP library from Mofosyne C decoder
 - [X] Write the BMP file on SD
 - [X] Fix Palette issue with some games
 - [X] Handle with storage % instead number of files
@@ -287,10 +289,10 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 - [X] Add a message to display the number of images printed
 - [ ] Add a web interface
 
-## Things that can be improved in the future (feel free to contribute)
-* RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode.
+## Things that can be improved in the future (or not... but feel free to contribute)
+* RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode. Consequence is that the image files generated on SD card do not own time attributes. Copying the files into your favorite storage folder fixes this "issue".
 * The file conversion to PNG uses dependencies and uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today.
-* The PNG library used, PNGenc, have a bug on the calculation of crc of the IDAT chunck for big files when used on ESP32. We chose to fix this crc issue onboard with an image patcher so that the PNG files generated can strictly match with the PNG specifications. We did not dig far into PNGenc to see wether the bug was easy to fix or not as patching individually each image was easy and fast.
-* The BMP upscaling is quite slow due to the lack of onboard memory: all is processed by reading/writing to the SD card with very limited buffers (one line of pixels at most). It is certainly possible to optimize the code here.
-* The ESP is forced to run at 160 MHz instead of 240 MHz. At full speed we experienced protocol unstability. We did not investigate what was the reason nor how to force run a full speed (faulty boards sold on Aliexpress ? Need for a magic cap on serial line ?).
+* The PNG library used, PNGenc, have a bug on the calculation of crc of the IDAT chunck for big files when used on ESP32. We chose to fix this crc issue onboard with an image patcher so that the PNG files generated here strictly match to the PNG specifications. We did not dig far into PNGenc to see wether the bug was easy to fix or not as patching individually each image was easy and fast.
+* The BMP upscaling is quite slow due to the lack of onboard memory and because it makes two things. First, all images are processed by reading/writing to the SD card on the fly, using a very limited buffer (one line of pixels per image at most). Second, it compresses the native 24-bits BMP format output by the C decoder library to 4-bits indexed BMP in order to save storage space.
+* The ESP is forced to run at 160 MHz instead of its native 240 MHz. At full speed we experienced protocol unstability with few games. We did not investigate what was the reason nor how to force run at full speed (faulty boards sold on Aliexpress ? Need for a magic cap on serial line ?).
 * The choice of implementing a short press button function for dealing with some games is due to the fact that automatic splitting of images can be tricky as Game Boy Printer protocol specifications appeared to be rather unstrict. On the 110 games, most of them sends an after margin after printing one image to feed the paper and allow proper cutting. But sometimes, games send an after margin within image for aesthetic reason or no margin at all between images (but white packets instead). This render the automatic splitting of images all but obvious. Reverse engineering the protocol on 110 games was a very huge effort and we have debated a lot on how dealing with particular games that are perhaps totally unknown or forgotten. We hope that the solution provided here is the most convenient for users. It is at least the most conservative from a video game history point of view.
