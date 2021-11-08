@@ -222,7 +222,11 @@ void GetNumberFiles() {
   
   Serial.printf("Dump Files: %d files\n", totalDumps);
   Serial.printf("Image Files: %d files\n", totalImages);
-  oled_writeNumImages(totalDumps,totalImages);
+
+  if(bootAsPrinter){
+    oled_writeNumImages(totalDumps,totalImages);
+  }
+  
 }
 #endif
 
@@ -240,4 +244,22 @@ void full() {
   #ifdef USE_OLED
     oledStateChange(3); //Printer Full
   #endif
+}
+
+/*******************************************************************************
+  Simple controller to change the Boot Mode
+*******************************************************************************/
+bool fs_alternateBootMode() {
+  String bootmode = "bootmode.txt";
+  char path[14];  
+  sprintf(path, "/%s", bootmode);
+  
+  if(FSYS.remove(path)){
+    return false;
+  } else {
+    File file = FSYS.open(path,FILE_WRITE);
+    file.print("BOOT");
+    file.close();
+    return true;
+  } 
 }

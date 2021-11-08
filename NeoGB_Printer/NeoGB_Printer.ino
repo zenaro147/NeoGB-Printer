@@ -7,6 +7,21 @@
 #include "./includes/gblink/gbp_serial_io.h"
 #include "./includes/led/LED_status.h"
 
+//SD libraries 
+#include "FS.h"
+#include "SD.h"
+#include "SPI.h"
+#define FSYS SD
+
+#ifdef ENABLE_WEBSERVER
+  #include <WiFi.h>
+  //#include <WiFiMulti.h>
+  #include <WebServer.h>
+  #include <ESPmDNS.h>
+  //#include <uri/UriBraces.h>
+#endif
+
+
 /*******************************************************************************
 *******************************************************************************/
 
@@ -33,26 +48,27 @@ long longPressTime = 2000; //2 seconds
 boolean buttonActive = false;
 boolean longPressActive = false;
 
+//Data Controller
 byte image_data[6000] = {}; //1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
-bool testmode = false;
-
-bool isWriting = false;
-bool isConverting = false;
-
-bool isFileSystemMounted = false;
-
 unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
-
 unsigned int dumpCount = 0;
-
-bool setMultiPrint = false;
 unsigned int totalMultiImages = 1;
+bool testmode = false;
 
+//States
+bool bootAsPrinter;
+bool isWriting = false;
+bool isConverting = false;
+bool isFileSystemMounted = false;
+bool setMultiPrint = false;
+
+//
+
+//MISC
 TaskHandle_t TaskWriteImage;
-
 SPIClass spiSD(HSPI);
 /*******************************************************************************
   Utility Functions
@@ -89,21 +105,20 @@ void ICACHE_RAM_ATTR serialClock_ISR(void)
 *******************************************************************************/
 void setup(void)
 {
-  // Config Serial
-  // Has to be fast or it will not transfer the image fast enough to the computer
-  Serial.begin(115200);  
-  //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
-  setCpuFrequencyMhz(80); 
+  Serial.begin(115200); // Config Serial
+  setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
   
-  LED_init();  
+  LED_init();
+    
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
   
-  /* Setup File System and OLED*/
+  /* Setup OLED Display*/
   #ifdef USE_OLED
     oled_setup();
   #endif
-  
+
+  //Check Test Mode
   if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
     testmode = true;
     #ifdef USE_OLED
@@ -114,6 +129,7 @@ void setup(void)
       oledStateChange(0); //Splash Screen
     #endif 
   }
+  //Blink the LED to test it. For RGB LED, must in this order: WHITE(all colors), RED, GREEN, BLUE
   #ifdef LED_STATUS_PIN 
     LED_blink(LED_STATUS_PIN, 3, 50, 50);
   #endif
@@ -123,9 +139,8 @@ void setup(void)
     LED_blink(LED_STATUS_GREEN, 1, 300, 50);
     LED_blink(LED_STATUS_BLUE, 1, 300, 50);
   #endif
-  
 
-  //Force BMP output if no one was defined and the Upscale Factor
+  //Force BMP output and Upscale Factor if no one was defined. 
   #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
       #define BMP_OUTPUT
   #endif
@@ -140,169 +155,205 @@ void setup(void)
       #endif
   #endif
   
-  delay(3000);
+  delay(3000); //Little delay for stetic 
 
+  //Initialize FileSystem
   isFileSystemMounted = fs_setup();
+  
   if(isFileSystemMounted){
-    uint8_t percUsed = fs_info();
-    if (percUsed <= 10) {
-      isFileSystemMounted=false;
-      full();
-    }
-    freeFileIndex = nextFreeFileIndex();
-
-    /* Pins from gameboy link cable */
-    pinMode(GBP_SC_PIN, INPUT);
-    pinMode(GBP_SI_PIN, INPUT);
-    pinMode(GBP_SO_PIN, OUTPUT);
-    /* Default link serial out pin state */
-    digitalWrite(GBP_SO_PIN, LOW);
-  
-    /* Setup */
-    gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
-  
-    /* Attach ISR */
-    #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-      attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+    //Check the bootMode (Printer mode or WiFi mode)
+    #ifdef ENABLE_WEBSERVER     
+      WiFi.disconnect(); 
+      bootAsPrinter = fs_alternateBootMode();
     #else
-      attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+      bootAsPrinter = true;
     #endif
+    
+    if (bootAsPrinter){
+      Serial.println("-----------------------");
+      Serial.println("Booting in printer mode");
+      Serial.println("-----------------------\n");
+
+      //Get the % of use and the next image ID
+      uint8_t percUsed = fs_info();
+      //If full, stucks with a message
+      if (percUsed <= 10) {
+        isFileSystemMounted=false;
+        full();
+        return;
+      }
+      freeFileIndex = nextFreeFileIndex();
   
-    gbp_pkt_init(&gbp_pktBuff);
-        
+      /* Pins from gameboy link cable */
+      pinMode(GBP_SC_PIN, INPUT);
+      pinMode(GBP_SI_PIN, INPUT);
+      pinMode(GBP_SO_PIN, OUTPUT);
+      /* Default link serial out pin state */
+      digitalWrite(GBP_SO_PIN, LOW);
+    
+      /* Setup */
+      gpb_serial_io_init(sizeof(gbp_serialIO_raw_buffer), gbp_serialIO_raw_buffer);
+    
+      /* Attach ISR */
+      #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+      #else
+        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+      #endif
+    
+      gbp_pkt_init(&gbp_pktBuff);
+  
+      #ifdef USE_OLED
+      oledStateChange(1); //Printer Idle
+        GetNumberFiles();
+      #endif
+    }else{  
+      Serial.println("-----------------------");
+      Serial.println("Booting in server mode");
+      Serial.println("-----------------------\n");  
+      #ifdef USE_OLED
+      oledStateChange(9); //Printer Idle as Server
+        GetNumberFiles();
+      #endif
+    }
+    
     #ifdef LED_STATUS_PIN 
       LED_blink(LED_STATUS_PIN, 3, 100, 100);
     #endif
     #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
       LED_blink(LED_STATUS_GREEN, 3,100,100);
     #endif
-    
-    #ifdef USE_OLED
-      oledStateChange(1); //Printer Idle
-      GetNumberFiles();
-    #endif
+   
   }else{
+    #ifdef USE_OLED
+      oledStateChange(2); //SD Init Error
+    #endif
     #ifdef LED_STATUS_PIN 
       LED_blink(LED_STATUS_PIN, 3, 200, 200);
     #endif
     #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
       LED_blink(LED_STATUS_RED, 3,200,200);
     #endif
-    #ifdef USE_OLED
-      oledStateChange(2); //SD Init Error
-    #endif
   }
 }
 
 void loop(){
   if(isFileSystemMounted){
-    gbp_packet_capture_loop();
-
-    // Trigger Timeout and reset the printer if byte stopped being received.
-    static uint32_t last_millis = 0;
-    uint32_t curr_millis = millis();
-    if (curr_millis > last_millis){
-      uint32_t elapsed_ms = curr_millis - last_millis;
-      if (gbp_serial_io_timeout_handler(elapsed_ms)) {
-        //Printer Timeout
-        Serial.println("Printer Timeout");
-        
-        //Reset Values
-        chkHeader=99;
-        memset(image_data, 0x00, sizeof(image_data)); 
-        
-        #ifdef USE_OLED
-          oledStateChange(7); //Printer Idle (without show number of files - for safity reasons)
-        #endif
-        #ifdef LED_STATUS_PIN 
-          LED_led_OFF(LED_STATUS_PIN);
-        #endif
-        #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-          LED_led_OFF(LED_STATUS_GREEN);
-        #endif
-        if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-          callNextFile();
+    if (bootAsPrinter){
+      gbp_packet_capture_loop();
+      
+      // Trigger Timeout and reset the printer if byte stopped being received.
+      static uint32_t last_millis = 0;
+      uint32_t curr_millis = millis();
+      if (curr_millis > last_millis){
+        uint32_t elapsed_ms = curr_millis - last_millis;
+        if (gbp_serial_io_timeout_handler(elapsed_ms)) {
+          //Printer Timeout
+          Serial.println("Printer Timeout");
+          
+          //Reset Values
+          chkHeader=99;
+          memset(image_data, 0x00, sizeof(image_data)); 
+          
+          #ifdef USE_OLED
+            oledStateChange(7); //Printer Idle (without show number of files - for safity reasons)
+          #endif
+          #ifdef LED_STATUS_PIN 
+            LED_led_OFF(LED_STATUS_PIN);
+          #endif
+          #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+            LED_led_OFF(LED_STATUS_GREEN);
+          #endif
+          if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
+            callNextFile();
+          }
         }
       }
-    }
-    last_millis = curr_millis;  
+      last_millis = curr_millis;
 
-    // Feature to detect a short press and a Long Press
-    if(!isWriting){
-      if (digitalRead(BTN_PUSH) == HIGH) {  
-        if (buttonActive == false) {  
-          buttonActive = true;
-          buttonTimer = millis();  
-        }  
-        if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)) {  
-          longPressActive = true;
-          //Long press to convert to BMP
-          if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
-            Serial.println("Converting to Image File");
-            isConverting = true;            
-            #ifdef USE_OLED
-              oledStateChange(5); //TXT to BMP
-            #endif
-            
-            #ifdef LED_STATUS_PIN
-              LED_blink(LED_STATUS_PIN, 3,100,100);
-            #endif
-            #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-              LED_blink(LED_STATUS_BLUE, 3,100,100);
-            #endif
-            setCpuFrequencyMhz(240); //File conversion at full speed !
-            ConvertFilesBMP();
-            setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz instead the default 240MHz. 
-            #ifdef LED_STATUS_PIN 
-              LED_blink(LED_STATUS_PIN, 3,100,100);
-            #endif
-            #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-              LED_blink(LED_STATUS_BLUE, 3,100,100);
-            #endif
-            
-            #ifdef USE_OLED
-              oledStateChange(1); //Printer Idle
-              GetNumberFiles();
-            #endif     
+      // Feature to detect a short press and a Long Press
+      if(!isWriting){
+        if (digitalRead(BTN_PUSH) == HIGH) {
+          if (buttonActive == false) {
+            buttonActive = true;
+            buttonTimer = millis();  
           }
-        }  
-      } else {  
-        if (buttonActive == true) {
-          if (longPressActive == true) {
-            longPressActive = false;  
-          } else {
-            delay(500);
-            if((totalMultiImages-1) > 1){
-              Serial.println("Get next file ID");
+          if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
+            longPressActive = true;
+            //Long press to convert to BMP
+            if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
+              Serial.println("Converting to Image File");
+              isConverting = true;            
+              #ifdef USE_OLED
+                oledStateChange(5); //TXT to BMP
+              #endif
               
-              #ifdef LED_STATUS_PIN 
-                LED_led_ON(LED_STATUS_PIN);
+              #ifdef LED_STATUS_PIN
+                LED_blink(LED_STATUS_PIN, 3,100,100);
               #endif
               #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-                LED_led_ON(LED_STATUS_RED, LED_STATUS_BLUE);
-              #endif                      
-              #ifdef USE_OLED
-                oledStateChange(8); //Force Next File
+                LED_blink(LED_STATUS_BLUE, 3,100,100);
               #endif
-
-              callNextFile();
+              setCpuFrequencyMhz(240); //File conversion at full speed !
+              ConvertFilesBMP();
+              setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz instead the default 240MHz. 
+              #ifdef LED_STATUS_PIN 
+                LED_blink(LED_STATUS_PIN, 3,100,100);
+              #endif
+              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+                LED_blink(LED_STATUS_BLUE, 3,100,100);
+              #endif
               
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
                 GetNumberFiles();
-              #endif
-              #ifdef LED_STATUS_PIN 
-                LED_led_OFF(LED_STATUS_PIN);
-              #endif
-              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-                LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
-              #endif  
-              
+              #endif     
             }
           }  
-          buttonActive = false;  
-        }  
+        }else{
+          if (buttonActive == true) {
+            if (longPressActive == true) {
+              longPressActive = false;  
+            } else {
+              delay(500);
+              if((totalMultiImages-1) > 1){
+                Serial.println("Get next file ID");
+                
+                #ifdef LED_STATUS_PIN 
+                  LED_led_ON(LED_STATUS_PIN);
+                #endif
+                #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+                  LED_led_ON(LED_STATUS_RED, LED_STATUS_BLUE);
+                #endif                      
+                #ifdef USE_OLED
+                  oledStateChange(8); //Force Next File
+                #endif
+  
+                callNextFile();
+                
+                #ifdef USE_OLED
+                  oledStateChange(1); //Printer Idle
+                  GetNumberFiles();
+                #endif
+                #ifdef LED_STATUS_PIN 
+                  LED_led_OFF(LED_STATUS_PIN);
+                #endif
+                #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+                  LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
+                #endif  
+                
+              }
+            }  
+            buttonActive = false;  
+          }  
+        }
       }
+    }else{
+      //WebServer Stuffs Here
     }
+    
+    
+
+   
   }
 }
