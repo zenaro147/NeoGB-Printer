@@ -271,11 +271,7 @@ void png_upscaler(char input[], char output[], int scale_factor) {
     //       Serial.println(" ");
 
     for (unsigned j = 0; j < scale_factor; j++) {
-      for (unsigned k = 0; k < up_w / 2 ; k++) { //because 4-bits format
-        bmp_buffer.write(compressed_line[k]);
-        //Serial.print(normal_line[k], HEX);
-      }
-      //Serial.println(" ");
+        bmp_buffer.write(compressed_line, up_w / 2);
     }
     //Serial.println(" ");
   }
