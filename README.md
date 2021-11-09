@@ -12,6 +12,7 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
 You need to install some Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
+* ESP32
 * PNGenc (If you want to output the images as PNG).
 * Adafruit SSD1306 (If you want to use the OLED Display).
 * Adafruit GFX Library (If you want to use the OLED Display).
