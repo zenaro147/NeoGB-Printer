@@ -22,6 +22,8 @@ uint8_t actualfile = 0;
   Convert to BMP
 *******************************************************************************/
 void ConvertFilesBMP(){
+  unsigned long perf;
+  
   //Remove the interrupt to prevent receive data from Gameboy
   detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
 
@@ -79,7 +81,8 @@ void ConvertFilesBMP(){
     FSYS.remove(fileBMPPath);             
     testmode = false;
   }
-  
+
+  //Get the first image ID to process
   do {
     sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
     sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
@@ -89,7 +92,7 @@ void ConvertFilesBMP(){
     firstDumpID++;
   } while(true);
   
-  //Loop to check only the availables files based on nextFreeFileIndex function
+  //Loop to check the availables files in Dump Folder based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
     #ifdef USE_OLED
       oledStateChange(5); //TXT to BMP
@@ -112,12 +115,14 @@ void ConvertFilesBMP(){
           }
         }
       }else{
-        break; //Exit from the loop, because don't have any more files
+        break; //Exit from the loop, because don't have more files
       }
     }
     
     // Loop to parse the files based on the previous results
-    for (int z = 1; z <= numfiles; z++){      
+    for (int z = 1; z <= numfiles; z++){
+      perf = millis();
+      
       actualfile = z;
       //Check if is a single file or a long print
       if (numfiles == 1){
@@ -153,7 +158,9 @@ void ConvertFilesBMP(){
       memset(image_data, 0x00, sizeof(image_data));
       img_index = 0;
       
-      Serial.println("... Done!");
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+     
     
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
@@ -170,12 +177,18 @@ void ConvertFilesBMP(){
 
     //Create a 4bits BMP and resize the image
     #ifdef BMP_OUTPUT
+    
       sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
+      Serial.print("Saving the BMP-4bits image");
+      perf = millis();
       if(BMP_UPSCALE_FACTOR < 1){
         bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+      
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
@@ -189,13 +202,19 @@ void ConvertFilesBMP(){
       #ifdef USE_OLED
         oledStateChange(6); //TXT to PNG
       #endif
+      
       sprintf(pathOutput, "/output/png/%05d.png", i);
+      Serial.print("Saving the PNG image");
+      perf = millis();
       if(PNG_UPSCALE_FACTOR < 1){
         png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
       png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+      
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif

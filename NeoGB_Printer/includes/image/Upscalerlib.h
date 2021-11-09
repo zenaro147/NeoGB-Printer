@@ -9,7 +9,7 @@ PNG png; // static instance of the PNG encoder class
 File myfile;
 
 void * myOpen(const char *filename) {
-  Serial.printf("Attempting to open %s\n", filename);
+  //Serial.printf("Attempting to open %s\n", filename);
   // IMPORTANT!!! - don't use FILE_WRITE because it includes O_APPEND
   // this will cause the file to be written incorrectly
   //
@@ -36,14 +36,14 @@ int32_t mySeek(PNGFILE *handle, int32_t position) {
 
 void png_upscaler(char input[], char output[], int scale_factor) {
 
-  Serial.print("Trying to load: ");
-  Serial.println(input);
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
   File file = FSYS.open(input);
   if (!file) {
-    Serial.print(input);
-    Serial.println(": this file does not exist");
+    //Serial.print(input);
+    //Serial.println(": this file does not exist");
   }
-  Serial.println("Upscaling to indexed PNG");
+  //Serial.println("Upscaling to indexed PNG");
   byte header[54];//read the image source header
   file.read(header, 54);
   unsigned long BMPsize = ((header[5] << 24) | (header[4] << 16) | (header[3] << 8) | (header[2]));
@@ -96,13 +96,13 @@ void png_upscaler(char input[], char output[], int scale_factor) {
         //Serial.println(" ");
       }
       iDataSize = png.close();
-      Serial.print("PNG filesize: ");
-      Serial.println(iDataSize, DEC);
+      //Serial.print("PNG filesize: ");
+      //Serial.println(iDataSize, DEC);
     }
   } else {
-    Serial.println("Failed to create the file on the SD card !");
+    //Serial.println("Failed to create the file on the SD card !");
   }
-  Serial.println("Upscaled PNG file encoded !");
+  //Serial.println("Upscaled PNG file encoded !");
   file.close();
 }
 
@@ -146,15 +146,15 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   //create_buffer("/00001.bmp","/upscaled.bmp",4);
   void bmp_upscaler(char input[], char output[], int scale_factor) {
 // BMP upscaler and compressor written by Raphael BOICHOT
-  Serial.print("Trying to load: ");
-  Serial.println(input);
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
   File file = FSYS.open(input);
   File bmp_buffer = FSYS.open(output, FILE_WRITE);
   if (!file) {
-    Serial.print(input);
-    Serial.println(": this file does not exist");
+    //Serial.print(input);
+    //Serial.println(": this file does not exist");
   }
-  Serial.println("Upscaling to 4bits BMP");
+  //Serial.println("Upscaling to 4bits BMP");
   //read the image source header
   byte header[54];
   file.read(header, 54);
@@ -280,7 +280,7 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   file.close();
   bmp_buffer.close();
   //RGB_led_OFF(LED_STATUS_BLUE);
-  Serial.println("Upscaled BMP file encoded !");
+  //Serial.println("Upscaled BMP file encoded !");
   //Serial.println(sizeof(bmp),DEC);
   }
   /////////////////////////////////////////////////////////////////////////////////////BMP upscaler stuff////////////////
