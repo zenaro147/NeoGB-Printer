@@ -1,7 +1,7 @@
 
 #include "arduino.h"
 /////////////////////////////////////////////////////////////////////////////////////PNGenc stuff////////////////
-#include "PNGenc.h"
+#include "PNGenc/PNGenc.h"
 // PNG encoder written by Larry Bank
 // The PNG uspcaler is bugged when the crc of IDAT chunk is calculated, so there is a patch to correct this in png_CRC32_patch.ino
 // Upscaler written by Raphael BOICHOT

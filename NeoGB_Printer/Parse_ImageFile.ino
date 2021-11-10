@@ -70,7 +70,7 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      //png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
@@ -211,7 +211,7 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      //png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       
