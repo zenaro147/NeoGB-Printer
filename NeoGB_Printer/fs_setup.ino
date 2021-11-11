@@ -122,8 +122,7 @@ unsigned int nextFreeFileIndex() {
         if (!FSYS.exists(path)) {
           sprintf(path, "/dumps/%05d_%05d.bin", i, 1);
           if(!FSYS.exists(path)){
-            Serial.print("Next File: ");
-            Serial.println(i);
+            Serial.printf("Next File: %u\n",i);
             return i;
           }else{
             dumpCount++;

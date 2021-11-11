@@ -70,7 +70,6 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      //png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
@@ -211,7 +210,6 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      //png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       
@@ -224,19 +222,17 @@ void ConvertFilesBMP(){
     #endif
     FSYS.remove(fileBMPPath);
   }
-
-  numfiles=0; 
-  actualfile=0;
-  isConverting = false;
-  
-  callNextFile(); // Get Next ID available
   
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
   #else
     attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-  #endif
+  #endif  
+  callNextFile(); // Get Next ID available  
   
+  numfiles=0; 
+  actualfile=0;
+  isConverting = false;
 }
 
 /*******************************************************************************
