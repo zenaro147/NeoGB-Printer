@@ -64,4 +64,4 @@
 /*************************
  * WEB SERVER DEFINITIONS
  *************************/
-//#define ENABLE_WEBSERVER
+//#define ENABLE_WEBSERVER //UNDER DEVELOPMENT - DO NOT UNCOMMENT THIS
