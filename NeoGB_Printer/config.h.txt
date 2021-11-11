@@ -64,4 +64,10 @@
 /*************************
  * WEB SERVER DEFINITIONS
  *************************/
-//#define ENABLE_WEBSERVER //UNDER DEVELOPMENT - DO NOT UNCOMMENT THIS
+//#define ENABLE_WEBSERVER //UNDER DEVELOPMENT - DO NOT UNCOMMENT THIS FOR NOW
+#ifdef ENABLE_WEBSERVER
+  #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
+  #define DEFAULT_AP_SSID "gameboyprinter"                //Your WiFi SSID
+  #define DEFAULT_AP_PSK "gameboyprinter"      //Your WiFi Password
+  #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
+#endif

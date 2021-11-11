@@ -19,6 +19,7 @@
   #include <WebServer.h>
   #include <ESPmDNS.h>
   //#include <uri/UriBraces.h>
+  //#include <ArduinoJson.h>
 #endif
 
 
@@ -65,7 +66,10 @@ bool isConverting = false;
 bool isFileSystemMounted = false;
 bool setMultiPrint = false;
 
-//
+//WebServer Variables
+String mdnsName = DEFAULT_MDNS_NAME;
+String accesPointSSID = DEFAULT_AP_SSID;
+String accesPointPassword = DEFAULT_AP_PSK;
 
 //MISC
 TaskHandle_t TaskWriteImage;
@@ -211,8 +215,11 @@ void setup(void)
       Serial.println("-----------------------");
       Serial.println("Booting in server mode");
       Serial.println("-----------------------\n");  
+      initWifi();
+      mdns_setup();
+      webserver_setup();
       #ifdef USE_OLED
-      oledStateChange(9); //Printer Idle as Server
+        oledStateChange(9); //Printer Idle as Server
         GetNumberFiles();
       #endif
     }
@@ -350,6 +357,7 @@ void loop(){
       }
     }else{
       //WebServer Stuffs Here
+      webserver_loop();
     }
     
     

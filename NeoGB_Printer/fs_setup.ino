@@ -95,6 +95,20 @@ bool fs_setup() {
       }
     #endif
 
+    #ifdef ENABLE_WEBSERVER
+      root = FSYS.open("/www");
+      if(!root){
+          Serial.println("- failed to open WebServer directory");
+          if(FSYS.mkdir("/www")){
+              Serial.println("WebServer Dir created");
+          } else {
+              Serial.println("mkdir failed");
+          }
+      }else{
+        Serial.println("WebServer folder already exist.");
+      }
+    #endif
+
     for (int i = 0; i < 100; i++) {
       if (i % 10 == 0) {
         Serial.print(".");
