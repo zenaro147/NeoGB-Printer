@@ -2,7 +2,7 @@
 // Embedded-friendly PNG Encoder
 //
 // Copyright (c) 2000-2021 BitBank Software, Inc.
-// Written by Larry Bank
+// Written by Larry Bank, crc erro fixed by Raphaël BOICHOT 2021-11-11
 // Project started 12/9/2000
 //
 #include <stdint.h>
@@ -16,8 +16,7 @@
 
 unsigned char PNGFindFilter(uint8_t *pCurr, uint8_t *pPrev, int iPitch, int iStride);
 void PNGFilter(uint8_t ucFilter, uint8_t *pOut, uint8_t *pCurr, uint8_t *pPrev, int iStride, int iPitch);
-//
-// Calculate the PNG-style CRC value for a block of data
+// Calculate the PNG-style CRC value for several blocks of data (BOICHOT FIX 2021-10-11)
 //
 uint32_t PNGCalcCRC(unsigned char *buf, int len, uint32_t u32_start)
 {
@@ -26,50 +25,6 @@ uint32_t PNGCalcCRC(unsigned char *buf, int len, uint32_t u32_start)
    static int crc_table_computed = 0;
     uint32_t crc = u32_start; //0xffffffff;
    int n;
-
-   /* Make the table for a fast CRC. */
-   if (crc_table_computed == 0)
-   {
-     uint32_t c;
-     int n, k;
-     
-     for (n = 0; n < 256; n++) {
-       c = (uint32_t) n;
-       for (k = 0; k < 8; k++) {
-         if (c & 1)
-           c = 0xedb88320L ^ (c >> 1);
-         else
-           c = c >> 1;
-       }
-       crc_table[n] = c;
-     }
-     crc_table_computed = 1;
-   }
-
-   /* Update a running CRC with the bytes buf[0..len-1]--the CRC
-      should be initialized to all 1's, and the transmitted value
-      is the 1's complement of the final running CRC (see the
-      crc() routine below)). */
-
-     for (n = 0; n < len; n++)
-     {
-         crc = crc_table[(crc ^ buf[n]) & 0xff] ^ (crc >> 8);
-     }
-
-  return crc ^ 0xffffffffL;
-
-} /* PNGCalcCRC() */
-
-
-// Calculate the PNG-style CRC value for several blocks of data (BOICHOT FIX 2021-10-11)
-//
-uint32_t PNGCalcCRC2(unsigned char *buf, int len, uint32_t u32_start)
-{
-/* Table of CRCs of all 8-bit messages. */
-   static uint32_t crc_table[256];
-   static int crc_table_computed = 0;
-    uint32_t crc = u32_start; //0xffffffff;
-   int n;
    if (crc_table_computed == 0)
    {
      uint32_t c;
@@ -91,8 +46,8 @@ uint32_t PNGCalcCRC2(unsigned char *buf, int len, uint32_t u32_start)
      {
          crc = crc_table[(crc ^ buf[n]) & 0xff] ^ (crc >> 8);
      }
-  return crc;
-  //return crc ^ 0xffffffffL;
+  return crc;//////Raphaël BOICHOT fix
+  //return crc ^ 0xffffffffL;//////Raphaël BOICHOT fix
 } /* PNGCalcCRC() */
 
 static unsigned char PAETH(unsigned char a, unsigned char b, unsigned char c)
@@ -156,6 +111,7 @@ static int PNGStartFile(PNGIMAGE *pImage)
     p[iSize++] = 0; // filter type 0
     p[iSize++] = 0; // interlace = no
     ulCRC = PNGCalcCRC(&p[iSize-17], 17, 0xffffffff); // store CRC for IHDR chunk
+    ulCRC=ulCRC ^ 0xffffffffL;//////Raphaël BOICHOT fix
     WRITEMOTO32(p, iSize, ulCRC);
     iSize += 4;
 
@@ -174,6 +130,7 @@ static int PNGStartFile(PNGIMAGE *pImage)
                p[iSize++] = pImage->ucPalette[i*3+0]; // blue
            }
            ulCRC = PNGCalcCRC(&p[iSize-(iLen*3)-4], 4+(iLen*3), 0xffffffff); // store CRC for PLTE chunk
+           ulCRC=ulCRC ^ 0xffffffffL;//////Raphaël BOICHOT fix
            WRITEMOTO32(p, iSize, ulCRC);
            iSize += 4;
            if (pImage->iTransparent >= 0 || pImage->ucHasAlphaPalette) // add transparency chunk
@@ -211,6 +168,7 @@ static int PNGStartFile(PNGIMAGE *pImage)
                        break;
                } // switch
                ulCRC = PNGCalcCRC(&p[iSize - iLen - 4], 4 + iLen, 0xffffffff); // store CRC for tRNS chunk
+               ulCRC=ulCRC ^ 0xffffffffL;//////Raphaël BOICHOT fix
                WRITEMOTO32(p, iSize, ulCRC);
                iSize += 4;
            }
@@ -245,6 +203,7 @@ int PNGEndFile(PNGIMAGE *pImage)
         WRITEMOTO32(p, iSize-8, pImage->iCompressedSize); // write IDAT chunk size
         iSize += pImage->iCompressedSize;
         ulCRC = PNGCalcCRC(&p[iSize-pImage->iCompressedSize-4], pImage->iCompressedSize+4, 0xffffffff); // store CRC for IDAT chunk
+        ulCRC=ulCRC ^ 0xffffffffL;//////Raphaël BOICHOT fix
         WRITEMOTO32(p, iSize, ulCRC);
         iSize += 4;
         // Write the IEND chunk
@@ -275,10 +234,10 @@ int PNGEndFile(PNGIMAGE *pImage)
             if (iReadSize > PNG_FILE_BUF_SIZE)
                 iReadSize = PNG_FILE_BUF_SIZE;
             (*pImage->pfnRead)(&pImage->PNGFile, pImage->ucFileBuf, iReadSize);
-            ulCRC = PNGCalcCRC2(pImage->ucFileBuf, iReadSize, ulCRC);
+            ulCRC = PNGCalcCRC(pImage->ucFileBuf, iReadSize, ulCRC);
             i -= iReadSize;
         }
-        ulCRC=ulCRC ^ 0xffffffffL;
+        ulCRC=ulCRC ^ 0xffffffffL;//////Raphaël BOICHOT fix
         WRITEMOTO32(p, 0, ulCRC); // now write the CRC
         iSize += pImage->iCompressedSize + 4;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
