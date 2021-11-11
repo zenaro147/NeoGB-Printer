@@ -2,7 +2,7 @@
 // Embedded-friendly PNG Encoder
 //
 // Copyright (c) 2000-2021 BitBank Software, Inc.
-// Written by Larry Bank, crc erro fixed by Raphaël BOICHOT 2021-11-11
+// Written by Larry Bank, crc error fixed by Raphaël BOICHOT 2021-11-11
 // Project started 12/9/2000
 //
 #include <stdint.h>
