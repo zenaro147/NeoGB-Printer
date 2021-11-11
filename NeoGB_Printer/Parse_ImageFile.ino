@@ -56,12 +56,6 @@ void ConvertFilesBMP(){
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
-      #ifdef LED_STATUS_PIN 
-        LED_blink(LED_STATUS_PIN,1,100,50);
-      #endif
-      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_blink(LED_STATUS_BLUE,1,100,50);
-      #endif
     #endif
     #ifdef PNG_OUTPUT
       sprintf(pathOutput, "/output/png/%05d.png", 0);
@@ -70,12 +64,6 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      #ifdef LED_STATUS_PIN 
-        LED_blink(LED_STATUS_PIN,1,100,50);
-      #endif
-      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_blink(LED_STATUS_BLUE,1,100,50);
-      #endif
     #endif
     FSYS.remove(fileBMPPath);             
     testmode = false;
@@ -94,7 +82,7 @@ void ConvertFilesBMP(){
   //Loop to check the availables files in Dump Folder based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
     #ifdef USE_OLED
-      oledStateChange(5); //TXT to BMP
+      oledStateChange(5); //BIN to BMP
     #endif
 
     //Check if the file is a long print or a single file
@@ -176,9 +164,11 @@ void ConvertFilesBMP(){
 
     //Create a 4bits BMP and resize the image
     #ifdef BMP_OUTPUT
-    
+      #ifdef USE_OLED
+        oledStateChange(10); //24bits-BMP to 4bits-BMP
+      #endif      
       sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
-      Serial.print("Saving the BMP-4bits image");
+      Serial.printf("Saving BMP-4bits image in: %s",pathOutput);
       perf = millis();
       if(BMP_UPSCALE_FACTOR < 1){
         bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
@@ -199,11 +189,11 @@ void ConvertFilesBMP(){
     //Create a PNG and resize the image
     #ifdef PNG_OUTPUT
       #ifdef USE_OLED
-        oledStateChange(6); //TXT to PNG
+        oledStateChange(6); //BMP to PNG
       #endif
       
       sprintf(pathOutput, "/output/png/%05d.png", i);
-      Serial.print("Saving the PNG image");
+      Serial.printf("Saving PNG image in: %s",pathOutput);
       perf = millis();
       if(PNG_UPSCALE_FACTOR < 1){
         png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
@@ -221,6 +211,7 @@ void ConvertFilesBMP(){
       #endif
     #endif
     FSYS.remove(fileBMPPath);
+    Serial.printf("\n");
   }
   
   #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR

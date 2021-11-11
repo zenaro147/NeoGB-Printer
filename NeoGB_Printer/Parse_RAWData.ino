@@ -30,7 +30,7 @@ inline void gbp_packet_capture_loop() {
         pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5) << 8) & 0xFF00;
         
         #ifdef USE_OLED
-          oledStateChange(4); //HEX to TXT
+          oledStateChange(4); //HEX to BIN
         #endif     
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
 

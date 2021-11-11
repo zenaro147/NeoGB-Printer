@@ -204,7 +204,7 @@ void setup(void)
       gbp_pkt_init(&gbp_pktBuff);
   
       #ifdef USE_OLED
-      oledStateChange(1); //Printer Idle
+        oledStateChange(1); //Printer Idle
         GetNumberFiles();
       #endif
     }else{  
@@ -285,7 +285,7 @@ void loop(){
               Serial.println("Converting to Image File");
               isConverting = true;            
               #ifdef USE_OLED
-                oledStateChange(5); //TXT to BMP
+                oledStateChange(5); //BIN to BMP
               #endif
               
               #ifdef LED_STATUS_PIN
