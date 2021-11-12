@@ -110,7 +110,6 @@ void ICACHE_RAM_ATTR serialClock_ISR(void)
 void setup(void)
 {
   Serial.begin(115200); // Config Serial
-  setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
   
   LED_init();
     
@@ -211,10 +210,11 @@ void setup(void)
         oledStateChange(1); //Printer Idle
         GetNumberFiles();
       #endif
+      setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
     }else{  
       Serial.println("-----------------------");
       Serial.println("Booting in server mode");
-      Serial.println("-----------------------\n");  
+      Serial.println("-----------------------\n");
       initWifi();
       mdns_setup();
       webserver_setup();

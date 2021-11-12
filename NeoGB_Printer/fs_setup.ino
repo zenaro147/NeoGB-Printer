@@ -107,6 +107,18 @@ bool fs_setup() {
       }else{
         Serial.println("WebServer folder already exist.");
       }
+      
+      root = FSYS.open("/www/thumb");
+      if(!root){
+          Serial.println("- failed to open Thumbnail directory");
+          if(FSYS.mkdir("/www/thumb")){
+              Serial.println("Thumbnail Dir created");
+          } else {
+              Serial.println("mkdir failed");
+          }
+      }else{
+        Serial.println("Thumbnail folder already exist.");
+      }
     #endif
 
     for (int i = 0; i < 100; i++) {

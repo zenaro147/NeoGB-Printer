@@ -162,6 +162,12 @@ void ConvertFilesBMP(){
     actualfile=0;
     delay(100);
 
+    #ifdef ENABLE_WEBSERVER
+      //Generate the thumbnail for the Webserver
+      sprintf(pathOutput, "/www/thumb/%05d.png", i);
+      png_upscaler(fileBMPPath,pathOutput,1);
+    #endif
+    
     //Create a 4bits BMP and resize the image
     #ifdef BMP_OUTPUT
       #ifdef USE_OLED

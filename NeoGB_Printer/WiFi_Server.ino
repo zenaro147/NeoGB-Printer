@@ -16,22 +16,11 @@ bool handleFileRead(String path) {
   if (path.endsWith("/")) {
     path += "index.html";
   }
-
-  String pathWithGz = path + ".gz";
-  File file1 = FSYS.open(path);
-  File file2 = FSYS.open(pathWithGz);
   
-  if(file1 || file2) {
+  File file = FSYS.open(path);
+  if(file) {
     String contentType = getContentType(path);
-
-    if(file2) {
-      path += ".gz";
-    }
     
-    file1.close();
-    file2.close();  
-    
-    File file = FSYS.open(path);
     defaultHeaders();
     size_t sent = server.streamFile(file, contentType);
     file.close();

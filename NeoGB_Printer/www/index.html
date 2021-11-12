@@ -33,15 +33,19 @@
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
 		<div class="gallery" id="gallery">
-			<figure class="gallery__item">
-				<a href="output/bmp/00034.bmp"></a>
-				<a download="00034.bmp" href="output/bmp/00034.bmp" title="ImageName"><img src="output/bmp/00034.bmp" class="gallery__img"></a>
-			</figure>
 		</div>
 		<hr>
 		<p id="demo"></p>
 		<script>
 			var imgdata = JSON.parse(data);
+			for (let i = 1; i <= imgdata[0].FolderInfo.totImages; i++) {
+				var content = "<figure class=\"gallery__item\">";
+				content += "<a download=\""+imgdata[0].ImageFolder[i].thumb.substring(21, 11)+"\" href=\""+imgdata[0].ImageFolder[i].bmp+"\"><img src=\""+imgdata[0].ImageFolder[i].thumb+"\" class=\"gallery__img\"></a>";
+				content += "</figure>";
+				<!-- document.getElementById("gallery").innerHTML += "<a download=\""00034.bmp"\" href=\""output/bmp/00034.bmp"\"><img src=\""output/bmp/00034.bmp"\" class=\"gallery__img\"></a><br>"; -->
+				document.getElementById("gallery").innerHTML += content;
+				
+			}
 			document.getElementById("demo").innerHTML += "Hello JavaScript!<br>";
 		</script>
 	</body>
