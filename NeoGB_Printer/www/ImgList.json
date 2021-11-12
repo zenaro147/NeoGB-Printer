@@ -1,0 +1,1 @@
+data = '[{"FolderInfo": {"hasDumps":false}, "ImageFolder":{"00001": {"bmp": "output/bmp/00001.bmp","png": "output/png/00002.png"},"00002": {"bmp": "output/bmp/00002.bmp","png": "output/png/00002.png"}}}]'

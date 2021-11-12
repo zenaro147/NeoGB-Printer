@@ -1,12 +1,48 @@
-<!DOCTYPE HTML><html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <link rel="icon"  type="image/png" href="favicon.png">
-  <title>ESP Web Server</title>
-</head>
-<body>
-  <h1>Hello World!</h1>
-  <p>This page was built with files from a microSD card.</p>
-</body>
+<!doctype html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="icon"  type="image/png" href="favicon.png">
+		<title>Game Boy Printer Gallery</title>
+		<style>
+			body {font-family: Helvetica, sans-serif;}
+			.gallery {
+				display: grid;
+				grid-template-columns: 33.3% 33.3% 33.3%;
+				grid-gap: 2px;
+			}
+			.gallery__img {
+				width: 100%;
+				aspect-ratio: 1 / 1;
+				object-fit: cover;
+			}
+			figure{
+				margin: 0px;
+			}
+			@media (min-width: 576px) { 
+				.gallery__img {
+					width: 30%;
+					aspect-ratio: 1 / 1;
+					object-fit: cover;
+				} 
+			}
+		</style>
+		<script type="text/javascript" src="ImgList.json"></script>
+	</head>
+	<body style="margin:0px;">
+		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
+		<hr>
+		<div class="gallery" id="gallery">
+			<figure class="gallery__item">
+				<a href="output/bmp/00034.bmp"></a>
+				<a download="00034.bmp" href="output/bmp/00034.bmp" title="ImageName"><img src="output/bmp/00034.bmp" class="gallery__img"></a>
+			</figure>
+		</div>
+		<hr>
+		<p id="demo"></p>
+		<script>
+			var imgdata = JSON.parse(data);
+			document.getElementById("demo").innerHTML += "Hello JavaScript!<br>";
+		</script>
+	</body>
 </html>
