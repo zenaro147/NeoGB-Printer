@@ -185,8 +185,8 @@ void GetNumberFiles() {
   char path[31];
   char path2[31];
   int i = 0;
-  int totalDumps=0;
-  int totalImages=0;
+  totalDumps=0;
+  totalImages=0;
   File root;
   File file;
   

@@ -15,11 +15,10 @@
 
 #ifdef ENABLE_WEBSERVER
   #include <WiFi.h>
-  //#include <WiFiMulti.h>
   #include <WebServer.h>
   #include <ESPmDNS.h>
-  //#include <uri/UriBraces.h>
-  //#include <ArduinoJson.h>
+  #include <uri/UriBraces.h>
+  #include <ArduinoJson.h>
 #endif
 
 
@@ -70,6 +69,8 @@ bool setMultiPrint = false;
 String mdnsName = DEFAULT_MDNS_NAME;
 String accesPointSSID = DEFAULT_AP_SSID;
 String accesPointPassword = DEFAULT_AP_PSK;
+int totalDumps=0;
+int totalImages=0;
 
 //MISC
 TaskHandle_t TaskWriteImage;
@@ -171,7 +172,7 @@ void setup(void)
     #else
       bootAsPrinter = true;
     #endif
-    
+    bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
