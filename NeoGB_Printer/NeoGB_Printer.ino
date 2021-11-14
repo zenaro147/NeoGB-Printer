@@ -17,8 +17,8 @@
   #include <WiFi.h>
   #include <WebServer.h>
   #include <ESPmDNS.h>
-  #include <uri/UriBraces.h>
-  #include <ArduinoJson.h>
+  //#include <uri/UriBraces.h>
+  //#include <ArduinoJson.h>
 #endif
 
 
@@ -172,7 +172,7 @@ void setup(void)
     #else
       bootAsPrinter = true;
     #endif
-    bootAsPrinter = false;
+    //bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -216,12 +216,12 @@ void setup(void)
       Serial.println("-----------------------");
       Serial.println("Booting in server mode");
       Serial.println("-----------------------\n");
+      GetNumberFiles();
       initWifi();
       mdns_setup();
       webserver_setup();
       #ifdef USE_OLED
         oledStateChange(9); //Printer Idle as Server
-        GetNumberFiles();
       #endif
     }
     

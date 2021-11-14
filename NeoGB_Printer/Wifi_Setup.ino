@@ -1,4 +1,5 @@
 #ifdef ENABLE_WEBSERVER
+#include "config.h"
 bool hasNetworkSettings = true;
   
 void initWifi(){

@@ -5,48 +5,101 @@
 		<link rel="icon"  type="image/png" href="favicon.png">
 		<title>Game Boy Printer Gallery</title>
 		<style>
-			body {font-family: Helvetica, sans-serif;}
+			body{
+				font-family: Helvetica, sans-serif;
+			}
 			.gallery {
 				display: grid;
 				grid-template-columns: 33.3% 33.3% 33.3%;
-				grid-gap: 2px;
+				row-gap: 1px;
+				column-gap: 1px;
 			}
 			.gallery__img {
 				width: 100%;
 				aspect-ratio: 1 / 1;
 				object-fit: cover;
 			}
-			figure{
-				margin: 0px;
+			figure{				
+				margin-top: 4px;
+				margin-bottom: 0px;
+				margin-left: 4px;
+				margin-right: 4px;
 			}
+			
+			.button {
+				background-color: #808080;
+				border: none;
+				color: white;
+				padding: 3% 4%;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;
+				margin: 4px 2px;
+				cursor: pointer;
+				border-radius: 10px;
+			}
+			
 			@media (min-width: 576px) { 
-				.gallery__img {
-					width: 30%;
-					aspect-ratio: 1 / 1;
-					object-fit: cover;
-				} 
+				.gallery {
+					margin: auto;
+					width: 50%;
+					row-gap: 0.4%;
+					column-gap: 3%;
+				}
 			}
 		</style>
 		<script type="text/javascript" src="ImgList.json"></script>
 	</head>
-	<body style="margin:0px;">
+	<body style="margin:0px;" onload="">
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
-		<div class="gallery" id="gallery">
-		</div>
-		<hr>
-		<p id="demo"></p>
+		<div class="gallery" id="gallery"></div>
 		<script>
+			function LoadJson() {
+				window.location.href = "refreshlist";
+			}
+		
 			var imgdata = JSON.parse(data);
 			for (let i = 1; i <= imgdata[0].FolderInfo.totImages; i++) {
-				var content = "<figure class=\"gallery__item\">";
-				content += "<a download=\""+imgdata[0].ImageFolder[i].thumb.substring(21, 11)+"\" href=\""+imgdata[0].ImageFolder[i].bmp+"\"><img src=\""+imgdata[0].ImageFolder[i].thumb+"\" class=\"gallery__img\"></a>";
-				content += "</figure>";
-				<!-- document.getElementById("gallery").innerHTML += "<a download=\""00034.bmp"\" href=\""output/bmp/00034.bmp"\"><img src=\""output/bmp/00034.bmp"\" class=\"gallery__img\"></a><br>"; -->
+				var content = "<figure class=\"gallery__item\" id=\"Content"+imgdata[0].ImageFolder[i].ImageName+"\">";
+				content += "<img src=\"thumb/"+imgdata[0].ImageFolder[i].ImageName+".png\" class=\"gallery__img\" onclick='ShowMenu(\"Get"+imgdata[0].ImageFolder[i].ImageName+"\")'>";
+				content += "<div id=\"Get"+imgdata[0].ImageFolder[i].ImageName+"\" style=\"display: none;\">";
+				if (imgdata[0].ImageFolder[i].bmp == 1) {
+					content += "<a download=\""+imgdata[0].ImageFolder[i].ImageName+".bmp\" href=\"download/"+imgdata[0].ImageFolder[i].ImageName+".bmp\" class=\"button\">BMP</a> ";
+				}
+				if (imgdata[0].ImageFolder[i].png == 1) {
+					content += "<a download=\""+imgdata[0].ImageFolder[i].ImageName+".bmp\" href=\"download/"+imgdata[0].ImageFolder[i].ImageName+".png\" class=\"button\">PNG</a> ";
+				}
+				//content += "<a href=\"/delete/"+imgdata[0].ImageFolder[i].ImageName+"\" onclick='clearBox(\"Content"+imgdata[0].ImageFolder[i].ImageName+"\");'>Delete</a> ";
+				content += "<a onclick='clearBox(\"Content"+imgdata[0].ImageFolder[i].ImageName+"\");' class=\"button\">Delete</a> ";
+				content += "</div></figure>";
 				document.getElementById("gallery").innerHTML += content;
-				
 			}
-			document.getElementById("demo").innerHTML += "Hello JavaScript!<br>";
+		</script>
+		
+		<!-- MENU SCRIPT -->
+		<script>
+			function ShowMenu(MenuName) {
+				var x = document.getElementById(MenuName);
+				if (x.style.display === "none") {
+					x.style.display = "block";
+				} else {
+					x.style.display = "none";
+				}
+			}
+			
+			function clearBox(elementID) {
+				var r = confirm("Are you sure you want to delete this photo?");
+				if (r == true) {
+					document.getElementById(elementID).remove();
+					var link = "delete/"+elementID.substring(7,11)
+					window.location.href = link;
+				}
+			}
+		
+			
+			
 		</script>
 	</body>
 </html>
