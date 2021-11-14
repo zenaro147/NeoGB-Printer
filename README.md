@@ -1,6 +1,6 @@
 # The NeoGB Printer
 
-The NeoGB Printer is a standalone Game Boy Printer emulator very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
+The NeoGB Printer is an SD card-based standalone Game Boy Printer emulator. It is very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts bougth new is below $15. All parts can be easily exchanged with other projects, reused or harvested from dead electronics as they are all very common.
 
