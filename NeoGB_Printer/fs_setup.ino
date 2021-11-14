@@ -275,9 +275,10 @@ void full() {
   Simple controller to change the Boot Mode
 *******************************************************************************/
 bool fs_alternateBootMode() {
-  String bootmode = "bootmode.txt";
-  char path[14];  
-  sprintf(path, "/%s", bootmode);
+//  String bootmode = "bootmode.txt";
+//  char path[14];  
+//  sprintf(path, "/%s", bootmode);
+  char path[]="/bootmode.txt";
   
   if(FSYS.remove(path)){
     return false;

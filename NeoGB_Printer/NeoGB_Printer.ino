@@ -15,8 +15,10 @@
 
 #ifdef ENABLE_WEBSERVER
   #include <WiFi.h>
-  #include <WebServer.h>
-  #include <ESPmDNS.h>
+  //#include <WebServer.h>
+    #include <ESPmDNS.h>
+  #include <AsyncTCP.h>
+  #include <ESPAsyncWebServer.h>
   //#include <uri/UriBraces.h>
   //#include <ArduinoJson.h>
 #endif
@@ -66,9 +68,11 @@ bool isFileSystemMounted = false;
 bool setMultiPrint = false;
 
 //WebServer Variables
-String mdnsName = DEFAULT_MDNS_NAME;
-String accesPointSSID = DEFAULT_AP_SSID;
-String accesPointPassword = DEFAULT_AP_PSK;
+#ifdef ENABLE_WEBSERVER
+  String mdnsName = DEFAULT_MDNS_NAME;
+  String accesPointSSID = DEFAULT_AP_SSID;
+  String accesPointPassword = DEFAULT_AP_PSK;
+#endif
 int totalDumps=0;
 int totalImages=0;
 
@@ -113,7 +117,6 @@ void setup(void)
   Serial.begin(115200); // Config Serial
   
   LED_init();
-    
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
   
@@ -133,6 +136,7 @@ void setup(void)
       oledStateChange(0); //Splash Screen
     #endif 
   }
+  
   //Blink the LED to test it. For RGB LED, must in this order: WHITE(all colors), RED, GREEN, BLUE
   #ifdef LED_STATUS_PIN 
     LED_blink(LED_STATUS_PIN, 3, 50, 50);
@@ -166,13 +170,12 @@ void setup(void)
   
   if(isFileSystemMounted){
     //Check the bootMode (Printer mode or WiFi mode)
-    #ifdef ENABLE_WEBSERVER     
-      WiFi.disconnect(); 
+    #ifdef ENABLE_WEBSERVER
       bootAsPrinter = fs_alternateBootMode();
     #else
       bootAsPrinter = true;
     #endif
-    //bootAsPrinter = false;
+    bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -217,6 +220,7 @@ void setup(void)
       Serial.println("Booting in server mode");
       Serial.println("-----------------------\n");
       GetNumberFiles();
+      RefreshWebData();
       initWifi();
       mdns_setup();
       webserver_setup();

@@ -3,6 +3,7 @@
 bool hasNetworkSettings = true;
   
 void initWifi(){
+  WiFi.disconnect(); 
   Serial.print("Connecting to wifi ");  
   WiFi.mode(WIFI_MODE_STA);  
   
