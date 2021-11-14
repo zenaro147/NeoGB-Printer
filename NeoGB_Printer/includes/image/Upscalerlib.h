@@ -283,4 +283,70 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   //Serial.println("Upscaled BMP file encoded !");
   //Serial.println(sizeof(bmp),DEC);
   }
-  /////////////////////////////////////////////////////////////////////////////////////BMP upscaler stuff////////////////
+/////////////////////////////////////////////////////////////////////////////////////BMP upscaler stuff////////////////
+
+
+//////////////////////////////////////////////////////////PNG thumbnail generator
+void png_downscaler(char input[], char output[], int scale_factor) {
+
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
+  File file = FSYS.open(input);
+  if (!file) {
+    Serial.print(input);
+    Serial.println(": this file does not exist");
+  }
+  //Serial.println("Downscaling to indexed PNG");
+  byte header[54];//read the image source header
+  file.read(header, 54);
+  unsigned long BMPsize = ((header[5] << 24) | (header[4] << 16) | (header[3] << 8) | (header[2]));
+  unsigned long STARToffset = ((header[13] << 24) | (header[12] << 16) | (header[11] << 8) | (header[10]));
+  unsigned w = ((header[21] << 24) | (header[20] << 16) | (header[19] << 8) | (header[18]));
+  unsigned h = -((header[25] << 24) | (header[24] << 16) | (header[23] << 8) | (header[22]));
+  unsigned down_w = w / scale_factor;
+  unsigned down_h = h / scale_factor;
+  unsigned WIDTH = down_w;
+  unsigned HEIGHT = down_h;
+  uint8_t ucPal[768] = {0x00, 0x00, 0x00, 0x55, 0x55, 0x55, 0xAA, 0xAA, 0xAA, 0xFF, 0xFF, 0xFF}; // palette entered by triplets
+  //uint8_t ucAlphaPal[256] = {0,255}; // first color (black) is fully transparent
+  int rc, iDataSize, x, y;
+  uint8_t ucLine[WIDTH];
+  byte pixel;
+  byte octet;
+  byte normal_line[w*3];
+ 
+  rc = png.open(output, myOpen, myClose, myRead, myWrite, mySeek);
+
+  if (rc == PNG_SUCCESS) {
+    rc = png.encodeBegin(WIDTH, HEIGHT, PNG_PIXEL_INDEXED, 8, ucPal, 3);
+    //png.setAlphaPalette(ucAlphaPal);
+    if (rc == PNG_SUCCESS) {
+      for (int y = 0; y < HEIGHT && rc == PNG_SUCCESS; y++) {
+        // prepare a line of image to create a red box with an x on a transparent background
+
+        for (unsigned l = 0; l < (scale_factor); l++) {//jump n lines
+        file.read(normal_line,w*3);
+        }
+
+        for (unsigned k = 0; k < down_w; k++) {//
+          pixel=normal_line[3*scale_factor*k];
+          if (pixel == 0xFF) octet = 0x03;
+          if (pixel == 0xAA) octet = 0x02;
+          if (pixel == 0x55) octet = 0x01;
+          if (pixel == 0x00) octet = 0x00;
+            ucLine[k] = octet;
+        }
+          rc = png.addLine(ucLine);
+        //Serial.println(" ");
+      }
+      iDataSize = png.close();
+//      Serial.print("PNG filesize: ");
+//      Serial.println(iDataSize, DEC);
+    }
+  } else {
+    Serial.println("Failed to create the file on the SD card !");
+  }
+  //Serial.println("PNG thumbnail encoded !");
+  file.close();
+}
+//////////////////////////////////////////////////////////PNG thumbnail generator
