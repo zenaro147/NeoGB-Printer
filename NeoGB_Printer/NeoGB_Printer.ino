@@ -175,7 +175,7 @@ void setup(void)
     #else
       bootAsPrinter = true;
     #endif
-    bootAsPrinter = false;
+//    bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");

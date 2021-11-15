@@ -81,22 +81,14 @@ void RefreshWebData(){
   file.close();
 }
 
-void DeleteImage(){
-  
-}
-void GetImage(){
-  
-}
 
 
 
 bool handleFileRead(String path) {
   path = "/www" + path;
-
   if (path.endsWith("/")) {
     path += "index.html";
   }
-
   if(FSYS.exists(path)){
     return true;
   }else{
@@ -104,11 +96,10 @@ bool handleFileRead(String path) {
     Serial.println(" - Not Found");
     return false;
   }
-
-  
 }
 
 String getContentType(String filename) {
+  Serial.println(filename);
   if (filename.endsWith(".html")) return "text/html";
   else if (filename.endsWith(".css")) return "text/css";
   else if (filename.endsWith(".js")) return "application/javascript";
@@ -118,20 +109,69 @@ String getContentType(String filename) {
   return "text/plain"; //"application/octet-stream"
 }
 
+void DeleteImage(String img){
+  char pathimg [25];
+  sprintf(pathimg, "/www/thumb/%s.png", img);
+  if(FSYS.remove(pathimg)){
+    Serial.printf("%s Deleted. \n",pathimg);
+  }else{
+    Serial.printf("Error deleting %s \n",pathimg);
+  }
+  #ifdef BMP_OUTPUT
+    sprintf(pathimg, "/output/bmp/%s.bmp", img);
+    if(FSYS.remove(pathimg)){
+      Serial.printf("%s Deleted. \n",pathimg);
+    }else{
+      Serial.printf("Error deleting %s \n",pathimg);
+    }
+  #endif
+  #ifdef PNG_OUTPUT
+    sprintf(pathimg, "/output/png/%s.png", img);
+    if(FSYS.remove(pathimg)){
+      Serial.printf("%s Deleted. \n",pathimg);
+    }else{
+      Serial.printf("Error deleting %s \n",pathimg);
+    }
+  #endif
+}
 
 void webserver_setup() {
-//  server.on("/parseDumps", ParseDumps);
-//  server.on("/refreshlist", RefreshWebData);
-//  server.on("/delete", DeleteImage);
-//  server.on("/download", GetImage);
-
   server.on("/parseDumps", HTTP_GET, [](AsyncWebServerRequest *request){
     ParseDumps();
-    request->send(200, "text/plain", "OK");
+    request->send(200, "text/plain", "{\"Status\":0}");
   });
   server.on("/refreshlist", HTTP_GET, [](AsyncWebServerRequest *request){
     RefreshWebData();
-    request->send(200, "text/plain", "OK");
+    request->send(200, "text/plain", "{\"Status\":0}");
+  });
+
+  server.on("/download", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    const char* PARAM_INPUT_1 = "id";
+    const char* PARAM_INPUT_2 = "format";
+    String inputMessage1;
+    String inputMessage2;
+    if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)){
+      inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
+      inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
+      //Do something
+      String imgPath = "/output/"+inputMessage2+"/"+inputMessage1+"."+inputMessage2;
+      request->send(SD, imgPath, "image/bmp");
+    }else{
+      request->send(200, "text/plain", "Missing Parameters");
+    }
+  });
+  
+  server.on("/delete", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    const char* PARAM_INPUT_1 = "id";
+    String inputMessage1;
+    String inputMessage2;
+    if (request->hasParam(PARAM_INPUT_1)){
+      inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
+      DeleteImage(inputMessage1);
+      request->send(200, "text/plain", "{\"Status\":1}");
+    }else{
+      request->send(200, "text/plain", "{\"Status\":0}");
+    }
   });
 
   server.onNotFound([](AsyncWebServerRequest *request){
@@ -139,7 +179,7 @@ void webserver_setup() {
         request->send(404, "text/html", "<html><body><h1>404 - Not Found</h1><p>You probably forgot to upload the additional data.</p></body></html>");
       }else{
         String reqPatch = "/www"+String(request->url());
-        if (reqPatch.endsWith("/")) {
+        if (reqPatch.endsWith("/")){
           reqPatch += "index.html";
         }
         request->send(SD, reqPatch, getContentType(reqPatch));

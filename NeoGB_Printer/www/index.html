@@ -7,6 +7,7 @@
 		<style>
 			body{
 				font-family: Helvetica, sans-serif;
+				background-color: #c2c5cc;
 			}
 			.gallery {
 				display: grid;
@@ -43,9 +44,6 @@
 				cursor: pointer;
 				border-radius: 10px;
 			}
-			
-			
-			
 			
 			.gallery__img:hover {
 				opacity: 0.7;
@@ -122,11 +120,6 @@
 			  cursor: pointer;
 			}
 			
-			
-			
-			
-			
-			
 			@media (min-width: 576px) { 
 				.gallery {
 					margin: auto;
@@ -137,10 +130,27 @@
 			}
 		</style>
 		<script type="text/javascript" src="ImgList.json"></script>
+		<script>
+			function JsonGet(jsonlink){
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.open('GET', jsonlink, true);
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4) {
+						if(xmlhttp.status == 200) {
+							 console.log("Done.");
+						 }
+					}
+				};
+				xmlhttp.send(null);
+			}
+		</script>
 	</head>
-	<body style="margin:0px;" onload="">
+	<body style="margin:0px;" onload='JsonGet("refreshlist");'>
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
+		<div id="MenuContent" style="text-align: center;">
+			
+		</div>
 		<div class="gallery" id="gallery"></div>
 		
 		<!-- The Modal -->
@@ -162,6 +172,9 @@
 				content += "</figure>";
 				document.getElementById("gallery").innerHTML += content;
 			}
+			if (imgdata[0].FolderInfo.haveDumps == 1){
+				document.getElementById("MenuContent").innerHTML += "<a onclick='JsonGet(\"parseDumps\");' class=\"button\">Parse Dump files</a>";
+			}
 		</script>
 		
 		<!-- MENU SCRIPT -->
@@ -180,18 +193,8 @@
 				if (r == true) {
 					document.getElementById("myModal").style.display = "none";
 					document.getElementById(elementID).remove();
-					var link = "delete/"+elementID.substring(7,12)
-					
-					var xmlhttp = new XMLHttpRequest();
-					xmlhttp.open('GET', link, true);
-					xmlhttp.onreadystatechange = function() {
-						if (xmlhttp.readyState == 4) {
-							if(xmlhttp.status == 200) {
-								 console.log("Done.");
-							 }
-						}
-					};
-					xmlhttp.send(null);
+					var link = "delete?id="+elementID.substring(7,12);
+					JsonGet(link);
 				}
 			}
 		</script>
@@ -210,10 +213,10 @@
 				modalImg.src = img.src;
 				var content = "<div>"
 				if (imgdata[0].ImageFolder[imageID].bmp == 1) {
-					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download/"+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" class=\"button\">BMP</a> ";
+					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download?id="+imgdata[0].ImageFolder[imageID].ImageName+"&format=bmp\" class=\"button\">BMP</a> ";
 				}
 				if (imgdata[0].ImageFolder[imageID].png == 1) {
-					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download/"+imgdata[0].ImageFolder[imageID].ImageName+".png\" class=\"button\">PNG</a> ";
+					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download?id="+imgdata[0].ImageFolder[imageID].ImageName+"&format=png\" class=\"button\">PNG</a> ";
 				}
 				content += "<a onclick='clearBox(\"Content"+imgdata[0].ImageFolder[imageID].ImageName+"\");' class=\"button\">Delete</a></div>";
 				captionText.innerHTML = content;

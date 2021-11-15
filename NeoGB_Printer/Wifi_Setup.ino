@@ -8,6 +8,7 @@ void initWifi(){
   WiFi.mode(WIFI_MODE_STA);  
   
   WiFi.begin(DEFAULT_AP_SSID, DEFAULT_AP_PSK);
+  WiFi.setSleep(false);
   
   unsigned int connTimeout = millis() + WIFI_CONNECT_TIMEOUT;
   unsigned int connTick = 0;
