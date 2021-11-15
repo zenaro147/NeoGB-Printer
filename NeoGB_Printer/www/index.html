@@ -120,6 +120,20 @@
 			  cursor: pointer;
 			}
 			
+			.msgDumps{
+				color: #856404;
+				background-color: #fff3cd;
+				border-color: #ffeeba;
+				
+				margin-top: 1rem;
+				box-sizing: border-box;
+				position: relative;
+				padding: 0.75rem 1.25rem;
+				margin-bottom: 1rem;
+				border: 1px solid transparent;
+				border-radius: 0.25rem;
+			}
+			
 			@media (min-width: 576px) { 
 				.gallery {
 					margin: auto;
@@ -148,9 +162,7 @@
 	<body style="margin:0px;" onload='JsonGet("refreshlist");'>
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
-		<div id="MenuContent" style="text-align: center;">
-			
-		</div>
+		<div class="msgDumps" style="text-align: center; display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
 		<div class="gallery" id="gallery"></div>
 		
 		<!-- The Modal -->
@@ -173,7 +185,7 @@
 				document.getElementById("gallery").innerHTML += content;
 			}
 			if (imgdata[0].FolderInfo.haveDumps == 1){
-				document.getElementById("MenuContent").innerHTML += "<a onclick='JsonGet(\"parseDumps\");' class=\"button\">Parse Dump files</a>";
+				document.getElementsByClassName("msgDumps").style.display = "block";
 			}
 		</script>
 		
