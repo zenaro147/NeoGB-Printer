@@ -2,11 +2,11 @@
 
 AsyncWebServer server(80);
 
-void ParseDumps(){
-  if(totalDumps > 0){
-    ConvertFilesBMP();
-  }
-}
+//void ParseDumps(){
+//  if(totalDumps > 0){
+//    ConvertFilesBMP();
+//  }
+//}
 
 void RefreshWebData(){
   String path = "/www/ImgList.json"; 
@@ -135,10 +135,10 @@ void DeleteImage(String img){
 }
 
 void webserver_setup() {
-  server.on("/parseDumps", HTTP_GET, [](AsyncWebServerRequest *request){
-    ParseDumps();
-    request->send(200, "text/plain", "{\"Status\":0}");
-  });
+//  server.on("/parseDumps", HTTP_GET, [](AsyncWebServerRequest *request){
+//    ParseDumps();
+//    request->send(200, "text/plain", "{\"Status\":0}");
+//  });
   server.on("/refreshlist", HTTP_GET, [](AsyncWebServerRequest *request){
     RefreshWebData();
     request->send(200, "text/plain", "{\"Status\":0}");
@@ -190,5 +190,6 @@ void webserver_setup() {
 }
 
 void webserver_loop() {
+  
 }
 #endif
