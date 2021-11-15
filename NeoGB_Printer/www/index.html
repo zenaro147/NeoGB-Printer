@@ -120,7 +120,9 @@
 			  cursor: pointer;
 			}
 			
-			.msgDumps{
+			#msgDumps{
+				text-align: center; 
+			
 				color: #856404;
 				background-color: #fff3cd;
 				border-color: #ffeeba;
@@ -162,7 +164,7 @@
 	<body style="margin:0px;" onload='JsonGet("refreshlist");'>
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
-		<div class="msgDumps" style="text-align: center; display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
+		<div id="msgDumps" style="display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
 		<div class="gallery" id="gallery"></div>
 		
 		<!-- The Modal -->
@@ -185,7 +187,7 @@
 				document.getElementById("gallery").innerHTML += content;
 			}
 			if (imgdata[0].FolderInfo.haveDumps == 1){
-				document.getElementsByClassName("msgDumps").style.display = "block";
+				document.getElementById("msgDumps").style.display = "block";
 			}
 		</script>
 		
