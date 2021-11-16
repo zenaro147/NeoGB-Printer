@@ -49,13 +49,14 @@ void GetImage(){
     imgPath = "/output/png/" + imgPath;
   }
   String contentType = getContentType(imgPath);
-  //defaultHeaders();
+  defaultHeaders();
   File file = FSYS.open(imgPath);
   size_t sent = server.streamFile(file, contentType);
   file.close();
 }
 
 void refreshWebData(){
+  GetNumberFiles();
   char path[] = "/www/ImgList.json"; 
     File file = FSYS.open(path,FILE_WRITE);
     if(!file){
@@ -270,6 +271,7 @@ void getEnv(){
 void defaultHeaders() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
 }
+
 void send404() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(404, "text/html", "<html><body><h1>404 - Not Found</h1></body></html>");
@@ -315,11 +317,9 @@ void webserver_setup() {
   server.on("/dumps/list", getDumpsList);
   server.on(UriBraces("/dumps/{}"), handleDump);
 
-
-  server.on("/genericArgs", handleGenericArgs); //Associate the handler function to the path
-server.on("/specificArgs", handleSpecificArg);   //Associate the handler function to the path
-  
-
+//  server.on("/genericArgs", handleGenericArgs); //Associate the handler function to the path
+//  server.on("/specificArgs", handleSpecificArg);   //Associate the handler function to the path
+ 
   server.onNotFound([]() {
     if (!handleFileRead(server.uri())) {
       send404();
