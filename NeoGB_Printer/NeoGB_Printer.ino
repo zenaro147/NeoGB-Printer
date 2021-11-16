@@ -15,12 +15,10 @@
 
 #ifdef ENABLE_WEBSERVER
   #include <WiFi.h>
-  //#include <WebServer.h>
-    #include <ESPmDNS.h>
-  #include <AsyncTCP.h>
-  #include <ESPAsyncWebServer.h>
-  //#include <uri/UriBraces.h>
-  //#include <ArduinoJson.h>
+  #include <ESPmDNS.h>
+  #include <WebServer.h>
+  #include <uri/UriBraces.h>
+//  #include <ArduinoJson.h>
 #endif
 
 
@@ -175,7 +173,7 @@ void setup(void)
     #else
       bootAsPrinter = true;
     #endif
-//    bootAsPrinter = false;
+    bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -220,7 +218,6 @@ void setup(void)
       Serial.println("Booting in server mode");
       Serial.println("-----------------------\n");
       GetNumberFiles();
-      RefreshWebData();
       initWifi();
       mdns_setup();
       webserver_setup();

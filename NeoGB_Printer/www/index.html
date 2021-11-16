@@ -145,7 +145,6 @@
 				}
 			}
 		</style>
-		<script type="text/javascript" src="ImgList.json"></script>
 		<script>
 			function JsonGet(jsonlink){
 				var xmlhttp = new XMLHttpRequest();
@@ -160,8 +159,11 @@
 				xmlhttp.send(null);
 			}
 		</script>
+		<script>
+			JsonGet("refreshlist");
+		</script>
 	</head>
-	<body style="margin:0px;" onload='JsonGet("refreshlist");'>
+	<body style="margin:0px;">
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
 		<div id="msgDumps" style="display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
@@ -174,6 +176,7 @@
 			<div id="caption"></div>
 		</div>
 		
+		<script type="text/javascript" src="ImgList.json"></script>
 		<script>
 			function LoadJson() {
 				window.location.href = "refreshlist";
@@ -207,7 +210,7 @@
 				if (r == true) {
 					document.getElementById("myModal").style.display = "none";
 					document.getElementById(elementID).remove();
-					var link = "delete?id="+elementID.substring(7,12);
+					var link = "delete/"+elementID.substring(7,12);
 					JsonGet(link);
 				}
 			}
@@ -227,10 +230,10 @@
 				modalImg.src = img.src;
 				var content = "<div>"
 				if (imgdata[0].ImageFolder[imageID].bmp == 1) {
-					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download?id="+imgdata[0].ImageFolder[imageID].ImageName+"&format=bmp\" class=\"button\">BMP</a> ";
+					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download/"+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" class=\"button\">BMP</a> ";
 				}
 				if (imgdata[0].ImageFolder[imageID].png == 1) {
-					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".bmp\" href=\"download?id="+imgdata[0].ImageFolder[imageID].ImageName+"&format=png\" class=\"button\">PNG</a> ";
+					content += "<a download=\""+imgdata[0].ImageFolder[imageID].ImageName+".png\" href=\"download/"+imgdata[0].ImageFolder[imageID].ImageName+".png\" class=\"button\">PNG</a> ";
 				}
 				content += "<a onclick='clearBox(\"Content"+imgdata[0].ImageFolder[imageID].ImageName+"\");' class=\"button\">Delete</a></div>";
 				captionText.innerHTML = content;
