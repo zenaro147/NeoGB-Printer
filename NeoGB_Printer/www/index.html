@@ -201,7 +201,7 @@
 
 		<div class="MenuBtns">
 			<a class="button" id="btnRefresh" onclick='JsonGet("refreshlist")'>Refresh List</a>
-			<a class="button" id="btnParse"  onclick='JsonGet("parseDumps")'>Parse Dumps</a>
+			<a class="button" id="btnParse" onclick='JsonGet("parseDumps")'>Parse Dumps</a>
 		</div>
 		<div class="loader" id="loader"></div>
 		
@@ -223,8 +223,8 @@
 				document.getElementById("gallery").innerHTML += content;
 			}
 			document.getElementById("loader").style.display = "none";
-			if (imgdata[0].FolderInfo.haveDumps == 1){
-				document.getElementById("btnParse").style.display = "block";
+			if (imgdata[0].FolderInfo.haveDumps == 0){
+				document.getElementById("btnParse").style.display = "none";
 			}
 		</script>
 		
