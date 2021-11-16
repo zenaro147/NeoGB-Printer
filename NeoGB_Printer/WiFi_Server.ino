@@ -39,6 +39,7 @@ void DeleteImage(){
     }
   #endif
 }
+
 void GetImage(){
   String imgPath = server.pathArg(0);
   if (imgPath.endsWith(".bmp")){
@@ -143,9 +144,29 @@ void refreshWebData(){
   defaultHeaders();
   server.send(200, "application/json", "{\"Status\":1}");  
 }
-void getEnv(){
-  server.send(200, "application/json", "{\"version\":\"0\",\"maximages\":0,\"env\":\"esp8266\",\"fstype\":\"littlefs\",\"bootmode\":\"alternating\",\"oled\":false}");  
-}
+
+//void handleGenericArgs() { //Handler ---- http://192.168.0.192/genericArgs?year=2000&month=01&day=20
+//  String message = "Number of args received:";
+//  message += server.args();            //Get number of parameters
+//  message += "\n";                            //Add a new line
+//  for (int i = 0; i < server.args(); i++) {
+//    message += "Arg nº" + (String)i + " –> ";   //Include the current iteration value
+//    message += server.argName(i) + ": ";     //Get the name of the parameter
+//    message += server.arg(i) + "\n";              //Get the value of the parameter
+//  } 
+//  server.send(200, "text/plain", message);       //Response to the HTTP request
+//}
+
+//void handleSpecificArg() { //Handler ---- http://192.168.0.192/specificArgs?Temperature=10
+//  String message = "";
+//  if (server.arg("Temperature")== ""){     //Parameter not found
+//    message = "Temperature Argument not found";
+//  }else{     //Parameter found
+//    message = "Temperature Argument = ";
+//    message += server.arg("Temperature");     //Gets the value of the query parameter
+//  }
+//  server.send(200, "text/plain", message);          //Returns the HTTP response
+//}
 
 /**************************************************************************************************************
   Functions to the Remote Acces using the Herr Zatacke interface https://herrzatacke.github.io/gb-printer-web/
@@ -239,6 +260,10 @@ void handleDump() {
   send404();
 }
 
+void getEnv(){
+  server.send(200, "application/json", "{\"version\":\"0\",\"maximages\":0,\"env\":\"esp8266\",\"fstype\":\"littlefs\",\"bootmode\":\"alternating\",\"oled\":false}");  
+}
+
 /**********************************************
   Main WebServer Functions and URL definitions
 ***********************************************/
@@ -289,6 +314,10 @@ void webserver_setup() {
   server.on("/env.json", getEnv);
   server.on("/dumps/list", getDumpsList);
   server.on(UriBraces("/dumps/{}"), handleDump);
+
+
+  server.on("/genericArgs", handleGenericArgs); //Associate the handler function to the path
+server.on("/specificArgs", handleSpecificArg);   //Associate the handler function to the path
   
 
   server.onNotFound([]() {
