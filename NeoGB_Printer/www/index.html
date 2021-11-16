@@ -178,10 +178,6 @@
 		
 		<script type="text/javascript" src="ImgList.json"></script>
 		<script>
-			function LoadJson() {
-				window.location.href = "refreshlist";
-			}
-		
 			var imgdata = JSON.parse(data);
 			for (let i = 1; i <= imgdata[0].FolderInfo.totImages; i++) {
 				var content = "<figure class=\"gallery__item\" id=\"Content"+imgdata[0].ImageFolder[i].ImageName+"\">";
