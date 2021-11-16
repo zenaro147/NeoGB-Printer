@@ -109,12 +109,12 @@ void refreshWebData(){
         Serial.print("imgName: ");
         Serial.println(imgName);
         Serial.print("imgID: ");
-        Serial.println(String(imgName).substring(0, 5));   
+        Serial.println(String(imgName).substring(11, 16));   
         
         file.print("\"");
         file.print(imgID);
         file.print("\":{\"ImageName\":\"");
-        file.print(String(imgName).substring(0, 5));
+        file.print(String(imgName).substring(11, 16));
         file.print("\",\"id\":");
         file.print(imgID);
         
