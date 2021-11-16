@@ -158,6 +158,10 @@
 			100% { transform: rotate(360deg); }
 			}
 			
+			.MenuBtns{
+				margin: 0 auto;
+				text-align: center;
+			}
 			
 			@media (min-width: 576px) { 
 				.gallery {
@@ -175,24 +179,33 @@
 				xmlhttp.onreadystatechange = function() {
 					if (xmlhttp.readyState == 4) {
 						if(xmlhttp.status == 200) {
-							 console.log("Done.");
+							switch (jsonlink) {
+								case 'refreshlist':
+									document.location.reload(true);
+									break;
+								case 'parseDumps':
+									break;
+								default:
+									console.log("Done.");
+							}
 						 }
 					}
 				};
 				xmlhttp.send(null);
 			}
 		</script>
-		<script>
-			JsonGet("refreshlist");
-		</script>
 	</head>
 	<body style="margin:0px;">
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
-		<div id="msgDumps" style="display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
+
+		<div class="MenuBtns">
+			<a class="button" id="btnRefresh" onclick='JsonGet("refreshlist")'>Refresh List</a>
+			<a class="button" id="btnParse"  onclick='JsonGet("parseDumps")'>Parse Dumps</a>
+		</div>
 		<div class="loader" id="loader"></div>
-		<div class="gallery" id="gallery"></div>
 		
+		<div class="gallery" id="gallery"></div>
 		<!-- The Modal -->
 		<div id="myModal" class="modal">
 			<span class="close">&times;</span>
@@ -211,7 +224,7 @@
 			}
 			document.getElementById("loader").style.display = "none";
 			if (imgdata[0].FolderInfo.haveDumps == 1){
-				document.getElementById("msgDumps").style.display = "block";
+				document.getElementById("btnParse").style.display = "block";
 			}
 		</script>
 		

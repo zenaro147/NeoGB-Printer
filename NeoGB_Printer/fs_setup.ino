@@ -248,9 +248,11 @@ void GetNumberFiles() {
   Serial.printf("Dump Files: %d files\n", totalDumps);
   Serial.printf("Image Files: %d files\n", totalImages);
 
-  if(bootAsPrinter){
-    oled_writeNumImages(totalDumps,totalImages);
-  }
+  #ifdef USE_OLED
+    if(bootAsPrinter){
+      oled_writeNumImages(totalDumps,totalImages);
+    }
+  #endif
   
 }
 #endif

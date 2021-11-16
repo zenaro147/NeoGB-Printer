@@ -2,16 +2,21 @@
 
 WebServer server(80);
 
-//void parseDumps(){
-//  if(totalDumps > 0){
-//    ConvertFilesBMP();
-//    defaultHeaders();
-//    server.send(200, "application/json", "{\"Status: \"Done\"}");  
-//  }else{
-//    defaultHeaders();
-//    server.send(200, "application/json", "{\"Status: \"Failed\"}");  
-//  }
-//}
+void parseDumps(){
+  if(totalDumps < 0){
+    defaultHeaders();
+    server.send(200, "application/json", "{\"Status: \"Failed\"}");  
+    return;
+  }
+  delay(200);
+  ConvertFilesBMP();
+  #ifdef USE_OLED
+    oledStateChange(9); //Printer Idle as Server
+  #endif
+  defaultHeaders();
+  server.send(200, "application/json", "{\"Status: \"Done\"}");  
+  
+}
 
 void DeleteImage(){
   String img = server.pathArg(0);
@@ -305,11 +310,14 @@ String getContentType(String filename) {
   else if (filename.endsWith(".ico")) return "image/x-icon";
   else if (filename.endsWith(".png")) return "image/png";
   else if (filename.endsWith(".bmp")) return "image/bmp";
+  else if (filename.endsWith(".json")) return "application/json";
   return "text/plain"; //"application/octet-stream"
 }
 
 void webserver_setup() {
+  refreshWebData();
   server.on("/refreshlist", refreshWebData);
+  server.on("/parseDumps", parseDumps);
   server.on(UriBraces("/delete/{}"), DeleteImage);
   server.on(UriBraces("/download/{}"), GetImage);
 

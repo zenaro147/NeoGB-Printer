@@ -22,10 +22,14 @@ uint8_t actualfile = 0;
   Convert to BMP
 *******************************************************************************/
 void ConvertFilesBMP(){
-  unsigned long perf;
+  #ifdef LED_STATUS_PIN
+    LED_blink(LED_STATUS_PIN, 3,100,100);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_BLUE, 3,100,100);
+  #endif
   
-  //Remove the interrupt to prevent receive data from Gameboy
-  detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+  unsigned long perf;
 
   //Clear variables
   memset(image_data, 0x00, sizeof(image_data));
@@ -219,17 +223,20 @@ void ConvertFilesBMP(){
     FSYS.remove(fileBMPPath);
     Serial.printf("\n");
   }
-  
-  #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-  #else
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-  #endif  
+    
   callNextFile(); // Get Next ID available  
   
   numfiles=0; 
   actualfile=0;
   isConverting = false;
+
+  GetNumberFiles();
+  #ifdef LED_STATUS_PIN 
+    LED_blink(LED_STATUS_PIN, 3,100,100);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_BLUE, 3,100,100);
+  #endif
 }
 
 /*******************************************************************************

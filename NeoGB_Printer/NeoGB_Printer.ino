@@ -210,8 +210,8 @@ void setup(void)
   
       #ifdef USE_OLED
         oledStateChange(1); //Printer Idle
-        GetNumberFiles();
       #endif
+      GetNumberFiles();
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
     }else{  
       Serial.println("-----------------------");
@@ -292,30 +292,26 @@ void loop(){
             //Long press to convert to BMP
             if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
               Serial.println("Converting to Image File");
-              isConverting = true;            
+              isConverting = true;
               #ifdef USE_OLED
                 oledStateChange(5); //BIN to BMP
               #endif
               
-              #ifdef LED_STATUS_PIN
-                LED_blink(LED_STATUS_PIN, 3,100,100);
-              #endif
-              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-                LED_blink(LED_STATUS_BLUE, 3,100,100);
-              #endif
+              //Remove the interrupt to prevent receive data from Gameboy
+              detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+              
               setCpuFrequencyMhz(240); //File conversion at full speed !
               ConvertFilesBMP();
               setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz instead the default 240MHz. 
-              #ifdef LED_STATUS_PIN 
-                LED_blink(LED_STATUS_PIN, 3,100,100);
-              #endif
-              #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-                LED_blink(LED_STATUS_BLUE, 3,100,100);
-              #endif
+
+              #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+                attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+              #else
+                attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+              #endif  
               
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
-                GetNumberFiles();
               #endif     
             }
           }  
@@ -342,8 +338,9 @@ void loop(){
                 
                 #ifdef USE_OLED
                   oledStateChange(1); //Printer Idle
-                  GetNumberFiles();
                 #endif
+                GetNumberFiles();
+                
                 #ifdef LED_STATUS_PIN 
                   LED_led_OFF(LED_STATUS_PIN);
                 #endif
