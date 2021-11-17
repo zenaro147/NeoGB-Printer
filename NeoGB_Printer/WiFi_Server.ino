@@ -9,7 +9,10 @@ void parseDumps(){
     return;
   }
   delay(200);
+  GetNumberFiles();
+  delay(200);
   ConvertFilesBMP();
+  delay(200);
   #ifdef USE_OLED
     oledStateChange(9); //Printer Idle as Server
   #endif
@@ -88,7 +91,7 @@ void refreshWebData(){
   
     char thumbDir[31];
     char imgDir[31];
-    char imgName[10];
+    char imgName[30];
     int imgID=1;
     sprintf(thumbDir, "/www/thumb");
     
@@ -102,24 +105,23 @@ void refreshWebData(){
         if(imgID > 1){
           file.print(",");
         }
-        sprintf(imgName, imgFile.name());
-        
-        Serial.print("Img File: ");    
-        Serial.println(imgFile);    
+        String imgFilePath = (String)imgFile.name();
+        uint8_t subStrLen = imgFilePath.length();
+        sprintf(imgName, "%s", imgFilePath.substring(subStrLen-9,subStrLen-4));
         Serial.print("imgName: ");
         Serial.println(imgName);
         Serial.print("imgID: ");
-        Serial.println(String(imgName).substring(11, 16));   
+        Serial.println(imgID);
         
         file.print("\"");
         file.print(imgID);
         file.print("\":{\"ImageName\":\"");
-        file.print(String(imgName).substring(11, 16));
+        file.print(imgName);
         file.print("\",\"id\":");
         file.print(imgID);
         
         #if defined(BMP_OUTPUT) || (!defined(BMP_OUTPUT) && !defined(PNG_OUTPUT))
-          sprintf(imgDir, "/output/bmp/%s.bmp", String(imgName).substring(0, 5));
+          sprintf(imgDir, "/output/bmp/%s.bmp", imgName);
           if(FSYS.exists(imgDir)){
             file.print(",\"bmp\":1");
           }else{
@@ -130,7 +132,7 @@ void refreshWebData(){
         #endif
         
         #ifdef PNG_OUTPUT
-          sprintf(imgDir, "/output/png/%s.png", String(imgName).substring(0, 5));
+          sprintf(imgDir, "/output/png/%s.png", imgName);
           if(FSYS.exists(imgDir)){
             file.print(",\"png\":1}");
           }else{
