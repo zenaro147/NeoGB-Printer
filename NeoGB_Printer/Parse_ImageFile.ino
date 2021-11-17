@@ -229,8 +229,7 @@ void ConvertFilesBMP(){
   numfiles=0; 
   actualfile=0;
   isConverting = false;
-
-  GetNumberFiles();
+  
   #ifdef LED_STATUS_PIN 
     LED_blink(LED_STATUS_PIN, 3,100,100);
   #endif

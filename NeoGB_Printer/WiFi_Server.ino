@@ -2,25 +2,6 @@
 
 WebServer server(80);
 
-void parseDumps(){
-  if(totalDumps < 0){
-    defaultHeaders();
-    server.send(200, "application/json", "{\"Status: \"Failed\"}");  
-    return;
-  }
-  delay(200);
-  GetNumberFiles();
-  delay(200);
-  ConvertFilesBMP();
-  delay(200);
-  #ifdef USE_OLED
-    oledStateChange(9); //Printer Idle as Server
-  #endif
-  defaultHeaders();
-  server.send(200, "application/json", "{\"Status: \"Done\"}");  
-  
-}
-
 void DeleteImage(){
   String img = server.pathArg(0);
   char pathimg [25];
@@ -64,39 +45,23 @@ void GetImage(){
 }
 
 void refreshWebData(){
-  GetNumberFiles();
+  Serial.println("WEB - Generating a new file List...");
   char path[] = "/www/ImgList.json"; 
     File file = FSYS.open(path,FILE_WRITE);
     if(!file){
       Serial.println("failed to open file for reading");
       return;
     }
-  
-    file.print("data='[{\"FolderInfo\":{\"totImages\":");
+
     
-    Serial.print("Total Images: ");
-    Serial.println(totalImages);
-    
-    file.print(String(totalImages));
-    file.print(",\"haveDumps\":");
-    Serial.print("haveDumps: ");
-    if(totalDumps > 0){
-      file.print("1");
-      Serial.println("1");
-    }else{
-      file.print("0");
-      Serial.println("0");
-    }
-    file.print("},\"ImageFolder\":{");
+    Serial.print("WEB - Getting image list");
+    file.print("data='[{\"ImageFolder\":{");
   
     char thumbDir[31];
     char imgDir[31];
     char imgName[30];
     int imgID=1;
     sprintf(thumbDir, "/www/thumb");
-    
-    Serial.print("Thumb Dir: ");
-    Serial.println(thumbDir);
     
     File root = FSYS.open(thumbDir);
     if(root.isDirectory()){
@@ -107,12 +72,7 @@ void refreshWebData(){
         }
         String imgFilePath = (String)imgFile.name();
         uint8_t subStrLen = imgFilePath.length();
-        sprintf(imgName, "%s", imgFilePath.substring(subStrLen-9,subStrLen-4));
-        Serial.print("imgName: ");
-        Serial.println(imgName);
-        Serial.print("imgID: ");
-        Serial.println(imgID);
-        
+        sprintf(imgName, "%s", imgFilePath.substring(subStrLen-9,subStrLen-4));        
         file.print("\"");
         file.print(imgID);
         file.print("\":{\"ImageName\":\"");
@@ -146,9 +106,36 @@ void refreshWebData(){
         imgFile = root.openNextFile();
       }
     }
+    Serial.println("... Done!");
+
+    Serial.print("WEB - Getting folder infos");
+    file.print("},\"FolderInfo\":{\"totImages\":");
+    file.print(imgID-1);
+    file.print(",\"haveDumps\":");
+    sprintf(thumbDir, "/dumps");   
+    int countDumps=0; 
+    root = FSYS.open(thumbDir);
+    if(root.isDirectory()){
+      File dumpFile = root.openNextFile();
+      while(dumpFile){
+        countDumps++;
+        if(countDumps > 0){
+          break;
+        }
+        dumpFile = root.openNextFile();
+      }
+    }
+    if(countDumps > 0){
+      file.print("1");
+    }else{
+      file.print("0");
+    }
+    Serial.println("... Done!");
+    
     file.print("}}]'");
     file.close();
   
+  Serial.println("WEB - New file generated! Refreshing page...");
   defaultHeaders();
   server.send(200, "application/json", "{\"Status\":1}");  
 }
@@ -318,8 +305,7 @@ String getContentType(String filename) {
 
 void webserver_setup() {
   refreshWebData();
-  server.on("/refreshlist", refreshWebData);
-  server.on("/parseDumps", parseDumps);
+  server.on("/refreshlist", refreshWebData);\
   server.on(UriBraces("/delete/{}"), DeleteImage);
   server.on(UriBraces("/download/{}"), GetImage);
 

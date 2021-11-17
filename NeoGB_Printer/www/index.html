@@ -136,33 +136,6 @@
 				border-radius: 0.25rem;
 			}
 			
-			.loader {
-				margin: 0 auto;
-				border: 10px solid #f3f3f3;
-				border-radius: 50%;
-				border-top: 10px solid #555;
-				width: 50px;
-				height: 50px;
-				-webkit-animation: spin 2s linear infinite; /* Safari */
-				animation: spin 2s linear infinite;
-			}
-
-			/* Safari */
-			@-webkit-keyframes spin {
-			0% { -webkit-transform: rotate(0deg); }
-			100% { -webkit-transform: rotate(360deg); }
-			}
-
-			@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-			}
-			
-			.MenuBtns{
-				margin: 0 auto;
-				text-align: center;
-			}
-			
 			@media (min-width: 576px) { 
 				.gallery {
 					margin: auto;
@@ -183,8 +156,6 @@
 								case 'refreshlist':
 									document.location.reload(true);
 									break;
-								case 'parseDumps':
-									break;
 								default:
 									console.log("Done.");
 							}
@@ -198,14 +169,14 @@
 	<body style="margin:0px;">
 		<h1 style="text-align: center;">Game Boy Printer Gallery</h1>
 		<hr>
-
-		<div class="MenuBtns">
-			<a class="button" id="btnRefresh" onclick='JsonGet("refreshlist")'>Refresh List</a>
-			<a class="button" id="btnParse" onclick='JsonGet("parseDumps")'>Parse Dumps</a>
+		
+		<div id="msgDumps" style="display: none;">You still have some dumps to convert into image. Please reboot your Printer to <b>Printer Mode</b> and convert then holding the button. Then reboot again to boot in <b>Server Mode</b> to see your new pics.</div>
+		<div style="margin: 0 auto; text-align: center;">
+			<a class="button" id="btnRefresh" onclick='JsonGet("refreshlist");'>Refresh List</a>
 		</div>
-		<div class="loader" id="loader"></div>
 		
 		<div class="gallery" id="gallery"></div>
+		
 		<!-- The Modal -->
 		<div id="myModal" class="modal">
 			<span class="close">&times;</span>
@@ -222,9 +193,9 @@
 				content += "</figure>";
 				document.getElementById("gallery").innerHTML += content;
 			}
-			document.getElementById("loader").style.display = "none";
-			if (imgdata[0].FolderInfo.haveDumps == 0){
-				document.getElementById("btnParse").style.display = "none";
+			
+			if (imgdata[0].FolderInfo.haveDumps == 1){
+				document.getElementById("msgDumps").style.display = "block";
 			}
 		</script>
 		

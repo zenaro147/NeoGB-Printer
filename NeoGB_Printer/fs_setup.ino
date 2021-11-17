@@ -176,17 +176,17 @@ int fs_info() {
   );
 }
 
-#ifdef USE_OLED
 /*******************************************************************************
   Get the number of images and dumps to show
 *******************************************************************************/
+#ifdef USE_OLED
 void GetNumberFiles() {
   char dirname[31];
   char path[31];
   char path2[31];
   int i = 0;
-  totalDumps=0;
-  totalImages=0;
+  uint8_t totalDumps=0;
+  int totalImages=0;
   File root;
   File file;
   
@@ -198,8 +198,8 @@ void GetNumberFiles() {
       i++;
       file = root.openNextFile();
     }
-  }    
-  sprintf(dirname, "/output/png");  
+  }
+  sprintf(dirname, "/output/png");
   root = FSYS.open(dirname);
   if(root.isDirectory()){
     File file = root.openNextFile();
@@ -207,7 +207,7 @@ void GetNumberFiles() {
       i++;
       file = root.openNextFile();
     }
-  }  
+  }
   for(int x = 1; x <= i; x++){
     sprintf(path, "/output/bmp/%05d.bmp", x);
     sprintf(path2, "/output/png/%05d.png", x);
@@ -223,40 +223,23 @@ void GetNumberFiles() {
   i=0;
   while(file){
     i++;
+    if (i > 0){
+      break;
+    }
     file = root.openNextFile();
   }
-  if(i>0){
-    do{
-      sprintf(path, "/dumps/%05d.bin", firstDumpID);
-      sprintf(path2, "/dumps/%05d_00001.bin", firstDumpID);
-      if (FSYS.exists(path) || FSYS.exists(path2)) {
-        break;
-      }
-      firstDumpID++;
-    }while(true);
+  if(i > 0){
+    Serial.println("Have Dumps? Yes");
+  }else{
+    Serial.println("Have Dumps? No");    
   }
-  
-  for(int x = 1; x <= i; x++){
-    sprintf(path, "/dumps/%05d.bin", firstDumpID);
-    sprintf(path2, "/dumps/%05d_00001.bin", firstDumpID);
-    if(FSYS.exists(path) || FSYS.exists(path2)){
-      totalDumps++;
-    }
-    firstDumpID++;
-  }
-  
-  Serial.printf("Dump Files: %d files\n", totalDumps);
   Serial.printf("Image Files: %d files\n", totalImages);
 
-  #ifdef USE_OLED
-    if(bootAsPrinter){
-      oled_writeNumImages(totalDumps,totalImages);
-    }
-  #endif
-  
+  if(bootAsPrinter){
+    oled_writeNumImages(totalDumps,totalImages);
+  }
 }
 #endif
-
 /*******************************************************************************
   "Printer Full" function
 *******************************************************************************/

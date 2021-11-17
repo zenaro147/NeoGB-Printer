@@ -71,8 +71,6 @@ bool setMultiPrint = false;
   String accesPointSSID = DEFAULT_AP_SSID;
   String accesPointPassword = DEFAULT_AP_PSK;
 #endif
-int totalDumps=0;
-int totalImages=0;
 
 //MISC
 TaskHandle_t TaskWriteImage;
@@ -173,7 +171,7 @@ void setup(void)
     #else
       bootAsPrinter = true;
     #endif
-//    bootAsPrinter = false;
+    bootAsPrinter = false;
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -210,14 +208,15 @@ void setup(void)
   
       #ifdef USE_OLED
         oledStateChange(1); //Printer Idle
+        GetNumberFiles();
       #endif
-      GetNumberFiles();
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
-    }else{  
+    }
+    #ifdef ENABLE_WEBSERVER
+    else{  
       Serial.println("-----------------------");
       Serial.println("Booting in server mode");
       Serial.println("-----------------------\n");
-      GetNumberFiles();
       initWifi();
       mdns_setup();
       webserver_setup();
@@ -225,6 +224,7 @@ void setup(void)
         oledStateChange(9); //Printer Idle as Server
       #endif
     }
+    #endif
     
     #ifdef LED_STATUS_PIN 
       LED_blink(LED_STATUS_PIN, 3, 100, 100);
@@ -338,8 +338,8 @@ void loop(){
                 
                 #ifdef USE_OLED
                   oledStateChange(1); //Printer Idle
+                  GetNumberFiles();
                 #endif
-                GetNumberFiles();
                 
                 #ifdef LED_STATUS_PIN 
                   LED_led_OFF(LED_STATUS_PIN);
@@ -356,7 +356,9 @@ void loop(){
       }
     }else{
       //WebServer Stuffs Here
-      webserver_loop();
+      #ifdef ENABLE_WEBSERVER
+        webserver_loop();
+      #endif
     }
     
     

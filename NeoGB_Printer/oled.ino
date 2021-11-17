@@ -39,13 +39,16 @@ void oled_setup() {
 }
 
 void oled_writeNumImages(int numTotDump, int numTotImages) { 
-  char textshow[10];
+  char textshow[16];
   
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  sprintf(textshow, "%d Dumps", numTotDump);
   display.setCursor(56, 15);
-  display.println(textshow);
+  if (numTotDump > 0){
+    display.println("Have Dumps? Yes");
+  }else{
+    display.println("Have Dumps? No");
+  }
   sprintf(textshow, "%d Images", numTotImages);  
   display.setCursor(56, 23);
   display.println(textshow);
