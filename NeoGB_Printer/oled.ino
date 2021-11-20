@@ -39,7 +39,7 @@ void oled_setup() {
 }
 
 void oled_writeNumImages(int numTotDump, int numTotImages) { 
-  char textshow[10];
+  char textshow[15];
   
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
