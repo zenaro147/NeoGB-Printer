@@ -74,14 +74,15 @@ void ConvertFilesBMP(){
   }
 
   //Get the first image ID to process
-  do {
-    sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
-    sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
-    if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
-      break;
-    }
-    firstDumpID++;
-  } while(true);
+//  do {
+//    sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
+//    sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
+//    if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
+//      break;
+//    }
+//    firstDumpID++;
+//  } while(true);
+firstDumpID=get_next_ID()-get_dumps(); 
   
   //Loop to check the availables files in Dump Folder based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
