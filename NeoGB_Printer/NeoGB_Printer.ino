@@ -277,8 +277,8 @@ void loop(){
             LED_led_OFF(LED_STATUS_GREEN);
           #endif
           if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-            dumpCount = update_get_dumps(1);
-            freeFileIndex=update_get_next_ID(1);
+            //dumpCount = update_get_dumps(1);
+            //freeFileIndex=update_get_next_ID(1);
             ResetPrinterVariables();
           }
         }
