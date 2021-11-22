@@ -328,7 +328,7 @@ void loop(){
             } else {
               delay(500);
               if((totalMultiImages-1) > 1){
-                Serial.println("Geting next file ID");
+                Serial.println("Getting next file ID");
                 
                 #ifdef LED_STATUS_PIN 
                   LED_led_ON(LED_STATUS_PIN);
@@ -339,7 +339,7 @@ void loop(){
                 #ifdef USE_OLED
                   oledStateChange(8); //Force Next File
                 #endif
-
+                delay(1000);
                 dumpCount = update_get_dumps(1);
                 freeFileIndex=update_get_next_ID(1);
                 ResetPrinterVariables();
