@@ -216,7 +216,7 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   //        Serial.print(" ");
   //  }
 
-  byte junk;
+  byte junk[3];
   byte pixel;
   byte normal_line[up_w];
   byte compressed_line[up_w / 2]; //because 4-bits format
@@ -228,9 +228,8 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   for (unsigned m = 0; m < h; m++) {
     index = 0;
     for (unsigned k = 0; k < w; k++) {
-      pixel = file.read();
-      junk = file.read();
-      junk = file.read();
+        file.read(junk, 3);
+	pixel = junk[1];
       for (unsigned i = 0; i < scale_factor; i++) {
         normal_line[index] = pixel;
         index = index + 1;
