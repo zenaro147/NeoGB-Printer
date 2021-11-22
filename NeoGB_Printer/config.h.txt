@@ -64,7 +64,7 @@
 /*************************
  * WEB SERVER DEFINITIONS
  *************************/
-//#define ENABLE_WEBSERVER //UNDER DEVELOPMENT - DO NOT UNCOMMENT THIS FOR NOW
+//#define ENABLE_WEBSERVER
 #ifdef ENABLE_WEBSERVER
   #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
   #define DEFAULT_AP_SSID "gameboyprinter"                //Your WiFi SSID
