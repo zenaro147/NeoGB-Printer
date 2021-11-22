@@ -2,10 +2,11 @@
 #include <stddef.h> // size_t
 
 #include "config.h"
+#include "./includes/led/LED_status.h"
+#include "./includes/StoreIDlib.h"
 #include "./includes/gblink/gameboy_printer_protocol.h"
 #include "./includes/gblink/gbp_pkt.h"
 #include "./includes/gblink/gbp_serial_io.h"
-#include "./includes/led/LED_status.h"
 
 //SD libraries 
 #include "FS.h"
@@ -21,6 +22,7 @@
 //  #include <ArduinoJson.h>
 #endif
 
+#define numVersion "Ver. 1.6.5-B"
 
 /*******************************************************************************
 *******************************************************************************/
@@ -52,7 +54,6 @@ boolean longPressActive = false;
 byte image_data[6000] = {}; //1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
 uint32_t img_index = 0x00;
-unsigned int nextFreeFileIndex();
 unsigned int freeFileIndex = 0;
 unsigned int dumpCount = 0;
 unsigned int totalMultiImages = 1;
@@ -75,6 +76,7 @@ bool setMultiPrint = false;
 //MISC
 TaskHandle_t TaskWriteImage;
 SPIClass spiSD(HSPI);
+
 /*******************************************************************************
   Utility Functions
 *******************************************************************************/
@@ -108,11 +110,11 @@ void ICACHE_RAM_ATTR serialClock_ISR(void)
 /*******************************************************************************
   Main Setup and Loop
 *******************************************************************************/
-void setup(void)
-{
+void setup(void){
   Serial.begin(115200); // Config Serial
-  
+
   LED_init();
+  
   /* Pin for pushbutton */ 
   pinMode(BTN_PUSH, INPUT);
   
@@ -148,15 +150,11 @@ void setup(void)
   #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
       #define BMP_OUTPUT
   #endif
-  #ifdef BMP_OUTPUT
-      #ifndef BMP_UPSCALE_FACTOR
-        #define BMP_UPSCALE_FACTOR
-      #endif
+  #if defined(BMP_OUTPUT) && !defined(BMP_UPSCALE_FACTOR)
+      #define BMP_UPSCALE_FACTOR 1
   #endif
-  #ifdef PNG_OUTPUT
-      #ifndef PNG_UPSCALE_FACTOR
-        #define PNG_UPSCALE_FACTOR
-      #endif
+  #if defined(PNG_OUTPUT) && !defined(PNG_UPSCALE_FACTOR)
+      #define PNG_UPSCALE_FACTOR 1
   #endif
   
   delay(3000); //Little delay for stetic 
@@ -165,6 +163,8 @@ void setup(void)
   isFileSystemMounted = fs_setup();
   
   if(isFileSystemMounted){
+    ID_file_checker(); //Create/check controller file
+    
     //Check the bootMode (Printer mode or WiFi mode)
     #ifdef ENABLE_WEBSERVER
       bootAsPrinter = fs_alternateBootMode();
@@ -172,20 +172,23 @@ void setup(void)
       bootAsPrinter = true;
     #endif
 //    bootAsPrinter = false;
+
+    //Get the % of use and the next image ID. If full boot as Server
+    uint8_t percUsed = fs_info();
+    //If full, stucks with a message
+    if (percUsed <= 10) {
+      bootAsPrinter=false;
+      full();
+      delay(5000);
+    }
+
     if (bootAsPrinter){
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
-      Serial.println("-----------------------\n");
-
-      //Get the % of use and the next image ID
-      uint8_t percUsed = fs_info();
-      //If full, stucks with a message
-      if (percUsed <= 10) {
-        isFileSystemMounted=false;
-        full();
-        return;
-      }
-      freeFileIndex = nextFreeFileIndex();
+      Serial.println("-----------------------");
+      
+      freeFileIndex = get_next_ID();
+      dumpCount = get_dumps();
   
       /* Pins from gameboy link cable */
       pinMode(GBP_SC_PIN, INPUT);
@@ -213,17 +216,17 @@ void setup(void)
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
     }
     #ifdef ENABLE_WEBSERVER
-    else{  
-      Serial.println("-----------------------");
-      Serial.println("Booting in server mode");
-      Serial.println("-----------------------\n");
-      initWifi();
-      mdns_setup();
-      webserver_setup();
-      #ifdef USE_OLED
-        oledStateChange(9); //Printer Idle as Server
-      #endif
-    }
+      else{  
+        Serial.println("-----------------------");
+        Serial.println("Booting in server mode");
+        Serial.println("-----------------------");
+        initWifi();
+        mdns_setup();
+        webserver_setup();
+        #ifdef USE_OLED
+          oledStateChange(9); //Printer Idle as Server
+        #endif
+      }
     #endif
     
     #ifdef LED_STATUS_PIN 
@@ -274,7 +277,9 @@ void loop(){
             LED_led_OFF(LED_STATUS_GREEN);
           #endif
           if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-            callNextFile();
+            dumpCount = update_get_dumps(1);
+            freeFileIndex=update_get_next_ID(1);
+            ResetPrinterVariables();
           }
         }
       }
@@ -289,7 +294,7 @@ void loop(){
           }
           if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
             longPressActive = true;
-            //Long press to convert to BMP
+            //Long press to convert to Image Files
             if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
               Serial.println("Converting to Image File");
               isConverting = true;
@@ -312,6 +317,7 @@ void loop(){
               
               #ifdef USE_OLED
                 oledStateChange(1); //Printer Idle
+                GetNumberFiles();
               #endif     
             }
           }  
@@ -322,7 +328,7 @@ void loop(){
             } else {
               delay(500);
               if((totalMultiImages-1) > 1){
-                Serial.println("Get next file ID");
+                Serial.println("Geting next file ID");
                 
                 #ifdef LED_STATUS_PIN 
                   LED_led_ON(LED_STATUS_PIN);
@@ -333,8 +339,10 @@ void loop(){
                 #ifdef USE_OLED
                   oledStateChange(8); //Force Next File
                 #endif
-  
-                callNextFile();
+
+                dumpCount = update_get_dumps(1);
+                freeFileIndex=update_get_next_ID(1);
+                ResetPrinterVariables();
                 
                 #ifdef USE_OLED
                   oledStateChange(1); //Printer Idle
@@ -359,10 +367,6 @@ void loop(){
       #ifdef ENABLE_WEBSERVER
         webserver_loop();
       #endif
-    }
-    
-    
-
-   
+    }   
   }
 }

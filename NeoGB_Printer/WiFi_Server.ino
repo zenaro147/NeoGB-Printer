@@ -2,6 +2,8 @@
 
 WebServer server(80);
 
+int imgID=0;
+
 void DeleteImage(){
   String img = server.pathArg(0);
   char pathimg [25];
@@ -45,6 +47,10 @@ void GetImage(){
 }
 
 void refreshWebData(){
+  #ifdef USE_OLED
+    oledStateChange(11); //Generating File List
+  #endif
+  imgID=0;
   Serial.println("WEB - Generating a new file List...");
   char path[] = "/www/ImgList.json"; 
     File file = FSYS.open(path,FILE_WRITE);
@@ -52,7 +58,6 @@ void refreshWebData(){
       Serial.println("failed to open file for reading");
       return;
     }
-
     
     Serial.print("WEB - Getting image list");
     file.print("data='[{\"ImageFolder\":{");
@@ -60,13 +65,13 @@ void refreshWebData(){
     char thumbDir[31];
     char imgDir[31];
     char imgName[30];
-    int imgID=1;
     sprintf(thumbDir, "/www/thumb");
     
     File root = FSYS.open(thumbDir);
     if(root.isDirectory()){
       File imgFile = root.openNextFile();
       while(imgFile){
+        imgID++;
         if(imgID > 1){
           file.print(",");
         }
@@ -80,15 +85,13 @@ void refreshWebData(){
         file.print("\",\"id\":");
         file.print(imgID);
         
-        #if defined(BMP_OUTPUT) || (!defined(BMP_OUTPUT) && !defined(PNG_OUTPUT))
+        #ifdef BMP_OUTPUT
           sprintf(imgDir, "/output/bmp/%s.bmp", imgName);
           if(FSYS.exists(imgDir)){
             file.print(",\"bmp\":1");
           }else{
             file.print(",\"bmp\":0");
           }
-        #else
-          file.print(",\"bmp\":0");
         #endif
         
         #ifdef PNG_OUTPUT
@@ -98,11 +101,7 @@ void refreshWebData(){
           }else{
             file.print(",\"png\":0}");
           }
-        #else
-          file.print(",\"png\":0}");
         #endif
-        
-        imgID++;
         imgFile = root.openNextFile();
       }
     }
@@ -110,22 +109,11 @@ void refreshWebData(){
 
     Serial.print("WEB - Getting folder infos");
     file.print("},\"FolderInfo\":{\"totImages\":");
-    file.print(imgID-1);
+    file.print(imgID);
     file.print(",\"haveDumps\":");
-    sprintf(thumbDir, "/dumps");   
-    int countDumps=0; 
-    root = FSYS.open(thumbDir);
-    if(root.isDirectory()){
-      File dumpFile = root.openNextFile();
-      while(dumpFile){
-        countDumps++;
-        if(countDumps > 0){
-          break;
-        }
-        dumpFile = root.openNextFile();
-      }
-    }
-    if(countDumps > 0){
+    sprintf(thumbDir, "/dumps");  
+     
+    if(get_dumps() > 0){
       file.print("1");
     }else{
       file.print("0");
@@ -136,6 +124,10 @@ void refreshWebData(){
     file.close();
   
   Serial.println("WEB - New file generated! Refreshing page...");
+  #ifdef USE_OLED
+    oledStateChange(9); //Printer Idle as Server
+  #endif
+  imgID=0;
   defaultHeaders();
   server.send(200, "application/json", "{\"Status\":1}");  
 }
@@ -177,33 +169,27 @@ void getDumpsList(){
 //  String dumpList;
 //  bool sep = false;
 //
-//  uint64_t total = 0;
-//  total = FSYS.totalBytes();
-//  uint64_t used = 0;
-//  used = FSYS.usedBytes();  
 //  uint64_t avail = total - used;
 //  
 //  File dumpDir = FSYS.open("/d");
 //
-//
 //  File file = dumpDir.openNextFile();
 //  while(file){
-//    dumpcount++;
 //    if (sep) {
 //      dumpList += ",";
 //    } else {
 //      sep = true;
 //    }    
 //    dumpList += "\"";
-//    dumpList += "/dumps/";
+//    dumpList += "/download/";
 //    dumpList += file.name();
 //    dumpList += "\"";
 //    file = dumpDir.openNextFile();
 //  }  
 //  
 //  char fs[100];
-//  sprintf(fs, "{\"total\":%llu,\"used\":%llu,\"available\":%llu,\"maximages\":%d,\"dumpcount\":%d}", total, used, avail, MAX_IMAGES, dumpcount);
-//
+//  sprintf(fs, "{\"total\":0,\"used\":0,\"available\":0,\"maximages\":0,\"dumpcount\":%d}", imgID);
+
 //  defaultHeaders();
 //  server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
   Serial.println("Enter Get Dump List");

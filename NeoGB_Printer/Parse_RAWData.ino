@@ -107,8 +107,7 @@ inline void gbp_packet_capture_loop() {
 /*******************************************************************************
   Write HEX dump file
 *******************************************************************************/
-void storeData(void *pvParameters)
-{
+void storeData(void *pvParameters) {
   unsigned long perf = millis();
   int img_index2=img_index;
   byte *image_data2 = ((byte*)pvParameters);
@@ -142,8 +141,8 @@ void storeData(void *pvParameters)
   uint8_t percUsed = fs_info();
   if (percUsed > 10) {
     if(!setMultiPrint){
-      freeFileIndex++;
-      dumpCount++;
+      freeFileIndex=update_get_next_ID(1);
+      dumpCount = update_get_dumps(1);
     }else{    
       totalMultiImages++;
     }
@@ -160,20 +159,18 @@ void storeData(void *pvParameters)
 
 /*******************************************************************************
   Force to call the next file 
-  (fix for Mary-Kate and Ashley Pocket Planner / E.T.: Digital Companion
+  (fix for Mary-Kate and Ashley Pocket Planner / E.T.: Digital Companion /
   McDonald's Monogatari : Honobono Tenchou Ikusei Game)
 *******************************************************************************/
-void callNextFile(){
-  setMultiPrint = false;
-  totalMultiImages = 1;
-
-  freeFileIndex = nextFreeFileIndex();
+void ResetPrinterVariables(){
   //Reset Variables
-  Serial.println("Printer ready.");
+  setMultiPrint = false;
+  totalMultiImages = 1;  
   img_index = 0x00;
   chkHeader = 99;
-  isWriting = false;
-  
+  isWriting = false;  
   memset(image_data, 0x00, sizeof(image_data));
+  
+  Serial.println("Printer ready.");
   
 }

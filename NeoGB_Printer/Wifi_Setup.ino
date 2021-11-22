@@ -36,19 +36,17 @@ void initWifi(){
     return;
   } else {
     WiFi.mode(WIFI_MODE_AP);
-//    const char * accesPointSSIDc = accesPointSSID.c_str();
-//    const char * accesPointPasswordc = accesPointPassword.c_str();
     const char * accesPointSSIDc = "gameboyprinter";
     const char * accesPointPasswordc = "gameboyprinter";
     WiFi.softAP(accesPointSSIDc, accesPointPasswordc);
-    Serial.println("AccessPoint " + accesPointSSID + " started");
+    Serial.println("AccessPoint gameboyprinter started");
   }
 }
 
 void mdns_setup() {
   String protocol = F("http://");
   String ip = "";
-  String localsrv = "";
+  String localsrv = ".local";
   
   const char * mdnsNamec = mdnsName.c_str();
   if (!MDNS.begin(mdnsNamec)) {

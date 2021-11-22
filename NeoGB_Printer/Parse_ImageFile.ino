@@ -123,10 +123,7 @@ void ConvertFilesBMP(){
       }
       sprintf(fileBMPPath, "/temp/%05d.bmp", i);
       
-      Serial.print("Parsing File: ");
-      Serial.print(path);
-      Serial.print(" to ");
-      Serial.print(fileBMPPath);
+      Serial.printf("Parsing File: %s to %s",path,fileBMPPath);
       
       //Open the file and copy it to the memory
       File file = FSYS.open(path);
@@ -201,7 +198,6 @@ void ConvertFilesBMP(){
       #ifdef USE_OLED
         oledStateChange(6); //BMP to PNG
       #endif
-      
       sprintf(pathOutput, "/output/png/%05d.png", i);
       Serial.printf("Saving PNG image in: %s",pathOutput);
       perf = millis();
@@ -220,12 +216,17 @@ void ConvertFilesBMP(){
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
     #endif
+    
     FSYS.remove(fileBMPPath);
     Serial.printf("\n");
+
+    update_dumps(-1); 
   }
-    
-  callNextFile(); // Get Next ID available  
   
+  dumpCount = get_dumps();
+  ResetPrinterVariables(); // Get Next ID available  
+
+  //Reset Local Variables
   numfiles=0; 
   actualfile=0;
   isConverting = false;
@@ -236,6 +237,13 @@ void ConvertFilesBMP(){
   #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
     LED_blink(LED_STATUS_BLUE, 3,100,100);
   #endif
+
+  uint8_t percUsed = fs_info();
+  if (percUsed <= 10) {
+      full();
+      delay(5000);
+      ESP.restart();
+  }
 }
 
 /*******************************************************************************
