@@ -127,7 +127,6 @@ void refreshWebData(){
   #ifdef USE_OLED
     oledStateChange(9); //Printer Idle as Server
   #endif
-  imgID=0;
   defaultHeaders();
   server.send(200, "application/json", "{\"Status\":1}");  
 }
@@ -159,41 +158,31 @@ void refreshWebData(){
   Functions to the Remote Acces using the Herr Zatacke interface https://herrzatacke.github.io/gb-printer-web/
 ***************************************************************************************************************/
 void getDumpsList(){
-//  String fileName = "";
-//  String fileShort = "";
-//
-//  // get number of files in /d/
-//  unsigned int dumpcount = 0;
-//
-//  String out;
-//  String dumpList;
-//  bool sep = false;
-//
-//  uint64_t avail = total - used;
-//  
-//  File dumpDir = FSYS.open("/d");
-//
-//  File file = dumpDir.openNextFile();
-//  while(file){
-//    if (sep) {
-//      dumpList += ",";
-//    } else {
-//      sep = true;
-//    }    
-//    dumpList += "\"";
-//    dumpList += "/download/";
-//    dumpList += file.name();
-//    dumpList += "\"";
-//    file = dumpDir.openNextFile();
-//  }  
-//  
-//  char fs[100];
-//  sprintf(fs, "{\"total\":0,\"used\":0,\"available\":0,\"maximages\":0,\"dumpcount\":%d}", imgID);
+  String dumpList;
+  bool sep = false;
+  
+  File dumpDir = FSYS.open("/www/thumb");
 
-//  defaultHeaders();
-//  server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
-  Serial.println("Enter Get Dump List");
-  send404();
+  File file = dumpDir.openNextFile();
+  while(file){
+    if (sep) {
+      dumpList += ",";
+    } else {
+      sep = true;
+    }    
+    dumpList += "\"/thumb/";
+    dumpList += file.name();
+    dumpList += "\"";
+    file = dumpDir.openNextFile();
+  }  
+  
+  char fs[100];
+  sprintf(fs, "{\"total\":0,\"used\":0,\"available\":0,\"maximages\":0,\"dumpcount\":%d}", imgID);
+
+  defaultHeaders();
+  server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
+//  Serial.println("Enter Get Dump List");
+//  send404();
 }
 
 void handleDump() {
