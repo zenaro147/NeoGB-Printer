@@ -162,14 +162,15 @@ void storeData(void *pvParameters) {
   McDonald's Monogatari : Honobono Tenchou Ikusei Game)
 *******************************************************************************/
 void ResetPrinterVariables(){
+  Serial.println("Reseting Vars...");
   //Reset Variables
   setMultiPrint = false;
   totalMultiImages = 1;  
   img_index = 0x00;
   chkHeader = 99;
   isWriting = false;  
+  isPrinting = false
   memset(image_data, 0x00, sizeof(image_data));
   
-  Serial.println("Printer ready.");
-  
+  Serial.println("Printer Ready");
 }
