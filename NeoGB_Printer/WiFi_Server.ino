@@ -172,12 +172,15 @@ void getDumpsList(){
     }
     dumpList += "\"/thumb/";
         
-    char imgName[30];
     String imgFilePath = (String)file.name();
     uint8_t subStrLen = imgFilePath.length();
-    dumpList += imgFilePath.substring(subStrLen-9,subStrLen);
+    String imgName = (String)imgFilePath.substring(subStrLen-9,subStrLen-4);
+    Serial.println(imgFilePath);
+    Serial.println(subStrLen);
+    Serial.println(imgName);
+    dumpList += imgName;
     
-    dumpList += "\"";
+    dumpList += ".png\"";
     file = dumpDir.openNextFile();
   }  
   
@@ -188,44 +191,44 @@ void getDumpsList(){
   server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
 }
 
-void handleDump() {
-  String path = "/dumps/" + server.pathArg(0); 
-
-  File file = FSYS.open(path);
-  if(!file || file.isDirectory()){
-    Serial.println("failed to open file for reading");
-    return;
-  }
-    
-  if(file) {
-    defaultHeaders();
-
-    server.setContentLength(file.available() * 3);
-    server.send(200, "text/plain");
-
-    Serial.println(file.available());
-    Serial.println(file.available() * 3);
-
-    char converted[DUMP_CHUNK_SIZE];
-    uint8_t index = 0;
-
-    while (file.available()) {
-      char c = file.read();
-
-      converted[index] = nibbleToCharLUT[(c>>4)&0xF];
-      converted[index + 1] = nibbleToCharLUT[(c>>0)&0xF];
-      converted[index + 2] = ' ';
-      index += 3;
-
-      if (index >= DUMP_CHUNK_SIZE || file.available() == 0) {
-        server.sendContent(converted, index);
-        index = 0;
-      }
-    }
-    file.close();
-    return;
-  }
-}
+//void handleDump() {
+//  String path = "/dumps/" + server.pathArg(0); 
+//
+//  File file = FSYS.open(path);
+//  if(!file || file.isDirectory()){
+//    Serial.println("failed to open file for reading");
+//    return;
+//  }
+//    
+//  if(file) {
+//    defaultHeaders();
+//
+//    server.setContentLength(file.available() * 3);
+//    server.send(200, "text/plain");
+//
+//    Serial.println(file.available());
+//    Serial.println(file.available() * 3);
+//
+//    char converted[DUMP_CHUNK_SIZE];
+//    uint8_t index = 0;
+//
+//    while (file.available()) {
+//      char c = file.read();
+//
+//      converted[index] = nibbleToCharLUT[(c>>4)&0xF];
+//      converted[index + 1] = nibbleToCharLUT[(c>>0)&0xF];
+//      converted[index + 2] = ' ';
+//      index += 3;
+//
+//      if (index >= DUMP_CHUNK_SIZE || file.available() == 0) {
+//        server.sendContent(converted, index);
+//        index = 0;
+//      }
+//    }
+//    file.close();
+//    return;
+//  }
+//}
 
 void getEnv(){
   server.send(200, "application/json", "{\"version\":\"0\",\"maximages\":0,\"env\":\"esp8266\",\"fstype\":\"littlefs\",\"bootmode\":\"alternating\",\"oled\":false}");  
@@ -280,11 +283,10 @@ void webserver_setup() {
   server.on("/refreshlist", refreshWebData);
   server.on(UriBraces("/delete/{}"), DeleteImage);
   server.on(UriBraces("/download/{}"), GetImage);
-  server.on(UriBraces("/d/{}"), handleDump);
+  //server.on(UriBraces("/d/{}"), handleDump);
 
   server.on("/env.json", getEnv);
   server.on("/dumps/list", getDumpsList);
-  server.on(UriBraces("/dumps/{}"), handleDump);
 
 //  server.on("/genericArgs", handleGenericArgs); //Associate the handler function to the path
 //  server.on("/specificArgs", handleSpecificArg);   //Associate the handler function to the path
