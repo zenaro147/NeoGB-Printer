@@ -278,7 +278,7 @@ void loop(){
           #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
             LED_led_OFF(LED_STATUS_GREEN);
           #endif
-          if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
+          if(!setMultiPrint && totalMultiImages > 1 && !isWriting && !isPrinting){
             ResetPrinterVariables();
           }
         }
@@ -327,7 +327,7 @@ void loop(){
               longPressActive = false;  
             } else {
               delay(500);
-              if((totalMultiImages-1) > 1 && chkMargin == 0 && && isPrinting){
+              if((totalMultiImages-1) > 1 && chkMargin == 0 && isPrinting){
                 Serial.println("Getting next file ID");
                 
                 #ifdef LED_STATUS_PIN 
