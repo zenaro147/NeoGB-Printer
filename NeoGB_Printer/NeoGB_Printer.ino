@@ -53,6 +53,7 @@ boolean longPressActive = false;
 //Data Controller
 byte image_data[6000] = {}; //1 GBC Picute (5.874)
 uint8_t chkHeader = 99;
+uint8_t chkMargin = 0x00;
 uint32_t img_index = 0x00;
 unsigned int freeFileIndex = 0;
 unsigned int dumpCount = 0;
@@ -61,6 +62,7 @@ bool testmode = false;
 
 //States
 bool bootAsPrinter;
+bool isPrinting = false;
 bool isWriting = false;
 bool isConverting = false;
 bool isFileSystemMounted = false;
@@ -277,8 +279,6 @@ void loop(){
             LED_led_OFF(LED_STATUS_GREEN);
           #endif
           if(!setMultiPrint && totalMultiImages > 1 && !isWriting){
-            //dumpCount = update_get_dumps(1);
-            //freeFileIndex=update_get_next_ID(1);
             ResetPrinterVariables();
           }
         }
@@ -286,7 +286,7 @@ void loop(){
       last_millis = curr_millis;
 
       // Feature to detect a short press and a Long Press
-      if(!isWriting){
+      if(!isWriting && !isPrinting){
         if (digitalRead(BTN_PUSH) == HIGH) {
           if (buttonActive == false) {
             buttonActive = true;
@@ -327,7 +327,7 @@ void loop(){
               longPressActive = false;  
             } else {
               delay(500);
-              if((totalMultiImages-1) > 1){
+              if((totalMultiImages-1) > 1 && chkMargin == 0){
                 Serial.println("Getting next file ID");
                 
                 #ifdef LED_STATUS_PIN 

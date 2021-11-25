@@ -1,8 +1,8 @@
 #ifdef ENABLE_WEBSERVER
 
 WebServer server(80);
-
 int imgID=0;
+#define DUMP_CHUNK_SIZE 90
 
 void DeleteImage(){
   String img = server.pathArg(0);
@@ -155,7 +155,7 @@ void refreshWebData(){
 //}
 
 /**************************************************************************************************************
-  Functions to the Remote Acces using the Herr Zatacke interface https://herrzatacke.github.io/gb-printer-web/
+  Functions to allow Remote Acces using the HerrZatacke interface https://herrzatacke.github.io/gb-printer-web/
 ***************************************************************************************************************/
 void getDumpsList(){
   String dumpList;
@@ -181,53 +181,45 @@ void getDumpsList(){
 
   defaultHeaders();
   server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
-//  Serial.println("Enter Get Dump List");
-//  send404();
 }
 
 void handleDump() {
-//  String path = "/d/" + server.pathArg(0); 
-//
-//  File file = FSYS.open(path); //check what print here
-//  Serial.println(path);
-//  if(!file || file.isDirectory()){
-//    Serial.println("failed to open file for reading");
-//    return;
-//  }
-//    
-//  if(file) {
-//    defaultHeaders();
-//
-//    server.setContentLength(file.available() * 3);
-//    server.send(200, "text/plain");
-//
-//    Serial.println(file.available());
-//    Serial.println(file.available() * 3);
-//
-//    const char nibbleToCharLUT[] = "0123456789ABCDEF";
-//
-//    char converted[DUMP_CHUNK_SIZE];
-//    uint8_t index = 0;
-//
-//    while (file.available()) {
-//      char c = file.read();
-//
-//      converted[index] = nibbleToCharLUT[(c>>4)&0xF];
-//      converted[index + 1] = nibbleToCharLUT[(c>>0)&0xF];
-//      converted[index + 2] = ' ';
-//      index += 3;
-//
-//      if (index >= DUMP_CHUNK_SIZE || file.available() == 0) {
-//        Serial.println(index + 3);
-//        server.sendContent(converted, index);
-//        index = 0;
-//      }
-//    }
-//    file.close();
-//    return;
-//  }
-  Serial.println("Enter Handle Dump");
-  send404();
+  String path = "/dumps/" + server.pathArg(0); 
+
+  File file = FSYS.open(path);
+  if(!file || file.isDirectory()){
+    Serial.println("failed to open file for reading");
+    return;
+  }
+    
+  if(file) {
+    defaultHeaders();
+
+    server.setContentLength(file.available() * 3);
+    server.send(200, "text/plain");
+
+    Serial.println(file.available());
+    Serial.println(file.available() * 3);
+
+    char converted[DUMP_CHUNK_SIZE];
+    uint8_t index = 0;
+
+    while (file.available()) {
+      char c = file.read();
+
+      converted[index] = nibbleToCharLUT[(c>>4)&0xF];
+      converted[index + 1] = nibbleToCharLUT[(c>>0)&0xF];
+      converted[index + 2] = ' ';
+      index += 3;
+
+      if (index >= DUMP_CHUNK_SIZE || file.available() == 0) {
+        server.sendContent(converted, index);
+        index = 0;
+      }
+    }
+    file.close();
+    return;
+  }
 }
 
 void getEnv(){
@@ -235,7 +227,7 @@ void getEnv(){
 }
 
 /**********************************************
-  Main WebServer Functions and URL definitions
+  Basic WebServer Functions and URL definitions
 ***********************************************/
 void defaultHeaders() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -280,9 +272,10 @@ String getContentType(String filename) {
 
 void webserver_setup() {
   refreshWebData();
-  server.on("/refreshlist", refreshWebData);\
+  server.on("/refreshlist", refreshWebData);
   server.on(UriBraces("/delete/{}"), DeleteImage);
   server.on(UriBraces("/download/{}"), GetImage);
+  server.on(UriBraces("/d/{}"), handleDump);
 
   server.on("/env.json", getEnv);
   server.on("/dumps/list", getDumpsList);

@@ -3,8 +3,6 @@ uint8_t dtpck = 0;
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte img_tmp[6000] = {}; // 1GBC Picute (5.874)
 
-uint8_t chkMargin = 0x00;
-
 TaskHandle_t TaskWriteDump;
 /*******************************************************************************
   Recieve Raw Data from GameBoy
@@ -36,6 +34,7 @@ inline void gbp_packet_capture_loop() {
 
         switch (chkHeader) {
           case 1:
+            isPrinting = true;
             chkMargin = 0x00;
             break;
           case 4:
@@ -141,20 +140,20 @@ void storeData(void *pvParameters) {
   uint8_t percUsed = fs_info();
   if (percUsed > 10) {
     if(!setMultiPrint){
+      isPrinting = false;
       freeFileIndex=update_get_next_ID(1);
       dumpCount = update_get_dumps(1);
     }else{    
       totalMultiImages++;
     }
-    
     //Reset Variables
     Serial.println("Printer ready.");
     isWriting = false;
   
-    vTaskDelete(NULL); 
   } else {
     full();
   }
+  vTaskDelete(NULL);
 }
 
 /*******************************************************************************
