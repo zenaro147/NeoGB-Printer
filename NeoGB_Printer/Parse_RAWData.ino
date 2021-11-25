@@ -169,7 +169,7 @@ void ResetPrinterVariables(){
   img_index = 0x00;
   chkHeader = 99;
   isWriting = false;  
-  isPrinting = false
+  isPrinting = false;
   memset(image_data, 0x00, sizeof(image_data));
   
   Serial.println("Printer Ready");
