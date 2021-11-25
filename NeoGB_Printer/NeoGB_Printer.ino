@@ -286,7 +286,7 @@ void loop(){
       last_millis = curr_millis;
 
       // Feature to detect a short press and a Long Press
-      if(!isWriting && !isPrinting){
+      if(!isWriting){
         if (digitalRead(BTN_PUSH) == HIGH) {
           if (buttonActive == false) {
             buttonActive = true;
@@ -295,7 +295,7 @@ void loop(){
           if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
             longPressActive = true;
             //Long press to convert to Image Files
-            if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
               Serial.println("Converting to Image File");
               isConverting = true;
               #ifdef USE_OLED
@@ -327,7 +327,7 @@ void loop(){
               longPressActive = false;  
             } else {
               delay(500);
-              if((totalMultiImages-1) > 1 && chkMargin == 0){
+              if((totalMultiImages-1) > 1 && chkMargin == 0 && && isPrinting){
                 Serial.println("Getting next file ID");
                 
                 #ifdef LED_STATUS_PIN 
