@@ -77,7 +77,7 @@ void refreshWebData(){
         }
         String imgFilePath = (String)imgFile.name();
         uint8_t subStrLen = imgFilePath.length();
-        sprintf(imgName, "%s", imgFilePath.substring(subStrLen-9,subStrLen-4));        
+        sprintf(imgName, "%s", imgFilePath.substring(subStrLen-9,subStrLen-4));
         file.print("\"");
         file.print(imgID);
         file.print("\":{\"ImageName\":\"");
@@ -169,9 +169,14 @@ void getDumpsList(){
       dumpList += ",";
     } else {
       sep = true;
-    }    
+    }
     dumpList += "\"/thumb/";
-    dumpList += file.name();
+        
+    char imgName[30];
+    String imgFilePath = (String)file.name();
+    uint8_t subStrLen = imgFilePath.length();
+    dumpList += imgFilePath.substring(subStrLen-9,subStrLen);
+    
     dumpList += "\"";
     file = dumpDir.openNextFile();
   }  
