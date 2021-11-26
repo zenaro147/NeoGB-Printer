@@ -173,7 +173,6 @@ void setup(void){
     #else
       bootAsPrinter = true;
     #endif
-//    bootAsPrinter = false;
 
     //Get the % of use and the next image ID. If full boot as Server
     uint8_t percUsed = fs_info();
