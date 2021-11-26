@@ -54,6 +54,17 @@ void oled_writeNumImages(int numTotDump) {
   #endif
 }
 
+void oled_ShowIP() { 
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(5, 21);
+  display.println(WiFi.localIP());
+  display.display();
+  #ifdef OLED_INVERT
+    display.invertDisplay(true);
+  #endif
+}
+
 
 void oled_drawStatus(const unsigned char statusName[]) {
   display.clearDisplay();

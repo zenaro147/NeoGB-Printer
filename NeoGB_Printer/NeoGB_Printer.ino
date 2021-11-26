@@ -226,6 +226,7 @@ void setup(void){
         webserver_setup();
         #ifdef USE_OLED
           oledStateChange(9); //Printer Idle as Server
+          oled_ShowIP();
         #endif
       }
     #endif
