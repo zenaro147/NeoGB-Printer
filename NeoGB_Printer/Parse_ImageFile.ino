@@ -82,7 +82,7 @@ void ConvertFilesBMP(){
 //    }
 //    firstDumpID++;
 //  } while(true);
-firstDumpID=get_next_ID()-get_dumps(); 
+  firstDumpID=get_next_ID()-get_dumps(); 
   
   //Loop to check the availables files in Dump Folder based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
