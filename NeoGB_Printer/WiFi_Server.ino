@@ -175,9 +175,6 @@ void getDumpsList(){
     String imgFilePath = (String)file.name();
     uint8_t subStrLen = imgFilePath.length();
     String imgName = (String)imgFilePath.substring(subStrLen-9,subStrLen-4);
-    Serial.println(imgFilePath);
-    Serial.println(subStrLen);
-    Serial.println(imgName);
     dumpList += imgName;
     
     dumpList += ".png\"";
