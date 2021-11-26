@@ -164,11 +164,9 @@ firstDumpID=get_next_ID()-get_dumps();
     actualfile=0;
     delay(100);
 
-    #ifdef ENABLE_WEBSERVER
-      //Generate the thumbnail for the Webserver
-      sprintf(pathOutput, "/www/thumb/%05d.png", i);
-      png_upscaler(fileBMPPath,pathOutput,1);
-    #endif
+    //Generate the thumbnail for the Webserver
+    sprintf(pathOutput, "/www/thumb/%05d.png", i);
+    png_upscaler(fileBMPPath,pathOutput,1);
     
     //Create a 4bits BMP and resize the image
     #ifdef BMP_OUTPUT
