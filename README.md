@@ -22,7 +22,12 @@ For webserver support, you must install manually two additionnal libraries:
 Just download the .zip (code >> download zip) and import to the Arduino IDE in Sketch > Include Library > Add .zip library.... and select the zip files.
 
 ## SD card Setup
-Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. **./www** contains the files for the webserver and **./E_paper/** a GNU Octave interpreter to transform your printer images into prints simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). During use of the NeoGB Printer, new files will appear on the card. **./ID_storage.bin** generates an unique ID for each print so avoid to delete it (if deleted, the image count will restart from 1 with a risk of overwriting existing images). Your images will be placed at **./output/bmp/** and **./output/png/** and can be deleted as you wish.
+Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. 
+* **./www** contains the files for the webserver.
+* **./E_paper/** a GNU Octave interpreter to transform your printer images into prints simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). 
+During use of the NeoGB Printer, new files will appear on the card. 
+* **./ID_storage.bin** generates an unique ID for each print so avoid to delete it (if deleted, the image count will restart from 1 with a risk of overwriting existing images). 
+* Your images will be placed at **./output/bmp/** and **./output/png/** and can be deleted as you wish.
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
