@@ -1,4 +1,4 @@
-# The NeoGB Printer
+# The NeoGB Printer - ポケットプリンタエミュレータ
 
 The NeoGB Printer is a SD card-based standalone Game Boy Printer emulator. It is easy to build with parts readily available on the market. It does require little to no soldering skill and is fast to install from Arduino IDE (few dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
