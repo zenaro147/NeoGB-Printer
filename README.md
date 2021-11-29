@@ -155,7 +155,9 @@ At each rebbot, the device will alternate between Printer mode and Webserver mod
 At each rebbot, the device wil alternate between Printer mode and Webserver mode
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for Webserver mode. **Booting time may take some time if you have a huge number of images on the SD card as webserver build the file list during this step.**
 * Access directly your images at http://gameboyprinter. The OLED screen indicate the IP address of the site too.
+
 OR
+
 * Access your images at https://herrzatacke.github.io/gb-printer-web/#/
 - Settings->Printer URL (enter the IP given on the OLED or the Arduino IDE serial)
 - Import->Open Printer page->Check Printer->Fetch Images
