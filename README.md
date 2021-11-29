@@ -1,13 +1,13 @@
 # The NeoGB Printer
 
-The NeoGB Printer is a SD card-based standalone Game Boy Printer emulator. It is very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
+The NeoGB Printer is a SD card-based standalone Game Boy Printer emulator. It is easy to build with parts readily available on the market. It does require little to no soldering skill and is fast to install from Arduino IDE (few dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts bougth new is below $15. All parts can be easily exchanged with other projects, reused or harvested from dead electronics as they are all very common.
 
-You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and/or PNG images, ready to use with social media.
+You just need to upload the code using the Arduino IDE, connect the components like described here, plug your SD card and print any image directly from a Gameboy compatible game. Serial protocol is directly recorded under binary form on SD card. Once your printing session is finished, hold the [button](#push-button-setup) (see below) for a few seconds and all the recorded data will be quickly converted to BMP and/or PNG images, ready to use with social media. Reboot the device once and you will access to an intuitive webserver mode.
 
 ## Software Setup
-First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings. This file contains all the options that can be changed in the emulator (pinout, OLED and LEDs features for example). Customize it according to the board and modules you are using.
+First of all, rename the `config.h.txt` to just `config.h` to import the pinout settings. This file contains all the options that can be changed in the emulator (pinout, OLED and LEDs features, webserver parameters, scaling factor for images, etc.). Customize it according to the board and modules you are using.
 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
@@ -21,19 +21,21 @@ For webserver support, you must install manually two additionnal libraries:
 
 Just download the .zip (code >> download zip) and import to the Arduino IDE in Sketch > Include Library > Add .zip library.... and select the zip files.
 
+## SD card Setup
+Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. **./www** contains the files for the webserver and **./E_paper/** a GNU Octave interpreter to transform your printer images into prints simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). During use of the NeoGB Printer, new files will appear on the card. **./ID_storage.bin** generates an unique ID for each print so avoid to delete it (if deleted, the image count will restart from 1 with a risk of overwriting existing images). Your images will be placed at **./output/bmp/** and **./output/png/** and can be deleted as you wish.
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
 * The number of total pins available in the board doesn't matter (Could be with 30 pins, 36 pins, 38 pins, whatever)
 * It's a **Dual Core module** (some ESP32 modules are single core, like the ESP32-S2 and ESP32-C3)
-* Have, at least, **2 SPI pins gourps** [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
+* Have, at least, **2 SPI pins groups** [like this example](https://4.bp.blogspot.com/-nGLtB2nUrDg/Wp6DQbzcJMI/AAAAAAAABq0/A6Z46p0SQSEdERWocWL94oUmeATMQre4wCLcBGAs/s1600/3.png) (normally it's called HSPI and VSPI, or sometimes have one called SPI and the other called VSPI or HSPI), make sure to check the pinout before buy one;
 
-Some boards already have a SD Card slot built in. We've never tested this kind of board, but IN THEORY it should work fine (as long as it has SPI pins available). If you choose to use this type of board, **we however won't be able to provide any support in case of bug**...But feel free to experiment.
+Some boards already have a SD Card slot built in. We've never tested this kind of board, but *in theory* it should work fine (as long as it has SPI pins available). If you choose to use this type of board, **we however won't be able to provide any support in case of bug**...But feel free to experiment.
 
 ## Gameboy Link Cable Setup
 Gameboy Original/Color Link Cable Pinout. If you don't want to sacrifice a Link Cable, you can use this [Gameboy Link Cable Breakout PCB](https://github.com/Palmr/gb-link-cable) to connect the pins and keep your Link Cable safely ! [You can buy this board here, from OSH Park](https://oshpark.com/shared_projects/srSgm3Yj). A bit of do-it-yourself is necessary at this step if you do not use a breakout board.
 
-Different from Arduino that operates in 5V like the GameBoy, the ESP32 operate is in 3.3V on its pins by default. You will need a [tiny bidirectionnal Level Shifter like this](https://pt.aliexpress.com/item/1005001839292815.html) to handle the communication protocol and prevent any overvoltage/undervoltage from any side. Direct connection between Game Boy and ESP pins without level shifter may work but we do not recommend this for reliability reasons.
+Different from Arduino that operates in 5V like the GameBoy, the ESP32 operate is in 3.3V on its pins by default. You will need a [tiny bidirectionnal Level Shifter like this](https://pt.aliexpress.com/item/1005001839292815.html) to handle the communication protocol and prevent any overvoltage/undervoltage from any side. Direct connection between Game Boy and ESP pins without level shifter may work but we do not recommend this for long term reliability reasons.
 
 Connect the Game Boy serial pins to the ESP pins following this scheme:
 ```
@@ -43,10 +45,10 @@ Connect the Game Boy serial pins to the ESP pins following this scheme:
 
 | Link Cable |Level Shifter|  ESP32  |
 |------------|-------------|---------|
-| Pin 1      |             |   N/A   | <- 5v from Game Boy (unreliable voltage source)
+| Pin 1      |             |   N/A   | <- 5v from Game Boy (unnecessary)
 | Pin 2      |  HV1<->LV1  |   G19   | <- Serial Out (Game Boy side)
 | Pin 3      |  HV2<->LV2  |   G23   | <- Serial In (Game Boy side)
-| Pin 4      |             |   N/A   | <- Serial Data
+| Pin 4      |             |   N/A   | <- Serial Data (unnecessary)
 | Pin 5      |  HV3<->LV3  |   G18   | <- Clock Out
 | Pin 6      |  GND<->GND  |   GND   | <- GND
 |            |      LV     |  +3.3V  | <- +3.3 volts from ESP32
@@ -74,7 +76,7 @@ To use it, connect the pins following this scheme:
 You will need to add a [little Push Button like this](https://pt.aliexpress.com/item/1005002824489337.html) to convert all RAW data to BMP and/or PNG. To use it, just set the `#define BTN_PUSH` in `config.h` to any pin you want.
 
 The function is simple:
-* Single short press: Force to refresh the image ID (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`).
+* Single short press: Force to refresh the image ID after printing (only two games require this action: `E.T.: Digital Companion` and `Mary-Kate and Ashley Pocket Planner`).
 * Long Press: Convert all RAW data to BMP/PNG images.
 
 ```
@@ -129,7 +131,7 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 ```
 
 ## WebServer interface (optional)
-The NeoGB Printer has an integrated WebServer to easily download your photos and delete then too. This will enable too a `dual boot mode`, in other words, the printer will alternate between `Printer Mode` (to print and generate the image files) and `Server Mode` (to access the Web interface and manage your pictures) on each boot
+The NeoGB Printer has an integrated WebServer to easily download your photos and delete them too. The printer will alternate between `Printer Mode` (to print and generate the image files) and `Server Mode` (to access the Web interface and manage your pictures) on each boot.
 
 If you want to use it, you can uncomment the line `#define ENABLE_WEBSERVER` from the `config.h`. Right below, you can edit some information about it too. In case the program can't connect to an existent WiFi network, the NeoGB Printer will automatically enters in Hotspot mode and will host a WiFi network called `gameboyprinter`
 - **DEFAULT_MDNS_NAME** : MDNS Hostname (useful for Apple products to connect instead the IP address) 
@@ -137,22 +139,23 @@ If you want to use it, you can uncomment the line `#define ENABLE_WEBSERVER` fro
 - **DEFAULT_AP_PSK** : Yout WiFi network password
 - **WIFI_CONNECT_TIMEOUT** : Wifi timeout connection in ms
 
-If you are using the OLED display, the IP address will shows on it to easily connection
+If you are using the OLED display, the IP address will shows on it to easily connect to you printer.
 
 ## Powering the beast
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ? Printer mode
-At each rebbot, the device will alternate between Printer mode and Webserver mode
+At each rebbot, the device will alternate between Printer mode and Webserver mode.
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
 * In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires some time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
-* Remove the SD card and enjoy your images ready to be published online !
+* Remove the SD card, connect to a computer and enjoy your upscaled images ready to be published online !
+* You can at this step run an [e-paper simulator](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation) with a GNU Octave interpreter by running **NeoGBPrinter_E_paper.m** directly from the SD card.
 * There is an easter egg in the printer, will you find it ?
 
 ## How to use it ? Webserver mode
-At each rebbot, the device wil alternate between Printer mode and Webserver mode
+At each rebbot, the device will alternate between Printer mode and Webserver mode.
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for Webserver mode. **Booting time may take some time if you have a huge number of images on the SD card as webserver build the file list during this step.**
 * Access directly your images at http://gameboyprinter. The OLED screen indicate the IP address of the site too.
 
