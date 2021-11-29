@@ -16,8 +16,8 @@ If you want to use the OLED Display, you need to install two Libraries from the 
 * Adafruit GFX Library
 
 For webserver support, you must install manually two additionnal libraries: 
-* [ESPAsyncWebServer] (https://github.com/me-no-dev/ESPAsyncWebServer)
-* [AsyncTCP] (https://github.com/me-no-dev/AsyncTCP)
+* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
+* [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 Just download the .zip (code >> download zip) and import to the Arduino IDE in Sketch > Include Library > Add .zip library.... and select the zip files.
 
 
