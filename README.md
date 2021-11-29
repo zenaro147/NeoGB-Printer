@@ -100,7 +100,6 @@ For the other legs, you need to use at least a 220 Ohm Resistor on each RGB leg.
 |  B  |  G4   | <-- YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
 
 ```
-
 If you are using a standard single color LED, connect it by following the example scheme below (always based on your `config.h` file). Using a single color LED in combination with OLED display is an interesting setup.
 ```
 | LED | ESP32 |
@@ -108,7 +107,6 @@ If you are using a standard single color LED, connect it by following the exampl
 |  +  |  G5   | <-- ANODE LED (the long one) - YOU CAN USE ANY GPIO AVAILABLE. Connect at least a 220 Ohm Resistor with it.
 |  -  |  GND  | <-- CATHODE LED (the short one)
 ```
-
 
 ## OLED Display Setup (optional)
 You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672229793.html). To use it, you need to uncomment `#define USE_OLED` and the following lines. The display will show the current status of the printer.
@@ -122,6 +120,18 @@ You can add a [tiny oled display like this](https://pt.aliexpress.com/item/32672
 | SDA          |    G21    | <-- YOU CAN USE ANY GPIO AVAILABLE
 
 ```
+
+## WebServer interface (optional)
+The NeoGB Printer has an integrated WebServer to easily download your photos and delete then too. This will enable too a `dual boot mode`, in other words, the printer will alternate between `Printer Mode` (to print and generate the image files) and `Server Mode` (to access the Web interface and manage your pictures) on each boot
+
+If you want to use it, you can uncomment the line `#define ENABLE_WEBSERVER` from the `config.h`. Right below, you can edit some information about it too. In case the program can't connect to an existent WiFi network, the NeoGB Printer will automatically enters in Hotspot mode and will host a WiFi network called `gameboyprinter`
+- **DEFAULT_MDNS_NAME** : MDNS Hostname (useful for Apple products to connect instead the IP address) 
+- **DEFAULT_AP_SSID** : Your WiFi network SSID
+- **DEFAULT_AP_PSK** : Yout WiFi network password
+- **WIFI_CONNECT_TIMEOUT** : Wifi timeout connection in ms
+
+If you are using the OLED display, the IP address will shows on it to easily connection
+
 ## Powering the beast
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
