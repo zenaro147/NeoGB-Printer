@@ -19,6 +19,7 @@ If you want to use the OLED Display, you need to install two Libraries from the 
 Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. 
 * **./www** contains the files for the webserver.
 * **./E_paper/** contains a GNU Octave/Matlab script to transform your printer images into printings simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). 
+
 During use of the NeoGB Printer, new files will appear on the card. 
 * **./ID_storage.bin** generates an unique ID for each print so avoid to delete it (**if deleted, the image count will restart from 1 with a risk of overwriting existing images)**. 
 * Your images will be placed at **./output/bmp/** and **./output/png/** and can be deleted as you wish.
