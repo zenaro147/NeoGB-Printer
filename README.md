@@ -15,12 +15,6 @@ If you want to use the OLED Display, you need to install two Libraries from the 
 * Adafruit SSD1306
 * Adafruit GFX Library
 
-For webserver support, you must install manually two additionnal libraries: 
-* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
-* [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
-
-Just download the .zip (code >> download zip) and import to the Arduino IDE in Sketch > Include Library > Add .zip library.... and select the zip files.
-
 ## SD card Setup
 Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. 
 * **./www** contains the files for the webserver.
