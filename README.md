@@ -1,6 +1,6 @@
 # The NeoGB Printer
 
-The NeoGB Printer is a standalone Game Boy Printer emulator very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
+The NeoGB Printer is a SD card-based standalone Game Boy Printer emulator. It is very easy to build with parts readily available on the market. It does require little to no soldering skill and is very easy to flash (no complicated dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](#list-games-fully-compatible-with-the-neogb-printer) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts bougth new is below $15. All parts can be easily exchanged with other projects, reused or harvested from dead electronics as they are all very common.
 
@@ -11,9 +11,9 @@ First of all, rename the `config.h.txt` to just `config.h` to import the pinout 
 
 To install the ESP32 board for the Arduino IDE, follow the [instructions here](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html). I highly recommended following the instructions to install via Boards Manager.
 
-You need to install some Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
-* Adafruit SSD1306 (If you want to use the OLED Display).
-* Adafruit GFX Library (If you want to use the OLED Display).
+If you want to use the OLED Display, you need to install two Libraries from the Arduino Library Manager - `Tools > Manage Libraries...`
+* Adafruit SSD1306
+* Adafruit GFX Library
 
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
@@ -129,7 +129,7 @@ Any 5 Volts source available will do the job as the device consumes less than 1 
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
-* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires very short time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
+* In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires some time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
 * Remove the SD card and enjoy your images ready to be published online !
 * Additionnaly, remote connection with WIFI is under development.
 * There is an easter egg in the printer, will you find it ?
@@ -286,11 +286,11 @@ Want to discuss with the authors or share your art and projects with people fond
 - [X] Improve the LED status using a RGB LED
 - [X] Add support to PNG in addition to BMP
 - [X] Add a message to display the number of images printed
-- [ ] Add a web interface
+- [X] Add a web interface
 
 ## Things that can be improved in the future (or not... but feel free to contribute)
 * RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode. Consequence is that the image files generated on SD card do not own time attributes. Copying the files into your favorite storage folder fixes this "issue".
-* The file conversion to PNG uses dependencies and uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today as png support is yet fast.
+* The file conversion to PNG uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today as png support is yet fast.
 * The BMP upscaling is quite slow due to the lack of onboard memory and because it makes two things. First, all images are processed by reading/writing to the SD card on the fly, using a very limited buffer (one line of pixels per image at most). Second, it compresses the native 24-bits BMP format output by the C decoder library to 4-bits indexed BMP in order to save storage space.
-* The ESP is forced to run at 80 MHz instead of its native 240 MHz during serial protocol. At full speed we experienced protocol unstability with few games. We did not investigate what was the reason (faulty boards sold on Aliexpress ? Need for a magic cap on serial line ?). Anyway, image conversion in the other hand is made at full speed.
+* The ESP is forced to run at 80 MHz instead of its native 240 MHz during serial protocol. At full speed we experienced protocol unstability with few games. We did not investigate what was the reason (faulty boards sold on Aliexpress ? Need for a magic cap on serial line ?). Anyway, image conversion is made at full speed, so experience for the user is not altered by this programming design choice.
 * The choice of implementing a short press button function for dealing with some games is due to the fact that automatic splitting of images can be tricky as Game Boy Printer protocol specifications appeared to be rather unstrict. On the 110 games, most of them sends an after margin after printing one image to feed the paper and allow proper cutting. But sometimes, games send an after margin within image for aesthetic reason or no margin at all between images (but white packets instead). This render the automatic splitting of images all but obvious. Reverse engineering the protocol on 110 games was a very huge effort and we have debated a lot on how dealing with particular games that are perhaps totally unknown or forgotten. We hope that the solution provided here is the most convenient for users. It is at least the most conservative from a video game history point of view.
