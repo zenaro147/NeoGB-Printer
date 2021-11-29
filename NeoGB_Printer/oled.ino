@@ -38,17 +38,27 @@ void oled_setup() {
   #endif
 }
 
-void oled_writeNumImages(int numTotDump, int numTotImages) { 
-  char textshow[10];
+void oled_writeNumImages(int numTotDump) { 
+  char textshow[15];
   
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  sprintf(textshow, "%d Dumps", numTotDump);
   display.setCursor(56, 15);
+  sprintf(textshow, "%d Dumps", numTotDump);  
   display.println(textshow);
-  sprintf(textshow, "%d Images", numTotImages);  
   display.setCursor(56, 23);
-  display.println(textshow);
+  display.println(numVersion);
+  display.display();
+  #ifdef OLED_INVERT
+    display.invertDisplay(true);
+  #endif
+}
+
+void oled_ShowIP() { 
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(5, 21);
+  display.println(WiFi.localIP());
   display.display();
   #ifdef OLED_INVERT
     display.invertDisplay(true);
@@ -93,6 +103,15 @@ void oledStateChange(uint8_t lcdStatus){
         break;
       case 8:
         oled_drawStatus(forceFile);
+        break;
+      case 9:
+        oled_drawStatus(idlePrinterServer);
+        break;
+      case 10:
+        oled_drawStatus(bmp2bmp);
+        break;
+      case 11:
+        oled_drawStatus(generateListFile);
         break;
       case 99:
         oled_drawStatus(oledTest);

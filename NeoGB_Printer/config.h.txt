@@ -1,11 +1,28 @@
+/*********************************
+ * GAMEBOY LINK CABLE DEFINITIONS
+ *********************************/
+// Note: Serial Clock Pin must be attached to an interrupt pin of the arduino (Pins 1 and 4 are not used)
+//  ___________
+// |  6  4  2  |
+//  \_5__3__1_/   (at cable)
+//
+//#define INVERT_SERIAL_PINS //Invert pin 2 and 3 order, since the pin 2 goes o 3 in the other side of the cable, and 3 goes to 2. This is useful if you are using a breakout board for the link cable
+#define ESP_MOSI_PIN 23
+#define ESP_MISO_PIN 19
+#define ESP_CLK_PIN 18
+
+#ifdef INVERT_SERIAL_PINS
+  #define GBP_SO_PIN ESP_MISO_PIN
+  #define GBP_SI_PIN ESP_MOSI_PIN
+#else
+  #define GBP_SO_PIN ESP_MOSI_PIN
+  #define GBP_SI_PIN ESP_MISO_PIN
+#endif
+#define GBP_SC_PIN ESP_CLK_PIN
+
 /*****************************
  * SD CARD MODULE DEFINITIONS 
  *****************************/
-//SD libraries 
-#include "FS.h"
-#include "SD.h"
-#include "SPI.h"
-#define FSYS SD
 //Define the SD Card Module Pins
 #define SD_CS   15
 #define SD_SCK  14
@@ -44,24 +61,13 @@
 //#define COMMON_ANODE
 //#define COMMON_CATHODE
 
-/*********************************
- * GAMEBOY LINK CABLE DEFINITIONS
- *********************************/
-// Note: Serial Clock Pin must be attached to an interrupt pin of the arduino (Pins 1 and 4 are not used)
-//  ___________
-// |  6  4  2  |
-//  \_5__3__1_/   (at cable)
-//
-//#define INVERT_SERIAL_PINS //Invert pin 2 and 3 order, since the pin 2 goes o 3 in the other side of the cable, and 3 goes to 2. This is useful if you are using a breakout board for the link cable
-#define ESP_MOSI_PIN 23
-#define ESP_MISO_PIN 19
-#define ESP_CLK_PIN 18
-
-#ifdef INVERT_SERIAL_PINS
-  #define GBP_SO_PIN ESP_MISO_PIN
-  #define GBP_SI_PIN ESP_MOSI_PIN
-#else
-  #define GBP_SO_PIN ESP_MOSI_PIN
-  #define GBP_SI_PIN ESP_MISO_PIN
+/*************************
+ * WEB SERVER DEFINITIONS
+ *************************/
+//#define ENABLE_WEBSERVER
+#ifdef ENABLE_WEBSERVER
+  #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
+  #define DEFAULT_AP_SSID "gameboyprinter"                //Your WiFi SSID
+  #define DEFAULT_AP_PSK "gameboyprinter"      //Your WiFi Password
+  #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
 #endif
-#define GBP_SC_PIN ESP_CLK_PIN

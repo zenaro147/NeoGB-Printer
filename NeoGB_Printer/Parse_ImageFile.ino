@@ -22,8 +22,14 @@ uint8_t actualfile = 0;
   Convert to BMP
 *******************************************************************************/
 void ConvertFilesBMP(){
-  //Remove the interrupt to prevent receive data from Gameboy
-  detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+  #ifdef LED_STATUS_PIN
+    LED_blink(LED_STATUS_PIN, 3,100,100);
+  #endif
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_BLUE, 3,100,100);
+  #endif
+  
+  unsigned long perf;
 
   //Clear variables
   memset(image_data, 0x00, sizeof(image_data));
@@ -54,12 +60,6 @@ void ConvertFilesBMP(){
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
-      #ifdef LED_STATUS_PIN 
-        LED_blink(LED_STATUS_PIN,1,100,50);
-      #endif
-      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_blink(LED_STATUS_BLUE,1,100,50);
-      #endif
     #endif
     #ifdef PNG_OUTPUT
       sprintf(pathOutput, "/output/png/%05d.png", 0);
@@ -68,31 +68,26 @@ void ConvertFilesBMP(){
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
-      #ifdef LED_STATUS_PIN 
-        LED_blink(LED_STATUS_PIN,1,100,50);
-      #endif
-      #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
-        LED_blink(LED_STATUS_BLUE,1,100,50);
-      #endif
     #endif
     FSYS.remove(fileBMPPath);             
     testmode = false;
   }
+
+  //Get the first image ID to process
+//  do {
+//    sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
+//    sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
+//    if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
+//      break;
+//    }
+//    firstDumpID++;
+//  } while(true);
+  firstDumpID=get_next_ID()-get_dumps(); 
   
-  do {
-    sprintf(pathcheck1, "/dumps/%05d.bin", firstDumpID);
-    sprintf(pathcheck2, "/dumps/%05d_00001.bin", firstDumpID);
-    if (FSYS.exists(pathcheck1) || FSYS.exists(pathcheck2)) {
-      break;
-    }
-    firstDumpID++;
-  } while(true);
-  
-  //Loop to check only the availables files based on nextFreeFileIndex function
+  //Loop to check the availables files in Dump Folder based on nextFreeFileIndex function
   for(int i = firstDumpID; i < freeFileIndex; i++){
     #ifdef USE_OLED
-      oledStateChange(5); //TXT to BMP
+      oledStateChange(5); //BIN to BMP
     #endif
 
     //Check if the file is a long print or a single file
@@ -112,12 +107,14 @@ void ConvertFilesBMP(){
           }
         }
       }else{
-        break; //Exit from the loop, because don't have any more files
+        break; //Exit from the loop, because don't have more files
       }
     }
     
     // Loop to parse the files based on the previous results
-    for (int z = 1; z <= numfiles; z++){      
+    for (int z = 1; z <= numfiles; z++){
+      perf = millis();
+      
       actualfile = z;
       //Check if is a single file or a long print
       if (numfiles == 1){
@@ -127,10 +124,7 @@ void ConvertFilesBMP(){
       }
       sprintf(fileBMPPath, "/temp/%05d.bmp", i);
       
-      Serial.print("Parsing File: ");
-      Serial.print(path);
-      Serial.print(" to ");
-      Serial.print(fileBMPPath);
+      Serial.printf("Parsing File: %s to %s",path,fileBMPPath);
       
       //Open the file and copy it to the memory
       File file = FSYS.open(path);
@@ -153,7 +147,9 @@ void ConvertFilesBMP(){
       memset(image_data, 0x00, sizeof(image_data));
       img_index = 0;
       
-      Serial.println("... Done!");
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+     
     
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
@@ -168,14 +164,26 @@ void ConvertFilesBMP(){
     actualfile=0;
     delay(100);
 
+    //Generate the thumbnail for the Webserver
+    sprintf(pathOutput, "/www/thumb/%05d.png", i);
+    png_upscaler(fileBMPPath,pathOutput,1);
+    
     //Create a 4bits BMP and resize the image
     #ifdef BMP_OUTPUT
+      #ifdef USE_OLED
+        oledStateChange(10); //24bits-BMP to 4bits-BMP
+      #endif      
       sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
+      Serial.printf("Saving BMP-4bits image in: %s",pathOutput);
+      perf = millis();
       if(BMP_UPSCALE_FACTOR < 1){
         bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+      
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
@@ -187,15 +195,19 @@ void ConvertFilesBMP(){
     //Create a PNG and resize the image
     #ifdef PNG_OUTPUT
       #ifdef USE_OLED
-        oledStateChange(6); //TXT to PNG
+        oledStateChange(6); //BMP to PNG
       #endif
       sprintf(pathOutput, "/output/png/%05d.png", i);
+      Serial.printf("Saving PNG image in: %s",pathOutput);
+      perf = millis();
       if(PNG_UPSCALE_FACTOR < 1){
         png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-      png_patcher(pathOutput); // Patch by Raphael BOICHOT to fix the CRC on PNG images
+      perf = millis() - perf;
+      Serial.printf("... Done! in %lums\n",perf);
+      
       #ifdef LED_STATUS_PIN 
         LED_blink(LED_STATUS_PIN,1,100,50);
       #endif
@@ -203,21 +215,34 @@ void ConvertFilesBMP(){
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
     #endif
+    
     FSYS.remove(fileBMPPath);
-  }
+    Serial.printf("\n");
 
+    update_dumps(-1); 
+  }
+  
+  dumpCount = get_dumps();
+  ResetPrinterVariables(); // Get Next ID available  
+
+  //Reset Local Variables
   numfiles=0; 
   actualfile=0;
   isConverting = false;
   
-  callNextFile(); // Get Next ID available
-  
-  #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-  #else
-    attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+  #ifdef LED_STATUS_PIN 
+    LED_blink(LED_STATUS_PIN, 3,100,100);
   #endif
-  
+  #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
+    LED_blink(LED_STATUS_BLUE, 3,100,100);
+  #endif
+
+  uint8_t percUsed = fs_info();
+  if (percUsed <= 10) {
+      full();
+      delay(5000);
+      ESP.restart();
+  }
 }
 
 /*******************************************************************************

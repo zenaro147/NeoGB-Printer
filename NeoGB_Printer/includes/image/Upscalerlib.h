@@ -1,7 +1,7 @@
 
 #include "arduino.h"
 /////////////////////////////////////////////////////////////////////////////////////PNGenc stuff////////////////
-#include "PNGenc.h"
+#include "PNGenc/PNGenc.h"
 // PNG encoder written by Larry Bank
 // The PNG uspcaler is bugged when the crc of IDAT chunk is calculated, so there is a patch to correct this in png_CRC32_patch.ino
 // Upscaler written by Raphael BOICHOT
@@ -9,7 +9,7 @@ PNG png; // static instance of the PNG encoder class
 File myfile;
 
 void * myOpen(const char *filename) {
-  Serial.printf("Attempting to open %s\n", filename);
+  //Serial.printf("Attempting to open %s\n", filename);
   // IMPORTANT!!! - don't use FILE_WRITE because it includes O_APPEND
   // this will cause the file to be written incorrectly
   //
@@ -36,14 +36,14 @@ int32_t mySeek(PNGFILE *handle, int32_t position) {
 
 void png_upscaler(char input[], char output[], int scale_factor) {
 
-  Serial.print("Trying to load: ");
-  Serial.println(input);
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
   File file = FSYS.open(input);
   if (!file) {
-    Serial.print(input);
-    Serial.println(": this file does not exist");
+    //Serial.print(input);
+    //Serial.println(": this file does not exist");
   }
-  Serial.println("Upscaling to indexed PNG");
+  //Serial.println("Upscaling to indexed PNG");
   byte header[54];//read the image source header
   file.read(header, 54);
   unsigned long BMPsize = ((header[5] << 24) | (header[4] << 16) | (header[3] << 8) | (header[2]));
@@ -96,13 +96,13 @@ void png_upscaler(char input[], char output[], int scale_factor) {
         //Serial.println(" ");
       }
       iDataSize = png.close();
-      Serial.print("PNG filesize: ");
-      Serial.println(iDataSize, DEC);
+      //Serial.print("PNG filesize: ");
+      //Serial.println(iDataSize, DEC);
     }
   } else {
-    Serial.println("Failed to create the file on the SD card !");
+    //Serial.println("Failed to create the file on the SD card !");
   }
-  Serial.println("Upscaled PNG file encoded !");
+  //Serial.println("Upscaled PNG file encoded !");
   file.close();
 }
 
@@ -146,15 +146,15 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   //create_buffer("/00001.bmp","/upscaled.bmp",4);
   void bmp_upscaler(char input[], char output[], int scale_factor) {
 // BMP upscaler and compressor written by Raphael BOICHOT
-  Serial.print("Trying to load: ");
-  Serial.println(input);
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
   File file = FSYS.open(input);
   File bmp_buffer = FSYS.open(output, FILE_WRITE);
   if (!file) {
-    Serial.print(input);
-    Serial.println(": this file does not exist");
+    //Serial.print(input);
+    //Serial.println(": this file does not exist");
   }
-  Serial.println("Upscaling to 4bits BMP");
+  //Serial.println("Upscaling to 4bits BMP");
   //read the image source header
   byte header[54];
   file.read(header, 54);
@@ -216,7 +216,7 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   //        Serial.print(" ");
   //  }
 
-  byte junk;
+  byte junk[3];
   byte pixel;
   byte normal_line[up_w];
   byte compressed_line[up_w / 2]; //because 4-bits format
@@ -228,9 +228,8 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   for (unsigned m = 0; m < h; m++) {
     index = 0;
     for (unsigned k = 0; k < w; k++) {
-      pixel = file.read();
-      junk = file.read();
-      junk = file.read();
+        file.read(junk, 3);
+	pixel = junk[1];
       for (unsigned i = 0; i < scale_factor; i++) {
         normal_line[index] = pixel;
         index = index + 1;
@@ -271,11 +270,7 @@ void png_upscaler(char input[], char output[], int scale_factor) {
     //       Serial.println(" ");
 
     for (unsigned j = 0; j < scale_factor; j++) {
-      for (unsigned k = 0; k < up_w / 2 ; k++) { //because 4-bits format
-        bmp_buffer.write(compressed_line[k]);
-        //Serial.print(normal_line[k], HEX);
-      }
-      //Serial.println(" ");
+        bmp_buffer.write(compressed_line, up_w / 2);
     }
     //Serial.println(" ");
   }
@@ -284,7 +279,73 @@ void png_upscaler(char input[], char output[], int scale_factor) {
   file.close();
   bmp_buffer.close();
   //RGB_led_OFF(LED_STATUS_BLUE);
-  Serial.println("Upscaled BMP file encoded !");
+  //Serial.println("Upscaled BMP file encoded !");
   //Serial.println(sizeof(bmp),DEC);
   }
-  /////////////////////////////////////////////////////////////////////////////////////BMP upscaler stuff////////////////
+/////////////////////////////////////////////////////////////////////////////////////BMP upscaler stuff////////////////
+
+
+//////////////////////////////////////////////////////////PNG thumbnail generator
+void png_downscaler(char input[], char output[], int scale_factor) {
+
+  //Serial.print("Trying to load: ");
+  //Serial.println(input);
+  File file = FSYS.open(input);
+  if (!file) {
+    Serial.print(input);
+    Serial.println(": this file does not exist");
+  }
+  //Serial.println("Downscaling to indexed PNG");
+  byte header[54];//read the image source header
+  file.read(header, 54);
+  unsigned long BMPsize = ((header[5] << 24) | (header[4] << 16) | (header[3] << 8) | (header[2]));
+  unsigned long STARToffset = ((header[13] << 24) | (header[12] << 16) | (header[11] << 8) | (header[10]));
+  unsigned w = ((header[21] << 24) | (header[20] << 16) | (header[19] << 8) | (header[18]));
+  unsigned h = -((header[25] << 24) | (header[24] << 16) | (header[23] << 8) | (header[22]));
+  unsigned down_w = w / scale_factor;
+  unsigned down_h = h / scale_factor;
+  unsigned WIDTH = down_w;
+  unsigned HEIGHT = down_h;
+  uint8_t ucPal[768] = {0x00, 0x00, 0x00, 0x55, 0x55, 0x55, 0xAA, 0xAA, 0xAA, 0xFF, 0xFF, 0xFF}; // palette entered by triplets
+  //uint8_t ucAlphaPal[256] = {0,255}; // first color (black) is fully transparent
+  int rc, iDataSize, x, y;
+  uint8_t ucLine[WIDTH];
+  byte pixel;
+  byte octet;
+  byte normal_line[w*3];
+ 
+  rc = png.open(output, myOpen, myClose, myRead, myWrite, mySeek);
+
+  if (rc == PNG_SUCCESS) {
+    rc = png.encodeBegin(WIDTH, HEIGHT, PNG_PIXEL_INDEXED, 8, ucPal, 3);
+    //png.setAlphaPalette(ucAlphaPal);
+    if (rc == PNG_SUCCESS) {
+      for (int y = 0; y < HEIGHT && rc == PNG_SUCCESS; y++) {
+        // prepare a line of image to create a red box with an x on a transparent background
+
+        for (unsigned l = 0; l < (scale_factor); l++) {//jump n lines
+        file.read(normal_line,w*3);
+        }
+
+        for (unsigned k = 0; k < down_w; k++) {//
+          pixel=normal_line[3*scale_factor*k];
+          if (pixel == 0xFF) octet = 0x03;
+          if (pixel == 0xAA) octet = 0x02;
+          if (pixel == 0x55) octet = 0x01;
+          if (pixel == 0x00) octet = 0x00;
+            ucLine[k] = octet;
+        }
+          rc = png.addLine(ucLine);
+        //Serial.println(" ");
+      }
+      iDataSize = png.close();
+//      Serial.print("PNG filesize: ");
+//      Serial.println(iDataSize, DEC);
+    }
+  } else {
+    Serial.println("Failed to create the file on the SD card !");
+  }
+  //Serial.println("PNG thumbnail encoded !");
+  file.close();
+}
+//////////////////////////////////////////////////////////PNG thumbnail generator

@@ -3,8 +3,6 @@ uint8_t dtpck = 0;
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte img_tmp[6000] = {}; // 1GBC Picute (5.874)
 
-uint8_t chkMargin = 0x00;
-
 TaskHandle_t TaskWriteDump;
 /*******************************************************************************
   Recieve Raw Data from GameBoy
@@ -30,12 +28,13 @@ inline void gbp_packet_capture_loop() {
         pktDataLength |= (gbp_serial_io_dataBuff_getByte_Peek(5) << 8) & 0xFF00;
         
         #ifdef USE_OLED
-          oledStateChange(4); //HEX to TXT
+          oledStateChange(4); //HEX to BIN
         #endif     
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
 
         switch (chkHeader) {
           case 1:
+            isPrinting = true;
             chkMargin = 0x00;
             break;
           case 4:
@@ -107,8 +106,7 @@ inline void gbp_packet_capture_loop() {
 /*******************************************************************************
   Write HEX dump file
 *******************************************************************************/
-void storeData(void *pvParameters)
-{
+void storeData(void *pvParameters) {
   unsigned long perf = millis();
   int img_index2=img_index;
   byte *image_data2 = ((byte*)pvParameters);
@@ -142,38 +140,37 @@ void storeData(void *pvParameters)
   uint8_t percUsed = fs_info();
   if (percUsed > 10) {
     if(!setMultiPrint){
-      freeFileIndex++;
-      dumpCount++;
+      isPrinting = false;
+      freeFileIndex=update_get_next_ID(1);
+      dumpCount = update_get_dumps(1);
     }else{    
       totalMultiImages++;
     }
-    
     //Reset Variables
     Serial.println("Printer ready.");
     isWriting = false;
   
-    vTaskDelete(NULL); 
   } else {
     full();
   }
+  vTaskDelete(NULL);
 }
 
 /*******************************************************************************
   Force to call the next file 
-  (fix for Mary-Kate and Ashley Pocket Planner / E.T.: Digital Companion
+  (fix for Mary-Kate and Ashley Pocket Planner / E.T.: Digital Companion /
   McDonald's Monogatari : Honobono Tenchou Ikusei Game)
 *******************************************************************************/
-void callNextFile(){
-  setMultiPrint = false;
-  totalMultiImages = 1;
-
-  freeFileIndex = nextFreeFileIndex();
+void ResetPrinterVariables(){
+  Serial.println("Reseting Vars...");
   //Reset Variables
-  Serial.println("Printer ready.");
+  setMultiPrint = false;
+  totalMultiImages = 1;  
   img_index = 0x00;
   chkHeader = 99;
-  isWriting = false;
-  
+  isWriting = false;  
+  isPrinting = false;
   memset(image_data, 0x00, sizeof(image_data));
   
+  Serial.println("Printer Ready");
 }
