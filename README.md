@@ -145,7 +145,7 @@ If you are using the OLED display, the IP address will shows on it to easily con
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
 ## How to use it ? Printer mode
-At each rebbot, the device will alternate between Printer mode and Webserver mode.
+At each reboot, the device will alternate between Printer mode and Webserver mode.
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
@@ -155,7 +155,7 @@ At each rebbot, the device will alternate between Printer mode and Webserver mod
 * There is an easter egg in the printer, will you find it ?
 
 ## How to use it ? Webserver mode
-At each rebbot, the device will alternate between Printer mode and Webserver mode.
+At each reboot, the device will alternate between Printer mode and Webserver mode.
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for Webserver mode. **Booting time may take some time if you have a huge number of images on the SD card as webserver build the file list during this step.**
 * Access directly your images at http://gameboyprinter. The OLED screen indicate the IP address of the site too.
 
