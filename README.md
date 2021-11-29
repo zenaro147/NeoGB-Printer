@@ -142,14 +142,24 @@ If you are using the OLED display, the IP address will shows on it to easily con
 ## Powering the beast
 Any 5 Volts source available will do the job as the device consumes less than 1 W: powerbank with USB cable, mobile phone with OTG cable, lithium battery with charger circuit, regular AA batteries with 5 volts regulator like the DD1205UA, etc.
 
-## How to use it ?
+## How to use it ? Printer mode
+At each rebbot, the device will alternate between Printer mode and Webserver mode
 * Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
 * In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires some time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
 * Remove the SD card and enjoy your images ready to be published online !
-* Additionnaly, remote connection with WIFI is under development.
 * There is an easter egg in the printer, will you find it ?
+
+## How to use it ? Webserver mode
+At each rebbot, the device wil alternate between Printer mode and Webserver mode
+* Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for Webserver mode. **Booting time may take some time if you have a huge number of images on the SD card as webserver build the file list during this step.**
+* Access directly your images at http://gameboyprinter. The OLED screen indicate the IP address of the site too.
+OR
+* Access your images at https://herrzatacke.github.io/gb-printer-web/#/
+- Settings->Printer URL (enter the IP given on the OLED or the Arduino IDE serial)
+- Import->Open Printer page->Check Printer->Fetch Images
+- Gallery. Now you can play with palettes and export your images.
 
 ## User manual in brief
 ![user_manual](/Supplementary_images/User_manual.png)
@@ -175,6 +185,7 @@ You should not power the ESP from the GameBoy, as this might damage the GameBoy 
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
 * Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
 * Cristofer Cruz: 3D model for the GB Printer shell.
+* Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
 Want to discuss with the authors or share your art and projects with people fond of the Game Boy Camera and Pocket Printer ? **Join the Game Boy Camera Club Discord**: https://discord.gg/dKND7cFuqM
 
