@@ -24,7 +24,7 @@ Just download the .zip (code >> download zip) and import to the Arduino IDE in S
 ## SD card Setup
 Format any size SD card in FAT32 and copy the content of the 'SD' folder to the SD card, so that **./www/** and **./E_paper/** directories are at the root. 
 * **./www** contains the files for the webserver.
-* **./E_paper/** contains a GNU Octave interpreter to transform your printer images into printings simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). 
+* **./E_paper/** contains a GNU Octave/Matlab script to transform your printer images into printings simulating the output of an actual Game Boy Printer (aka [e-paper](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation)). 
 During use of the NeoGB Printer, new files will appear on the card. 
 * **./ID_storage.bin** generates an unique ID for each print so avoid to delete it (**if deleted, the image count will restart from 1 with a risk of overwriting existing images)**. 
 * Your images will be placed at **./output/bmp/** and **./output/png/** and can be deleted as you wish.
@@ -156,7 +156,7 @@ At each rebbot, the device will alternate between Printer mode and Webserver mod
 * Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
 * In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires some time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
 * Remove the SD card, connect to a computer and enjoy your upscaled images ready to be published online !
-* You can at this step run an [e-paper simulator](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation) with a GNU Octave interpreter by running **NeoGBPrinter_E_paper.m** directly from the SD card.
+* You can at this step run an [e-paper simulator](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation) with a GNU Octave/Matlab interpreter by running **NeoGBPrinter_E_paper.m** directly from the SD card.
 * There is an easter egg in the printer, will you find it ?
 
 ## How to use it ? Webserver mode
