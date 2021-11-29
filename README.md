@@ -15,6 +15,12 @@ If you want to use the OLED Display, you need to install two Libraries from the 
 * Adafruit SSD1306
 * Adafruit GFX Library
 
+For webserver support, you must install manually two additionnal libraries: 
+* [ESPAsyncWebServer] (https://github.com/me-no-dev/ESPAsyncWebServer)
+* [AsyncTCP] (https://github.com/me-no-dev/AsyncTCP)
+Just download the .zip (code >> download zip) and import to the Arduino IDE in Sketch > Include Library > Add .zip library.... and select the zip files.
+
+
 ## Hardware Setup
 This code has been created for a "DOIT ESP32 DEVKIT V1" [ESP32 based board](https://github.com/espressif/arduino-esp32/). All my tests was executed using [this chinese board](https://a.aliexpress.com/_mOCHLMT). You can use any other board available in the market. Just make sure of few points:
 * The number of total pins available in the board doesn't matter (Could be with 30 pins, 36 pins, 38 pins, whatever)
