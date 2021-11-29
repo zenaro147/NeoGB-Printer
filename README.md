@@ -308,19 +308,6 @@ Want to discuss with the authors or share your art and projects with people fond
 - *Tsuri Sensei 2 (釣り先生2)*
 - *VS Lemmings (VS.レミングス)*
 
-# ToDo List:
-- [x] Update the code to support all games
-- [x] Use the original BMP library from Mofosyne C decoder
-- [X] Write the BMP file on SD
-- [X] Fix Palette issue with some games
-- [X] Handle with storage % instead number of files
-- [X] Parse the Output directory too, to return the next image ID
-- [X] Update documetation (wiring, compatible devices, etc)
-- [X] Improve the LED status using a RGB LED
-- [X] Add support to PNG in addition to BMP
-- [X] Add a message to display the number of images printed
-- [X] Add a web interface
-
 ## Things that can be improved in the future (or not... but feel free to contribute)
 * RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode. Consequence is that the image files generated on SD card do not own time attributes. Copying the files into your favorite storage folder fixes this "issue".
 * The file conversion to PNG uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today as png support is yet fast.
