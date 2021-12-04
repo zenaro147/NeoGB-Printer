@@ -146,9 +146,9 @@ Any 5 Volts source available will do the job as the device consumes less than 1 
 
 ## How to use it ? Printer mode
 At each reboot, the device will alternate between Printer mode and Webserver mode.
-* Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red first, than Green and than Blue. In this exactly order. Otherwise, change the pin order in the `config.h`), wait for the next 3 green flashes indicating that the filesystem is ready for printing.
+* Power the ESP, white LED flashes 3 times immediately, followed by an RGB test (Must blink Red, Green and Blue in this exact order. Otherwise, change the pin order in the `config.h`).  Wait for the next 3 green flashes indicating that the filesystem is ready for printing.
 * Print as with the real Game Boy Printer, as many prints as you wish in a single session. Data are stored in binaries .bin files called "dumps" on the SD card. Batch printing with Game Boy Camera is of course possible.
-* Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led make a long flash to indicate that command have been acknowledged.
+* Some rare games require a short press on pushbutton to separate the files after printing as they do not have a margin indication in the print command. If button is pressed short, magenta led flashes one second to indicate that command have been acknowledged.
 * In the same session or later after a reboot, press the pushbutton for about 2 seconds to convert all .bin binaries in .bmp, .png or both. The scaling factor could be independently chosen between 1 and any value for each output format. The conversion begins and ends with 3 blue flashes. Each image requires some time to be converted (depending on the scaling factor used), so convert them regularly and/or be patient.
 * Remove the SD card, connect to a computer and enjoy your upscaled images ready to be published online !
 * You can at this step run an [e-paper simulator](https://github.com/Raphael-Boichot/GameboyPrinterPaperSimulation) with a GNU Octave/Matlab interpreter by running **NeoGBPrinter_E_paper.m** directly from the SD card.
