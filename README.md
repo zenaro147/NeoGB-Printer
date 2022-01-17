@@ -196,6 +196,9 @@ Want to discuss with the authors or share your art and projects with people fond
 
 ![credits](/Supplementary_images/credits.png)
 
+# List of projects compatible with the NeoGB Printer:
+* [reini1305 - gb_bannerprinter](https://github.com/reini1305/gb_bannerprinter)
+
 # List of games tested and fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
 - *Alice in Wonderland (never released in Japan)*
