@@ -198,6 +198,7 @@ Want to discuss with the authors or share your art and projects with people fond
 
 # List of projects compatible with the NeoGB Printer:
 * [reini1305 - gb_bannerprinter](https://github.com/reini1305/gb_bannerprinter)
+* [The-Arduino-SD-Game-Boy-Printer](https://github.com/Raphael-Boichot/The-Arduino-SD-Game-Boy-Printer) (which is convoluted but possible)
 
 # List of games tested and fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
