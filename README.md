@@ -196,10 +196,10 @@ Want to discuss with the authors or share your art and projects with people fond
 
 ![credits](/Supplementary_images/credits.png)
 
-# List of projects compatible with the NeoGB Printer:
+# List of homebrew projects compatible with the NeoGB Printer:
 * [reini1305 - gb_bannerprinter](https://github.com/reini1305/gb_bannerprinter) - perfect emulation.
 * [The-Arduino-SD-Game-Boy-Printer](https://github.com/Raphael-Boichot/The-Arduino-SD-Game-Boy-Printer) - it is convoluted but possible. It can be used as debug tool.
-* [Blarble1290](https://8bittygames.com/blarble1290/) - it works if you convert the dumps between each dialog round, but you have to reset manually the dump counter at the end of a playing session into ID_storage.bin (last byte must be 0x00) and erase the remaining dumps into the ./dumps folder. The Games itself prints with actual Game Boy Printers, not with actual Pocket Printers which probably implies timing issues within the protocol used.
+* [Blarble1290](https://8bittygames.com/blarble1290/) - it works if you convert the dumps between each dialog round, but you have to reset manually the dump counter at the end of a playing session into ID_storage.bin (last byte must be 0x00) and erase the remaining dumps into the ./dumps folder. The Game itself works with actual Game Boy Printers, not with actual Pocket Printers which probably implies tricky timing issues within the protocol used.
 
 # List of games tested and fully compatible with the NeoGB Printer:
 - *1942 (never released in Japan)*
