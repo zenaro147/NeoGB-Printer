@@ -142,6 +142,7 @@ void storeData(void *pvParameters) {
     if(!setMultiPrint){
       isPrinting = false;
       freeFileIndex=update_get_next_ID(1);
+      totalMultiImages=1; //fix to enforce correct printing with Blargle1290
       dumpCount = update_get_dumps(1);
     }else{    
       totalMultiImages++;
