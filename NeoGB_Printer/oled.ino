@@ -58,7 +58,9 @@ void oled_ShowIP() {
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(5, 21);
-  display.println(WiFi.localIP());
+  #ifdef ENABLE_WEBSERVER
+    display.println(WiFi.localIP());
+  #endif
   display.display();
   #ifdef OLED_INVERT
     display.invertDisplay(true);
