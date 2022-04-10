@@ -153,6 +153,20 @@ unsigned long update_get_dumps(int mod) {
   file.close();
   return dumps;
 }
+void set_dumps(long dumps) {
+  uint8_t buf[8];
+  char path[]="/ID_storage.bin";
+  File file = FSYS.open(path);
+  file.read(buf, 8);
+  file.close();
+  buf[7] = dumps >>  0;
+  buf[6] = dumps >>  8;
+  buf[5] = dumps >> 16;
+  buf[4] = dumps >> 24;
+  file = FSYS.open(path,FILE_WRITE);
+  file.write(buf, 8);
+  file.close();
+}
 /////////////////////////////////////////////////////////////////////////////////////update the dumps////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////update the total images////////////////
