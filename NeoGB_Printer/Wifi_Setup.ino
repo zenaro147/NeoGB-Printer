@@ -1,7 +1,8 @@
 #ifdef ENABLE_WEBSERVER
 #include "config.h"
 bool hasNetworkSettings = true;
-  
+String ip = "";
+
 void initWifi(){
   WiFi.disconnect(); 
   Serial.print("Connecting to wifi ");  
@@ -36,16 +37,13 @@ void initWifi(){
     return;
   } else {
     WiFi.mode(WIFI_MODE_AP);
-    const char * accesPointSSIDc = "gameboyprinter";
-    const char * accesPointPasswordc = "gameboyprinter";
-    WiFi.softAP(accesPointSSIDc, accesPointPasswordc);
+    WiFi.softAP(SOFT_AP_SSID, SOFT_AP_PSK);
     Serial.println("AccessPoint gameboyprinter started");
   }
 }
 
 void mdns_setup() {
   String protocol = F("http://");
-  String ip = "";
   String localsrv = ".local";
   
   const char * mdnsNamec = mdnsName.c_str();
