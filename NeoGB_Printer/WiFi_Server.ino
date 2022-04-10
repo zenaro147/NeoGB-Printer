@@ -97,11 +97,14 @@ void refreshWebData(){
         #ifdef PNG_OUTPUT
           sprintf(imgDir, "/output/png/%s.png", imgName);
           if(FSYS.exists(imgDir)){
-            file.print(",\"png\":1}");
+            file.print(",\"png\":1");
           }else{
-            file.print(",\"png\":0}");
+            file.print(",\"png\":0");
           }
         #endif
+
+        file.print("}");
+
         imgFile = root.openNextFile();
       }
     }
