@@ -90,6 +90,10 @@ void ConvertFilesBMP(){
       oledStateChange(5); //BIN to BMP
     #endif
 
+    //Reset the counter for the number of files
+    numfiles=0;
+    actualfile=0;
+
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.bin", i);
     if(FSYS.exists(path)) {
@@ -136,7 +140,6 @@ void ConvertFilesBMP(){
         img_index++;
       }
       file.close();
-      FSYS.remove(path);
            
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){
@@ -159,9 +162,6 @@ void ConvertFilesBMP(){
       #endif
     }
     
-    //Reset the counter for the number of files 
-    numfiles=0;
-    actualfile=0;
     delay(100);
 
     //Generate the thumbnail for the Webserver
@@ -219,10 +219,28 @@ void ConvertFilesBMP(){
     FSYS.remove(fileBMPPath);
     Serial.printf("\n");
 
+    //Delete the original dump files after the processing is done
+    for (int z = 1; z <= numfiles; z++){
+      //Check if is a single file or a long print
+      if (numfiles == 1){
+        sprintf(path, "/dumps/%05d.bin", i);
+      }else{
+        sprintf(path, "/dumps/%05d_%05d.bin", i, z);
+      }
+      FSYS.remove(path);
+    }
+
     update_dumps(-1); 
   }
   
   dumpCount = get_dumps();
+  // if the printer loses power or gets reset while converting,
+  // the dump count can get out of sync with actual dump files
+  if (dumpCount > 0) {
+    Serial.printf("Dump count is out of sync! %ld dump(s) missing under /dumps\n",dumpCount);
+    set_dumps(0L);
+  }
+
   ResetPrinterVariables(); // Get Next ID available  
 
   //Reset Local Variables
