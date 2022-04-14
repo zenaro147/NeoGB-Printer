@@ -134,7 +134,9 @@ int fs_info() {
 *******************************************************************************/
 void GetNumberFiles() {
   int totalDumps=get_dumps();
-  oled_writeNumImages(totalDumps);
+  #ifdef USE_OLED
+    oled_writeNumImages(totalDumps);
+  #endif
 }
 
 /*******************************************************************************
