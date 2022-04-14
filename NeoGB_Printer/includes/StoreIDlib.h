@@ -1,5 +1,5 @@
 
-#include "arduino.h"
+#include "Arduino.h"
 //SD libraries 
 #include "FS.h"
 #include "SD.h"
