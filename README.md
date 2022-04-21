@@ -1,5 +1,7 @@
 # The NeoGB Printer - ポケットプリンタエミュレータ
 
+<a href="https://www.buymeacoffee.com/zenaro147" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 The NeoGB Printer is a SD card-based standalone Game Boy Printer emulator. It is easy to build with parts readily available on the market. It does require little to no soldering skill and is fast to install from Arduino IDE (few dependancies). Using it is straigthforward and intuitive. Mounting the device with all parts on a table requires about an afternoon from opening the component bags to printing.
 
 This project is very similar to a popular ready-to-use solution available on the market, but the NeoGB Printer is open-source, cheap and tested with success with [all officially released games (110 in total)](https://docs.google.com/spreadsheets/d/1RQeTHemyEQnWHbKEhUy16cPxR6vA3YfeBbyx2tIXWaU/edit#gid=0) that support the [original Gameboy Printer](https://en.wikipedia.org/wiki/Game_Boy_Printer). The total cost for all the parts bougth new is below $15. All parts can be easily exchanged with other projects, reused or harvested from dead electronics as they are all very common.
@@ -8,10 +10,15 @@ You just need to upload the code using the Arduino IDE, connect the components l
 
 [**List of Games/Homebrew projects compatible with the NeoGB Printer**](https://github.com/zenaro147/NeoGB-Printer/wiki/Compatible-Games)
 
-## How to build one?
-All the instructions can be found in our [Wiki Page](https://github.com/zenaro147/NeoGB-Printer/wiki)
+## Development Status
+Latest Stable Release  [![Release Version](https://img.shields.io/github/v/release/zenaro147/NeoGB-Printer?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/latest/)  [![Release Date](https://img.shields.io/github/release-date/zenaro147/NeoGB-Printer?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/latest/)
 
-Make sure to follow every step. If you still have questions, ask us here or in the [Game Boy Camera Club Discord](https://discord.gg/dKND7cFuqM)
+Latest Development Release  [![Release Version](https://img.shields.io/github/release/zenaro147/NeoGB-Printer/all.svg?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/) [![Release Date](https://img.shields.io/github/release-date-pre/zenaro147/NeoGB-Printer.svg?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/) 
+
+## How to build one?
+All the instructions can be found in our **Wiki Page** [![Wiki](https://img.shields.io/badge/docs-on%20Wiki-lightgrey)](https://github.com/zenaro147/NeoGB-Printer/wiki)
+
+Make sure to follow every step. If you still have questions, ask us here or in the **Game Boy Camera Club Discord** [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
 
 ## User manual in brief
 ![user_manual](/Supplementary_images/User_manual.png)
@@ -31,7 +38,7 @@ Make sure to follow every step. If you still have questions, ask us here or in t
 * Cristofer Cruz: 3D model for the GB Printer shell.
 * Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
-Want to discuss with the authors or share your art and projects with people fond of the Game Boy Camera and Pocket Printer ? [**Join the Game Boy Camera Club Discord**](https://discord.gg/dKND7cFuqM)
+Want to discuss with the authors or share your art and projects with people fond of the Game Boy Camera and Pocket Printer? [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
 
 ![credits](/Supplementary_images/credits.png)
 
