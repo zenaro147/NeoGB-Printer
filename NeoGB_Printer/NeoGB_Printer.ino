@@ -19,7 +19,7 @@
   #include <ESPmDNS.h>
   #include <WebServer.h>
   #include <uri/UriBraces.h>
-//  #include <ArduinoJson.h>
+  #include <ArduinoJson.h>
 #endif
 
 #define numVersion "Ver. 1.6.9b"
@@ -221,6 +221,7 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
+        setupWifi(); //Get Data from the conf.json
         initWifi();
         mdns_setup();
         webserver_setup();

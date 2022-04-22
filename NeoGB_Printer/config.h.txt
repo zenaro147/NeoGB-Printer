@@ -69,7 +69,5 @@
   #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
   #define DEFAULT_AP_SSID "gameboyprinter"                //Your WiFi SSID
   #define DEFAULT_AP_PSK "gameboyprinter"      //Your WiFi Password
-  #define SOFT_AP_SSID "gameboyprinter"           //Access Point WiFi SSID
-  #define SOFT_AP_PSK "gameboyprinter"            //Access Point WiFi Password
   #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
 #endif
