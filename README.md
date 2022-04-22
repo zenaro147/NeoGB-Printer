@@ -25,7 +25,8 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 
 ## Builds Showcases:
 ![My personal prototype build - zenaro147](/showcase/zenaro147.jpg)
-![Setup by Raphaël BOICHOTy](/showcase/RaphaelBOICHOT.jpg)
+![Setup by Raphaël BOICHOT](/showcase/RaphaelBOICHOT.jpg)
+![Setup by Cristofer Cruz](/showcase/cristofercruz.jpg)
 
 ## Posts about:
 * [Hack a Day Article](https://hackaday.com/2021/10/22/an-open-source-game-boy-printer-that-doesnt-print/)
