@@ -221,7 +221,6 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
-        setupWifi(); //Get Data from the conf.json
         initWifi();
         mdns_setup();
         webserver_setup();

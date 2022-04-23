@@ -134,6 +134,23 @@ void refreshWebData(){
   server.send(200, "application/json", "{\"Status\":1}");  
 }
 
+void getConfig() {
+  defaultHeaders();
+  server.send(200, "application/json", GetConfigFile());
+}
+
+void setConfig() {
+  defaultHeaders();
+
+  // Check if body received
+  if (server.hasArg("plain") == false) {
+    server.send(200, "application/json", JsonErrorResponse("empty request"));
+    return;
+  }
+
+  server.send(200, "application/json", SetConfigFile(server.arg("plain")));
+}
+
 //void handleGenericArgs() { //Handler ---- http://192.168.0.192/genericArgs?year=2000&month=01&day=20
 //  String message = "Number of args received:";
 //  message += server.args();            //Get number of parameters

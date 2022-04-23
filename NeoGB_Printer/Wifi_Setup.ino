@@ -3,70 +3,9 @@
 bool hasNetworkSettings = true;
 String ip = "";
 
+void initWifi(){   
+  hasNetworkSettings = setupWifi(); //Get Data from the conf.json
 
-void createEmptyConfig() {
-  Serial.println("Preparing empty conf.json. \nYou can configure WiFi-Settings via the web interface.");
-  File confFileEmpty = FSYS.open("/www/conf.json", FILE_WRITE);
-  confFileEmpty.println("{}");
-  confFileEmpty.close();
-}
-
-void setupWifi() {
-  StaticJsonDocument<1023> conf;  
-  File confFile = FSYS.open("/www/conf.json");
-
-  if (confFile) { 
-    DeserializationError error = deserializeJson(conf, confFile.readString());
-    confFile.close();
-
-    if (!error) {
-      if (conf.containsKey("mdns")) {
-        if (String(conf["mdns"].as<String>()) != "") {
-          mdnsName = String(conf["mdns"].as<String>());
-        }
-      }
-
-      if (conf.containsKey("NetworkSettings")) { 
-        mdnsName = String(conf["NetworkSettings"]["mdns"].as<String>());
-        //Set the SSID and Passwork as default in case the mdns don't exist
-        if (mdnsName == "null" || mdnsName == "") {
-          accesPointPassword = DEFAULT_MDNS_NAME;
-          Serial.println("No MDNS settings configured - using default");
-        }
-
-        hasNetworkSettings = true;
-        accesPointSSID = String(conf["NetworkSettings"]["network"]["ssid"].as<String>());
-        accesPointPassword = String(conf["NetworkSettings"]["network"]["psk"].as<String>());
-        //Get Access Point Config in case the WiFi Network Config don't exist.
-        if (accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == "") {
-          hasNetworkSettings = false;
-          accesPointSSID = String(conf["NetworkSettings"]["ap"]["ssid"].as<String>());
-          accesPointPassword = String(conf["NetworkSettings"]["ap"]["psk"].as<String>());
-          Serial.println("No WiFi settings configured - getting the Access Point Settings...");
-
-          //Set the SSID and Password as default config (check the config.h file) in case the Access Point Config don't exist.
-          if (accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == "") {
-            Serial.println("No AccessPoint settings configured - using default");
-            accesPointSSID = DEFAULT_AP_SSID;
-            accesPointPassword = DEFAULT_AP_PSK;
-          }
-        }
-      }          
-    } else {
-      Serial.println("Error parsing conf.json");
-      Serial.println(error.c_str());
-      createEmptyConfig();
-    }
-  } else {
-    Serial.println("Could not open conf.json");
-    createEmptyConfig();
-  }
-  conf.clear();
-}
-
-
-
-void initWifi(){  
   const char * accesPointSSIDc = accesPointSSID.c_str();
   const char * accesPointPasswordc = accesPointPassword.c_str();
   
