@@ -68,6 +68,12 @@ bool isConverting = false;
 bool isFileSystemMounted = false;
 bool setMultiPrint = false;
 
+//Images Output settings
+bool outputAsBMP = BMP_OUTPUT;
+bool outputAsPNG = PNG_OUTPUT;
+uint8_t scaleBMP = BMP_UPSCALE_FACTOR;
+uint8_t scalePNG = PNG_UPSCALE_FACTOR;
+
 //WebServer Variables
 #ifdef ENABLE_WEBSERVER
   String mdnsName = DEFAULT_MDNS_NAME;
@@ -147,17 +153,6 @@ void setup(void){
     LED_blink(LED_STATUS_GREEN, 1, 300, 50);
     LED_blink(LED_STATUS_BLUE, 1, 300, 50);
   #endif
-
-  //Force BMP output and Upscale Factor if no one was defined. 
-  #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
-      #define BMP_OUTPUT
-  #endif
-  #if defined(BMP_OUTPUT) && !defined(BMP_UPSCALE_FACTOR)
-      #define BMP_UPSCALE_FACTOR 1
-  #endif
-  #if defined(PNG_OUTPUT) && !defined(PNG_UPSCALE_FACTOR)
-      #define PNG_UPSCALE_FACTOR 1
-  #endif
   
   delay(3000); //Little delay for stetic 
 
@@ -166,6 +161,7 @@ void setup(void){
   
   if(isFileSystemMounted){
     ID_file_checker(); //Create/check controller file
+    setupImages(); //Get the Images Output and Scale Factors from config file
     
     //Check the bootMode (Printer mode or WiFi mode)
     #ifdef ENABLE_WEBSERVER

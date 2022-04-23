@@ -8,9 +8,9 @@ void createEmptyConfig() {
   confFileEmpty.close();
 }
 
-/***********************************************
-  Set the WiFi settings to initiate the Server
-************************************************/
+/***************************************************************
+  Set the WiFi settings to initiate the Server during the boot
+****************************************************************/
 bool setupWifi() {
   StaticJsonDocument<1023> conf;  
   File confFile = FSYS.open("/www/conf.json");
@@ -21,37 +21,46 @@ bool setupWifi() {
 
     if (!error) {
       if (conf.containsKey("mdns")) {
-        if (String(conf["mdns"].as<String>()) != "") {
-          mdnsName = String(conf["mdns"].as<String>());
+        mdnsName = String(conf["mdns"].as<String>());
+        if (mdnsName == "null" || mdnsName == ""){
+          Serial.println("No MDNS settings configured - using default");
+          mdnsName = DEFAULT_MDNS_NAME;
         }
       }
-
-      if (conf.containsKey("NetworkSettings")) { 
-        mdnsName = String(conf["NetworkSettings"]["mdns"].as<String>());
-        //Set the SSID and Passwork as default in case the mdns don't exist
-        if (mdnsName == "null" || mdnsName == "") {
-          accesPointPassword = DEFAULT_MDNS_NAME;
-          Serial.println("No MDNS settings configured - using default");
-        }
-
-        accesPointSSID = String(conf["NetworkSettings"]["network"]["ssid"].as<String>());
-        accesPointPassword = String(conf["NetworkSettings"]["network"]["psk"].as<String>());
-        //Get Access Point Config in case the WiFi Network Config don't exist.
-        if (accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == "") {
-          accesPointSSID = String(conf["NetworkSettings"]["ap"]["ssid"].as<String>());
-          accesPointPassword = String(conf["NetworkSettings"]["ap"]["psk"].as<String>());
+      if (conf.containsKey("network")) {
+        accesPointSSID = String(conf["network"]["ssid"].as<String>());
+        accesPointPassword = String(conf["network"]["psk"].as<String>());        
+        if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
           Serial.println("No WiFi settings configured - getting the Access Point Settings...");
-
-          //Set the SSID and Password as default config (check the config.h file) in case the Access Point Config don't exist.
-          if (accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == "") {
+          if (conf.containsKey("ap")) {
+            accesPointSSID = String(conf["ap"]["ssid"].as<String>());
+            accesPointPassword = String(conf["ap"]["psk"].as<String>());
+          }
+          if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
+            Serial.println("No AccessPoint settings configured - using default");
+            accesPointSSID = DEFAULT_AP_SSID;
+            accesPointPassword = DEFAULT_AP_PSK;
+          } 
+          return false;
+        }
+        return true;
+      } else {
+        if (conf.containsKey("ap")) {
+          Serial.println("No WiFi settings configured - getting the Access Point Settings...");
+          accesPointSSID = String(conf["ap"]["ssid"].as<String>());
+          accesPointPassword = String(conf["ap"]["psk"].as<String>());
+          if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
             Serial.println("No AccessPoint settings configured - using default");
             accesPointSSID = DEFAULT_AP_SSID;
             accesPointPassword = DEFAULT_AP_PSK;
           }
         } else {
-          return true;
+          Serial.println("No AccessPoint settings configured - using default");
+          accesPointSSID = DEFAULT_AP_SSID;
+          accesPointPassword = DEFAULT_AP_PSK;
         }
-      }          
+        return false;
+      }
     } else {
       Serial.println("Error parsing conf.json");
       Serial.println(error.c_str());
@@ -64,6 +73,51 @@ bool setupWifi() {
   conf.clear();
   return false;
 }
+
+
+/****************************************************************
+  Set the Image settings to initiate the Server during the boot
+*****************************************************************/
+void setupImages() {
+  StaticJsonDocument<1023> conf;  
+  File confFile = FSYS.open("/www/conf.json");
+
+  if (confFile) { 
+    DeserializationError error = deserializeJson(conf, confFile.readString());
+    confFile.close();
+
+    if (!error) {
+      if (conf.containsKey("bmpimage")) {
+        outputAsBMP = conf["bmpimage"]["output"];
+        scaleBMP = conf["bmpimage"]["scale"];  
+        if(outputAsBMP == NULL || outputAsBMP == 0 || scaleBMP == NULL || scaleBMP == 0){
+          Serial.println("No BMP settings configured - using default");
+          outputAsBMP = BMP_OUTPUT;
+          scaleBMP = BMP_UPSCALE_FACTOR;
+        }
+      } 
+      
+      if (conf.containsKey("pngimage")) {
+        outputAsPNG = conf["pngimage"]["output"];
+        scalePNG = conf["pngimage"]["scale"];  
+        if(outputAsPNG == NULL || outputAsPNG == 0 || scalePNG == NULL || scalePNG == 0){
+          Serial.println("No PNG settings configured - using default");
+          outputAsPNG = PNG_OUTPUT;
+          scalePNG = PNG_UPSCALE_FACTOR;
+        }
+      } 
+    } else {
+      Serial.println("Error parsing conf.json");
+      Serial.println(error.c_str());
+      createEmptyConfig();
+    }
+  } else {
+    Serial.println("Could not open conf.json");
+    createEmptyConfig();
+  }
+  conf.clear();
+}
+
 
 /******************************
   Edit settings via WebServer
@@ -81,34 +135,39 @@ String GetConfigFile() {
     DeserializationError error = deserializeJson(conf, confFile.readString());
     confFile.close();
     if (!error) {
-      //Read network wettings
-      if (conf.containsKey("NetworkSettings")) {
-        JsonVariant mdns = conf["NetworkSettings"]["mdns"].as<JsonVariant>();
-        JsonVariant network = conf["NetworkSettings"]["network"].as<JsonVariant>();
+      //Read network settings
+      if (conf.containsKey("mdns")) {
+        JsonVariant mdns = conf["mdns"].as<JsonVariant>();
+      }
+      if (conf.containsKey("network")) {
+        JsonVariant network = conf["network"].as<JsonVariant>();
         network.remove("psk");
-        JsonVariant ap = conf["NetworkSettings"]["ap"].as<JsonVariant>();
+      }
+      if (conf.containsKey("ap")) {
+        JsonVariant ap = conf["ap"].as<JsonVariant>();
         ap.remove("psk");
       }
 
-      //Read image wettings
-      if (conf.containsKey("ImageSettings")) {
-        JsonVariant bmpconf = conf["ImageSettings"]["bmpimage"].as<JsonVariant>();
-        JsonVariant pngconf = conf["ImageSettings"]["pngimage"].as<JsonVariant>();
+      //Read image settings
+      if (conf.containsKey("bmpimage")) {
+        JsonVariant bmpconf = conf["bmpimage"].as<JsonVariant>();
       }
+      if (conf.containsKey("pngimage")) {
+        JsonVariant pngconf = conf["pngimage"].as<JsonVariant>();
+      }      
     } else {
       return JsonErrorResponse("JSON deserialization error");
     }
   } else {
     return JsonErrorResponse("No conf file");
   }
-
   String out;
   serializeJson(conf, out);
   conf.clear();
   return out;
 }
 
-//Write/Update Config File
+// Write-Update Config File
 String SetConfigFile(String body) {
   StaticJsonDocument<1023> confUpdate;
   StaticJsonDocument<1023> conf;
@@ -117,40 +176,51 @@ String SetConfigFile(String body) {
   if (error) {
     return JsonErrorResponse("cannot parse request body");
   }
-
   File confFile = FSYS.open("/www/conf.json");
-
   if (confFile) {
     deserializeJson(conf, confFile.readString()); // no need to check for an error - file will be re-written anyways
     confFile.close();
   }
-
+  
+  //Set network settings
   if (confUpdate.containsKey("mdns")) {
     conf["mdns"] = confUpdate["mdns"].as<String>();
   }
-
   if (confUpdate.containsKey("ap")) {
-    if (
-      confUpdate["ap"].containsKey("ssid") &&
-      confUpdate["ap"].containsKey("psk")
-    ) {
+    if (confUpdate["ap"].containsKey("ssid") && confUpdate["ap"].containsKey("psk")) {
       conf.remove("ap");
       JsonObject ap = conf.createNestedObject("ap");
       ap["ssid"] = confUpdate["ap"]["ssid"];
       ap["psk"] = confUpdate["ap"]["psk"];
     }
   }
-
-  if (confUpdate.containsKey("networks")) {
-    if (!conf.containsKey("networks")) {
-      conf.createNestedArray("networks");
+  if (confUpdate.containsKey("network")) {
+    if (confUpdate["network"].containsKey("ssid") && confUpdate["network"].containsKey("psk")) {
+      conf.remove("network");
+      JsonObject network = conf.createNestedObject("network");
+      network["ssid"] = confUpdate["network"]["ssid"];
+      network["psk"] = confUpdate["network"]["psk"];
     }
-
-    JsonArray networks = conf["networks"].as<JsonArray>();
-    JsonArray networksUpdate = confUpdate["networks"].as<JsonArray>();
-
   }
 
+  //Set image settings  
+  if (confUpdate.containsKey("bmpimage")) {
+    if (confUpdate["bmpimage"].containsKey("output") && confUpdate["bmpimage"].containsKey("scale")) {
+      conf.remove("bmpimage");
+      JsonObject bmpimage = conf.createNestedObject("bmpimage");
+      bmpimage["output"] = confUpdate["bmpimage"]["output"];
+      bmpimage["scale"] = confUpdate["bmpimage"]["scale"];
+    }
+  }  
+  if (confUpdate.containsKey("pngimage")) {
+    if (confUpdate["pngimage"].containsKey("output") && confUpdate["pngimage"].containsKey("scale")) {
+      conf.remove("pngimage");
+      JsonObject pngimage = conf.createNestedObject("pngimage");
+      pngimage["output"] = confUpdate["pngimage"]["output"];
+      pngimage["scale"] = confUpdate["pngimage"]["scale"];
+    }
+  }
+  
   File confFileUpdated = FSYS.open("/www/conf.json", FILE_WRITE);
   serializeJson(conf, confFileUpdated);
   confFileUpdated.close();

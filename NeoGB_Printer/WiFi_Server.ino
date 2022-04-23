@@ -13,22 +13,22 @@ void DeleteImage(){
   }else{
     Serial.printf("Error deleting %s \n",pathimg);
   }
-  #ifdef BMP_OUTPUT
+  if(BMP_OUTPUT){
     sprintf(pathimg, "/output/bmp/%s.bmp", img);
     if(FSYS.remove(pathimg)){
       Serial.printf("%s Deleted. \n",pathimg);
     }else{
       Serial.printf("Error deleting %s \n",pathimg);
     }
-  #endif
-  #ifdef PNG_OUTPUT
+  }
+  if(PNG_OUTPUT){
     sprintf(pathimg, "/output/png/%s.png", img);
     if(FSYS.remove(pathimg)){
       Serial.printf("%s Deleted. \n",pathimg);
     }else{
       Serial.printf("Error deleting %s \n",pathimg);
     }
-  #endif
+  }
 }
 
 void GetImage(){
@@ -85,23 +85,22 @@ void refreshWebData(){
         file.print("\",\"id\":");
         file.print(imgID);
         
-        #ifdef BMP_OUTPUT
+        if(BMP_OUTPUT){ 
           sprintf(imgDir, "/output/bmp/%s.bmp", imgName);
           if(FSYS.exists(imgDir)){
             file.print(",\"bmp\":1");
           }else{
             file.print(",\"bmp\":0");
           }
-        #endif
-        
-        #ifdef PNG_OUTPUT
+        }        
+        if(PNG_OUTPUT){ 
           sprintf(imgDir, "/output/png/%s.png", imgName);
           if(FSYS.exists(imgDir)){
             file.print(",\"png\":1");
           }else{
             file.print(",\"png\":0");
           }
-        #endif
+        }
 
         file.print("}");
 
@@ -208,6 +207,10 @@ void getDumpsList(){
   server.send(200, "application/json", "{\"fs\":" + String(fs) + ",\"dumps\":[" + dumpList + "]}");
 }
 
+void getEnv(){
+  server.send(200, "application/json", "{\"version\":\"0\",\"maximages\":0,\"env\":\"esp8266\",\"fstype\":\"littlefs\",\"bootmode\":\"alternating\",\"oled\":false}");  
+}
+
 //void handleDump() {
 //  String path = "/dumps/" + server.pathArg(0); 
 //
@@ -246,10 +249,6 @@ void getDumpsList(){
 //    return;
 //  }
 //}
-
-void getEnv(){
-  server.send(200, "application/json", "{\"version\":\"0\",\"maximages\":0,\"env\":\"esp8266\",\"fstype\":\"littlefs\",\"bootmode\":\"alternating\",\"oled\":false}");  
-}
 
 /**********************************************
   Basic WebServer Functions and URL definitions
@@ -300,8 +299,17 @@ void webserver_setup() {
   server.on("/refreshlist", refreshWebData);
   server.on(UriBraces("/delete/{}"), DeleteImage);
   server.on(UriBraces("/download/{}"), GetImage);
-  //server.on(UriBraces("/d/{}"), handleDump);
+  server.on("/config/get", getConfig);
+  server.on("/config/set", setConfig);
 
+
+
+
+
+/**************************************************************************************************************
+  Functions to allow Remote Acces using the HerrZatacke interface https://herrzatacke.github.io/gb-printer-web/
+***************************************************************************************************************/
+  //server.on(UriBraces("/d/{}"), handleDump);
   server.on("/env.json", getEnv);
   server.on("/dumps/list", getDumpsList);
 

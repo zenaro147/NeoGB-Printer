@@ -52,7 +52,7 @@ void ConvertFilesBMP(){
         gbpdecoder_gotByte(image_test[bytePos]);       
       }
     }
-    #ifdef BMP_OUTPUT
+    if(BMP_OUTPUT){
       //Create a 4bits BMP and resize the image
       sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
       if(BMP_UPSCALE_FACTOR < 1){
@@ -60,15 +60,15 @@ void ConvertFilesBMP(){
       }else{
         bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
       }
-    #endif
-    #ifdef PNG_OUTPUT
+    }
+    if(PNG_OUTPUT){
       sprintf(pathOutput, "/output/png/%05d.png", 0);
       if(PNG_UPSCALE_FACTOR < 1){
         png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
       }else{
         png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
       }
-    #endif
+    }
     FSYS.remove(fileBMPPath);             
     testmode = false;
   }
@@ -169,7 +169,7 @@ void ConvertFilesBMP(){
     png_upscaler(fileBMPPath,pathOutput,1);
     
     //Create a 4bits BMP and resize the image
-    #ifdef BMP_OUTPUT
+    if(BMP_OUTPUT){
       #ifdef USE_OLED
         oledStateChange(10); //24bits-BMP to 4bits-BMP
       #endif      
@@ -190,10 +190,9 @@ void ConvertFilesBMP(){
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
-    #endif
-    
+    } 
     //Create a PNG and resize the image
-    #ifdef PNG_OUTPUT
+    if(PNG_OUTPUT){
       #ifdef USE_OLED
         oledStateChange(6); //BMP to PNG
       #endif
@@ -214,7 +213,7 @@ void ConvertFilesBMP(){
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
-    #endif
+    }
     
     FSYS.remove(fileBMPPath);
     Serial.printf("\n");

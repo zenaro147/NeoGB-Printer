@@ -1,23 +1,19 @@
 {
-  "NetworkSettings": {
-    "mdns": "gameboyprinter",
-    "ap": {
-      "ssid":"gameboyprinter",
-      "psk":"gameboyprinter"
-    },    
-    "network": {
-      "ssid":"Your SSID",
-      "psk":"Your wifi password"
-    }
+  "mdns": "gameboyprinter",
+  "ap": {
+    "ssid":"gameboyprinter",
+    "psk":"gameboyprinter"
+  },    
+  "network": {
+    "ssid":"Your SSID",
+    "psk":"Your wifi password"
   },
-  "ImageSettings": {
-    "bmpimage": {
-      "output":1,
-      "scale":1
-    },
-    "pngimage": {
-      "output":1,
-      "scale":1
-    }
+  "bmpimage": {
+    "output":1,
+    "scale":1
+  },
+  "pngimage": {
+    "output":1,
+    "scale":1
   }
 }
