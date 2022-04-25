@@ -18,6 +18,8 @@ Latest Development Release  [![Release Version](https://img.shields.io/github/re
 ## How to build one?
 All the instructions can be found in our **Wiki Page** [![Wiki](https://img.shields.io/badge/docs-on%20Wiki-lightgrey)](https://github.com/zenaro147/NeoGB-Printer/wiki)
 
+Want a PCB for a cleaner design and easy to build? Check my PCB project here! [![PCB Project](https://img.shields.io/github/v/release/zenaro147/GBP-ESP32-PCB)](https://github.com/zenaro147/GBP-ESP32-PCB) 
+
 If you still have questions, ask us here or in the **Game Boy Camera Club Discord** [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
 
 ## User manual in brief
