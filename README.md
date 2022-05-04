@@ -33,6 +33,7 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 ## Posts about:
 * [Hack a Day Article](https://hackaday.com/2021/10/22/an-open-source-game-boy-printer-that-doesnt-print/)
 * [Reddit post](https://www.reddit.com/r/Gameboy/comments/qdfoys/the_first_opensource_and_fully_standalone_game/)
+* [Distant Arcade - Blog post](https://distantarcade.co.uk/the-neogb-printer-game-boy-printer-emulator/)
 
 ## Authors contribution:
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
