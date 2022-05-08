@@ -34,14 +34,11 @@
  ************************************/
 #define BTN_PUSH 34             // Define a PushButton to use to Force a new file/Generate the images.
 //#define BTN_INVERT           //Define to use the LOW state instead HIGH state
-#define BMP_OUTPUT            //Enable BMP image as output
+#define BMP_OUTPUT true           //Enable BMP image as output
 #define BMP_UPSCALE_FACTOR 4  //Set the Upsace factor for the BMP output
-//#define PNG_OUTPUT              //Enable PNG image as output
+//#define PNG_OUTPUT true             //Enable PNG image as output
 //#define PNG_UPSCALE_FACTOR 4    //Set the Upsace factor for the PNG output
 
-/***************************
- * OLED DISPLAY DEFINITIONS
- ***************************/
 /***************************
  * OLED DISPLAY DEFINITIONS
  ***************************/
@@ -85,12 +82,10 @@
  * WEB SERVER DEFINITIONS
  *************************/
 //#define ENABLE_WEBSERVER
-#ifdef ENABLE_WEBSERVER
-  #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
-  #define DEFAULT_AP_SSID "gameboyprinter"           //Access Point WiFi SSID
-  #define DEFAULT_AP_PSK "gameboyprinter"            //Access Point WiFi Password
-  #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
-#endif
+#define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
+#define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
+#define DEFAULT_AP_SSID "gameboyprinter"           //Access Point WiFi SSID
+#define DEFAULT_AP_PSK "gameboyprinter"            //Access Point WiFi Password
 
 /*************************
  * RTC DEFINITIONS
