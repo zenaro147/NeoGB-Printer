@@ -83,7 +83,7 @@ String accesPointPassword = DEFAULT_AP_PSK;
 
 //RTC-NTP Variables
 WiFiUDP udp;
-NTPClient ntp(udp, "pool.ntp.org", (RTC_TIMEZONE * 3600)+1080, 60000);//Cria um objeto "NTP" com as configurações.utilizada no Brasil
+NTPClient ntp(udp, "pool.ntp.org", (RTC_TIMEZONE * 3600)+RTC_TIMEDIFF, 60000);//Cria um objeto "NTP" com as configurações.utilizada no Brasil
 struct tm data;//Cria a estrutura que contem as informacoes da data.
 int hora;
 char data_formatada[64];
