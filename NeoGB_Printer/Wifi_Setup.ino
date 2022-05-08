@@ -3,7 +3,7 @@ bool hasNetworkSettings = true;
 String ip = "";
 
 void initWifi(){   
-  hasNetworkSettings = setupWifi(); //Get Data from the conf.json
+  hasNetworkSettings = loadWiFiConfig(); //Get Data from the conf.json
 
   const char * accesPointSSIDc = accesPointSSID.c_str();
   const char * accesPointPasswordc = accesPointPassword.c_str();
@@ -38,11 +38,10 @@ void initWifi(){
     Serial.print(" with IP address: ");
     Serial.println(WiFi.localIP());
 
+    //Get Time from NTP Server
     ntp.begin();                // Inicia o protocolo
     ntp.forceUpdate();        // Atualização .          // Variável que armazena
-
-
-    Serial.print(" Atualizando data e hora...");
+    Serial.print("Updating Date and Time...");
     hora = ntp.getEpochTime(); //Atualizar data e hora usando NTP online
     Serial.print(" NTP Unix: ");
     Serial.println(hora);
@@ -52,10 +51,9 @@ void initWifi(){
     time_t tt = time(NULL);//Obtem o tempo atual em segundos. Utilize isso sempre que precisar obter o tempo atual
     data = *gmtime(&tt);//Converte o tempo atual e atribui na estrutura
     strftime(data_formatada, 64, "%d/%m/%Y %H:%M:%S", &data);//Cria uma String formatada da estrutura "data"
-    Serial.print(" Data e hora atualizada:");
+    Serial.print("Date and Time updated: ");
     Serial.println(data_formatada);
-    
-    return;
+   
   } else {
     WiFi.mode(WIFI_MODE_AP);
     WiFi.softAP(accesPointSSIDc, accesPointPasswordc);
@@ -65,6 +63,7 @@ void initWifi(){
 
 #ifdef ENABLE_WEBSERVER
 void mdns_setup() {
+  loadMdnsConfig();
   String protocol = F("http://");
   String localsrv = ".local";
   

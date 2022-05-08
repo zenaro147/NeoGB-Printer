@@ -11,10 +11,11 @@ void createEmptyConfig() {
 /***************************************************************
   Set the WiFi settings to initiate the Server during the boot
 ****************************************************************/
-bool setupWifi() {
+#ifdef ENABLE_WEBSERVER
+void loadMdnsConfig(){
   StaticJsonDocument<1023> conf;  
   File confFile = FSYS.open("/www/conf.json");
-
+  
   if (confFile) { 
     DeserializationError error = deserializeJson(conf, confFile.readString());
     confFile.close();
@@ -27,6 +28,28 @@ bool setupWifi() {
           mdnsName = DEFAULT_MDNS_NAME;
         }
       }
+    } else {
+      Serial.println("Error parsing conf.json");
+      Serial.println(error.c_str());
+      createEmptyConfig();
+    }
+  } else {
+    Serial.println("Could not open conf.json");
+    createEmptyConfig();
+  }
+  conf.clear(); 
+}
+#endif
+
+bool loadWiFiConfig() {
+  StaticJsonDocument<1023> conf;  
+  File confFile = FSYS.open("/www/conf.json");
+
+  if (confFile) { 
+    DeserializationError error = deserializeJson(conf, confFile.readString());
+    confFile.close();
+
+    if (!error) {
       if (conf.containsKey("network")) {
         accesPointSSID = String(conf["network"]["ssid"].as<String>());
         accesPointPassword = String(conf["network"]["psk"].as<String>());        
@@ -35,12 +58,12 @@ bool setupWifi() {
           if (conf.containsKey("ap")) {
             accesPointSSID = String(conf["ap"]["ssid"].as<String>());
             accesPointPassword = String(conf["ap"]["psk"].as<String>());
+            if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
+              Serial.println("No AccessPoint settings configured - using default");
+              accesPointSSID = DEFAULT_AP_SSID;
+              accesPointPassword = DEFAULT_AP_PSK;
+            } 
           }
-          if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
-            Serial.println("No AccessPoint settings configured - using default");
-            accesPointSSID = DEFAULT_AP_SSID;
-            accesPointPassword = DEFAULT_AP_PSK;
-          } 
           return false;
         }
         return true;

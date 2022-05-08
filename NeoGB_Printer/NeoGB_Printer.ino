@@ -77,9 +77,11 @@ uint8_t scaleBMP = BMP_UPSCALE_FACTOR;
 uint8_t scalePNG = PNG_UPSCALE_FACTOR;
 
 //WebServer Variables
-String mdnsName = DEFAULT_MDNS_NAME;
 String accesPointSSID = DEFAULT_AP_SSID;
 String accesPointPassword = DEFAULT_AP_PSK;
+#ifdef ENABLE_WEBSERVER
+  String mdnsName = DEFAULT_MDNS_NAME;
+#endif
 
 //RTC-NTP Variables
 WiFiUDP udp;
@@ -232,7 +234,6 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
-//        initWifi();
         mdns_setup();
         webserver_setup();
         #ifdef USE_OLED

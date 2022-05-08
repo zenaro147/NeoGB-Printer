@@ -82,10 +82,12 @@
  * WEB SERVER DEFINITIONS
  *************************/
 //#define ENABLE_WEBSERVER
+#ifdef ENABLE_WEBSERVER  
+  #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
+#endif
 #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
-#define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
-#define DEFAULT_AP_SSID "gameboyprinter"           //Access Point WiFi SSID
-#define DEFAULT_AP_PSK "gameboyprinter"            //Access Point WiFi Password
+#define DEFAULT_AP_SSID "gameboyprinter"        //Default AccessPoint SSID
+#define DEFAULT_AP_PSK "gameboyprinter"         //Default AccessPoint Password
 
 /*************************
  * RTC DEFINITIONS
