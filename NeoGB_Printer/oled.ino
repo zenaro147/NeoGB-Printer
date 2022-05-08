@@ -1,40 +1,31 @@
 #ifdef USE_OLED
 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include "./includes/display/oled_graphics.h"
-
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 32
-
-// Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
-#define OLED_RESET -1
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-#ifndef OLED_SDA
-#define OLED_SDA 21
-#endif
-#ifndef OLED_SCL
-#define OLED_SCL 22
-#endif
 
 #define PRINTER_ICON_HEIGHT 27
 #define PRINTER_ICON_WIDTH 32
 
+#define OLED_WHITE 0xFFFF
+#define OLED_BLACK 0x0000
+
+#ifdef USE_SSD1306 //oled images 128x32  
+#include "./includes/display/SSD1306.hpp"
+static LGFX_SSD1306 display; // LGFX_SSD1306のインスタンス（クラスLGFX_SSD1306を使ってlcdでいろいろできるようにする）を作成
+#endif
+
+#ifdef USE_SSD1331 //oled images 96x64
+#include "./includes/display/SSD1331.hpp"
+static LGFX_SSD1331 display; // LGFX_SSD1331のインスタンス（クラスLGFX_SSD1306を使ってlcdでいろいろできるようにする）を作成
+#endif
+
 uint8_t prevlcdStatus=9;
 
 void oled_setup() {
-  Wire.begin(OLED_SDA, OLED_SCL);
-
-  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
-    Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
-  }
-
+  display.init();
   #ifdef OLED_ROTATE
     display.setRotation(2);
+  #else
+    display.setRotation(0);
   #endif
 }
 
@@ -42,36 +33,45 @@ void oled_writeNumImages(int numTotDump) {
   char textshow[15];
   
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(OLED_WHITE);
+
+  #ifdef USE_SSD1306
   display.setCursor(56, 15);
+  #endif
+  #ifdef USE_SSD1331 
+  display.setCursor(0, 48);
+  #endif
+
   sprintf(textshow, "%d Dumps", numTotDump);  
   display.println(textshow);
+
+  #ifdef USE_SSD1306
   display.setCursor(56, 23);
-  display.println(numVersion);
-  display.display();
-  #ifdef OLED_INVERT
-    display.invertDisplay(true);
   #endif
+  #ifdef USE_SSD1331 
+  display.setCursor(0, 56);
+  #endif
+
+  display.println(numVersion);
 }
 
 void oled_ShowIP() { 
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
+  display.setTextColor(OLED_WHITE);
+  
+  #ifdef USE_SSD1306
   display.setCursor(5, 21);
-  #ifdef ENABLE_WEBSERVER
-    display.println(ip);
   #endif
-  display.display();
-  #ifdef OLED_INVERT
-    display.invertDisplay(true);
+  #ifdef USE_SSD1331 
+  display.setCursor(0, 52);
   #endif
+  display.println(ip);
 }
 
 
 void oled_drawStatus(const unsigned char statusName[]) {
-  display.clearDisplay();
-  display.drawBitmap(0, 0, statusName, SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-  display.display();
+  display.fillScreen(OLED_BLACK);
+  display.drawBitmap(0, 0, statusName, SCREEN_WIDTH, SCREEN_HEIGHT, OLED_WHITE);
 }
 
 
@@ -119,12 +119,9 @@ void oledStateChange(uint8_t lcdStatus){
         oled_drawStatus(oledTest);
         break;
       default:
-        display.clearDisplay();
+        display.fillScreen(OLED_BLACK);
         break;
     }
-    #ifdef OLED_INVERT
-      display.invertDisplay(true);
-    #endif
     prevlcdStatus = lcdStatus;
   }
 }

@@ -54,10 +54,17 @@ inline void gbp_packet_capture_loop() {
         #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
           LED_led_ON(LED_STATUS_GREEN);
         #endif 
+        
+        Serial.print("// ");
+        Serial.print(pktTotalCount);
+        Serial.print(" : ");
+        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
       }
 
       // Print Hex Byte
       data_8bit = gbp_serial_io_dataBuff_getByte();
+      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
+      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
 
       if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
         image_data[img_index] = (byte)data_8bit;
@@ -93,9 +100,11 @@ inline void gbp_packet_capture_loop() {
                                   0);               // pin task to core 0 
           dtpck = 0x00;         
         }
+        Serial.println("");
         pktByteIndex = 0;
         pktTotalCount++;
       } else {
+        Serial.print((char)' ');
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }

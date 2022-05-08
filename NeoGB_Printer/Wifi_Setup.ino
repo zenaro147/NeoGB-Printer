@@ -1,4 +1,3 @@
-#ifdef ENABLE_WEBSERVER
 #include "config.h"
 bool hasNetworkSettings = true;
 String ip = "";
@@ -38,6 +37,24 @@ void initWifi(){
     Serial.print(WiFi.SSID());
     Serial.print(" with IP address: ");
     Serial.println(WiFi.localIP());
+
+    ntp.begin();                // Inicia o protocolo
+    ntp.forceUpdate();        // Atualização .          // Variável que armazena
+
+
+    Serial.print(" Atualizando data e hora...");
+    hora = ntp.getEpochTime(); //Atualizar data e hora usando NTP online
+    Serial.print(" NTP Unix: ");
+    Serial.println(hora);
+    timeval tv;//Cria a estrutura temporaria para funcao abaixo.
+    tv.tv_sec = hora;//Atribui minha data atual. Voce pode usar o NTP para isso ou o site citado no artigo!
+    settimeofday(&tv, NULL);//Configura o RTC para manter a data atribuida atualizada.
+    time_t tt = time(NULL);//Obtem o tempo atual em segundos. Utilize isso sempre que precisar obter o tempo atual
+    data = *gmtime(&tt);//Converte o tempo atual e atribui na estrutura
+    strftime(data_formatada, 64, "%d/%m/%Y %H:%M:%S", &data);//Cria uma String formatada da estrutura "data"
+    Serial.print(" Data e hora atualizada:");
+    Serial.println(data_formatada);
+    
     return;
   } else {
     WiFi.mode(WIFI_MODE_AP);
@@ -46,6 +63,7 @@ void initWifi(){
   }
 }
 
+#ifdef ENABLE_WEBSERVER
 void mdns_setup() {
   String protocol = F("http://");
   String localsrv = ".local";

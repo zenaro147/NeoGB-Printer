@@ -33,6 +33,7 @@
  * PUSH BUTTON AND IMAGE DEFINITIONS 
  ************************************/
 #define BTN_PUSH 34             // Define a PushButton to use to Force a new file/Generate the images.
+//#define BTN_INVERT           //Define to use the LOW state instead HIGH state
 #define BMP_OUTPUT            //Enable BMP image as output
 #define BMP_UPSCALE_FACTOR 4  //Set the Upsace factor for the BMP output
 //#define PNG_OUTPUT              //Enable PNG image as output
@@ -41,10 +42,29 @@
 /***************************
  * OLED DISPLAY DEFINITIONS
  ***************************/
+/***************************
+ * OLED DISPLAY DEFINITIONS
+ ***************************/
 //#define USE_OLED        //Enable OLED
+
+//Uncomment this if you are using SSD1306 display driver (I2C)
+//#define USE_SSD1306
 //#define OLED_SDA 21
 //#define OLED_SCL 22
-//#define OLED_INVERT   //Invert the display colors to easily spot the actual dimensions
+//#define OLED_COMPINS 1 // (If you have some issues with the image, try to change this with values between 1 and 4)
+
+//Uncomment this if you are using SSD1331 display driver (SPI)
+//#define USE_SSD1331
+//#define OLED_SCLK 14
+//#define OLED_MOSI 13
+//#define OLED_MISO 12
+//#define OLED_CS   15
+//#define OLED_DC   16
+//#define OLED_RST   4
+
+//Set your display dimensions
+//#define SCREEN_WIDTH 128
+//#define SCREEN_HEIGHT 32
 
 //#define OLED_ROTATE   //Rotate the display by 180°
 
@@ -67,7 +87,12 @@
 //#define ENABLE_WEBSERVER
 #ifdef ENABLE_WEBSERVER
   #define DEFAULT_MDNS_NAME "gameboyprinter"      //MDNS Hostname
-  #define DEFAULT_AP_SSID "gameboyprinter"                //Your WiFi SSID
-  #define DEFAULT_AP_PSK "gameboyprinter"      //Your WiFi Password
+  #define DEFAULT_AP_SSID "gameboyprinter"           //Access Point WiFi SSID
+  #define DEFAULT_AP_PSK "gameboyprinter"            //Access Point WiFi Password
   #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
 #endif
+
+/*************************
+ * RTC DEFINITIONS
+ *************************/
+ #define RTC_TIMEZONE -3 //Define your timezone

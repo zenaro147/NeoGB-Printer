@@ -9,20 +9,22 @@
 #include "./includes/gblink/gbp_serial_io.h"
 
 //SD libraries 
+#include "SPI.h"
 #include "FS.h"
 #include "SD.h"
-#include "SPI.h"
 #define FSYS SD
 
-#ifdef ENABLE_WEBSERVER
-  #include <WiFi.h>
-  #include <ESPmDNS.h>
-  #include <WebServer.h>
-  #include <uri/UriBraces.h>
-  #include <ArduinoJson.h>
-#endif
+#include <WiFi.h>
+#include <ESPmDNS.h> 
+#include <WebServer.h>
+#include <uri/UriBraces.h>
+#include <ArduinoJson.h>
 
-#define numVersion "Ver. 1.6.9b"
+//RTC-NTP Libraries
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+#define numVersion "Ver. 1.6.10b"
 
 /*******************************************************************************
 *******************************************************************************/
@@ -75,11 +77,17 @@ uint8_t scaleBMP = BMP_UPSCALE_FACTOR;
 uint8_t scalePNG = PNG_UPSCALE_FACTOR;
 
 //WebServer Variables
-#ifdef ENABLE_WEBSERVER
-  String mdnsName = DEFAULT_MDNS_NAME;
-  String accesPointSSID = DEFAULT_AP_SSID;
-  String accesPointPassword = DEFAULT_AP_PSK;
-#endif
+String mdnsName = DEFAULT_MDNS_NAME;
+String accesPointSSID = DEFAULT_AP_SSID;
+String accesPointPassword = DEFAULT_AP_PSK;
+
+//RTC-NTP Variables
+WiFiUDP udp;
+NTPClient ntp(udp, "pool.ntp.org", (RTC_TIMEZONE * 3600)+1080, 60000);//Cria um objeto "NTP" com as configurações.utilizada no Brasil
+struct tm data;//Cria a estrutura que contem as informacoes da data.
+int hora;
+char data_formatada[64];
+String hora_ntp;
 
 //MISC
 TaskHandle_t TaskWriteImage;
@@ -132,7 +140,11 @@ void setup(void){
   #endif
 
   //Check Test Mode
+  #ifdef BTN_INVERT
+  if(!testmode && (digitalRead(BTN_PUSH) == LOW)){
+  #else
   if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
+  #endif
     testmode = true;
     #ifdef USE_OLED
       oledStateChange(99); //Test
@@ -179,7 +191,10 @@ void setup(void){
       delay(5000);
     }
 
+    initWifi(); //Initiate WiFi and NTP
+
     if (bootAsPrinter){
+      WiFi.disconnect();
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
       Serial.println("-----------------------");
@@ -217,7 +232,7 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
-        initWifi();
+//        initWifi();
         mdns_setup();
         webserver_setup();
         #ifdef USE_OLED
@@ -283,7 +298,11 @@ void loop(){
 
       // Feature to detect a short press and a Long Press
       if(!isWriting){
-        if (digitalRead(BTN_PUSH) == HIGH) {
+        #ifdef BTN_INVERT
+        if(digitalRead(BTN_PUSH) == LOW){
+        #else
+        if(digitalRead(BTN_PUSH) == HIGH){
+        #endif
           if (buttonActive == false) {
             buttonActive = true;
             buttonTimer = millis();  
