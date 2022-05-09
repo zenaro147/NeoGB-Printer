@@ -23,9 +23,9 @@ uint8_t prevlcdStatus=9;
 void oled_setup() {
   display.init();
   #ifdef OLED_ROTATE
-    display.setRotation(0);
-  #else
     display.setRotation(2);
+  #else
+    display.setRotation(0);
   #endif
 }
 
@@ -35,21 +35,22 @@ void oled_writeNumImages(int numTotDump) {
   display.setTextSize(1);
   display.setTextColor(OLED_WHITE);
 
+  sprintf(textshow, "%d Dumps", numTotDump);
+
   #ifdef USE_SSD1306
-  display.setCursor(56, 15);
+  display.setCursor(get_xoffset(String(textshow)), 15);
   #endif
   #ifdef USE_SSD1331 
-  display.setCursor(0, 48);
+  display.setCursor(get_xoffset(String(textshow)), 47);
   #endif
-
-  sprintf(textshow, "%d Dumps", numTotDump);  
+  
   display.println(textshow);
 
   #ifdef USE_SSD1306
-  display.setCursor(56, 23);
+  display.setCursor(get_xoffset(String(numVersion)), 23);
   #endif
   #ifdef USE_SSD1331 
-  display.setCursor(0, 56);
+  display.setCursor(get_xoffset(String(numVersion)), 56);
   #endif
 
   display.println(numVersion);
@@ -60,14 +61,25 @@ void oled_ShowIP() {
   display.setTextColor(OLED_WHITE);
   
   #ifdef USE_SSD1306
-  display.setCursor(5, 21);
+  display.setCursor(get_xoffset(ip), 15);
   #endif
   #ifdef USE_SSD1331 
-  display.setCursor(0, 52);
+  display.setCursor(get_xoffset(ip), 47);
   #endif
   display.println(ip);
+
+  #ifdef USE_SSD1306
+  display.setCursor(get_xoffset(mdnsName + ".local"), 23);
+  #endif
+  #ifdef USE_SSD1331 
+  display.setCursor(get_xoffset(mdnsName + ".local"), 56);
+  #endif
+  display.println(mdnsName + ".local");
 }
 
+int get_xoffset(String message) {
+  return ((round(SCREEN_WIDTH / 6) - message.length()) / 2) * 6;
+}
 
 void oled_drawStatus(const unsigned char statusName[]) {
   display.fillScreen(OLED_BLACK);
