@@ -71,22 +71,13 @@ bool isFileSystemMounted = false;
 bool setMultiPrint = false;
 
 //Images Output settings
-bool outputAsBMP = BMP_OUTPUT;
-bool outputAsPNG = PNG_OUTPUT;
 uint8_t scaleBMP = BMP_UPSCALE_FACTOR;
 uint8_t scalePNG = PNG_UPSCALE_FACTOR;
 
-//WebServer Variables
-String accesPointSSID = DEFAULT_AP_SSID;
-String accesPointPassword = DEFAULT_AP_PSK;
-#ifdef ENABLE_WEBSERVER
-  String mdnsName = DEFAULT_MDNS_NAME;
-#endif
-
 //RTC-NTP Variables
 WiFiUDP udp;
-NTPClient ntp(udp, "pool.ntp.org", (RTC_TIMEZONE * 3600)+RTC_TIMEDIFF, 60000);//Cria um objeto "NTP" com as configurações.utilizada no Brasil
-struct tm data;//Cria a estrutura que contem as informacoes da data.
+NTPClient ntp(udp, "0.pool.ntp.org", (RTC_TIMEZONE * 3600)+RTC_TIMEDIFF, 60000); //Create the NTP object
+struct tm data; //Cria a estrutura que contem as informacoes da data.
 int hora;
 char data_formatada[64];
 String hora_ntp;
@@ -175,7 +166,7 @@ void setup(void){
   
   if(isFileSystemMounted){
     ID_file_checker(); //Create/check controller file
-    setupImages(); //Get the Images Output and Scale Factors from config file
+    setupImages(); //Get the Image Scale Factors from config file
     
     //Check the bootMode (Printer mode or WiFi mode)
     #ifdef ENABLE_WEBSERVER

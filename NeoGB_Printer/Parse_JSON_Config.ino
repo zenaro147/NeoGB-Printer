@@ -1,3 +1,10 @@
+//WebServer Variables
+String accesPointSSID;
+String accesPointPassword;
+#ifdef ENABLE_WEBSERVER
+  String mdnsName;
+#endif
+
 /***********************************************
   Create an empty JSON if the file don't exist
 ************************************************/
@@ -13,6 +20,7 @@ void createEmptyConfig() {
 ****************************************************************/
 #ifdef ENABLE_WEBSERVER
 void loadMdnsConfig(){
+  
   StaticJsonDocument<1023> conf;  
   File confFile = FSYS.open("/www/conf.json");
   
@@ -25,7 +33,7 @@ void loadMdnsConfig(){
         mdnsName = String(conf["mdns"].as<String>());
         if (mdnsName == "null" || mdnsName == ""){
           Serial.println("No MDNS settings configured - using default");
-          mdnsName = DEFAULT_MDNS_NAME;
+          mdnsName = "gameboyprinter";
         }
       }
     } else {
@@ -41,7 +49,9 @@ void loadMdnsConfig(){
 }
 #endif
 
-bool loadWiFiConfig() {
+
+
+bool loadWiFiConfig() {  
   StaticJsonDocument<1023> conf;  
   File confFile = FSYS.open("/www/conf.json");
 
@@ -60,8 +70,8 @@ bool loadWiFiConfig() {
             accesPointPassword = String(conf["ap"]["psk"].as<String>());
             if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
               Serial.println("No AccessPoint settings configured - using default");
-              accesPointSSID = DEFAULT_AP_SSID;
-              accesPointPassword = DEFAULT_AP_PSK;
+              accesPointSSID = "gameboyprinter";
+              accesPointPassword = "gameboyprinter";
             } 
           }
           return false;
@@ -74,13 +84,13 @@ bool loadWiFiConfig() {
           accesPointPassword = String(conf["ap"]["psk"].as<String>());
           if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
             Serial.println("No AccessPoint settings configured - using default");
-            accesPointSSID = DEFAULT_AP_SSID;
-            accesPointPassword = DEFAULT_AP_PSK;
+            accesPointSSID = "gameboyprinter";
+            accesPointPassword = "gameboyprinter";
           }
         } else {
           Serial.println("No AccessPoint settings configured - using default");
-          accesPointSSID = DEFAULT_AP_SSID;
-          accesPointPassword = DEFAULT_AP_PSK;
+          accesPointSSID = "gameboyprinter";
+          accesPointPassword = "gameboyprinter";
         }
         return false;
       }
@@ -111,21 +121,17 @@ void setupImages() {
 
     if (!error) {
       if (conf.containsKey("bmpimage")) {
-        outputAsBMP = conf["bmpimage"]["output"];
         scaleBMP = conf["bmpimage"]["scale"];  
-        if(outputAsBMP == NULL || outputAsBMP == 0 || scaleBMP == NULL || scaleBMP == 0){
+        if(scaleBMP == NULL || scaleBMP <= 0){
           Serial.println("No BMP settings configured - using default");
-          outputAsBMP = BMP_OUTPUT;
           scaleBMP = BMP_UPSCALE_FACTOR;
         }
       } 
       
       if (conf.containsKey("pngimage")) {
-        outputAsPNG = conf["pngimage"]["output"];
         scalePNG = conf["pngimage"]["scale"];  
-        if(outputAsPNG == NULL || outputAsPNG == 0 || scalePNG == NULL || scalePNG == 0){
+        if(scalePNG == NULL || scalePNG <= 0){
           Serial.println("No PNG settings configured - using default");
-          outputAsPNG = PNG_OUTPUT;
           scalePNG = PNG_UPSCALE_FACTOR;
         }
       } 

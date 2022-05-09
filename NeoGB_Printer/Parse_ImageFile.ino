@@ -52,22 +52,14 @@ void ConvertFilesBMP(){
         gbpdecoder_gotByte(image_test[bytePos]);       
       }
     }
-    if(BMP_OUTPUT){
+    if(scaleBMP > 0){
       //Create a 4bits BMP and resize the image
       sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
-      if(BMP_UPSCALE_FACTOR < 1){
-        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
-      }
+      bmp_upscaler(fileBMPPath,pathOutput,scaleBMP);
     }
-    if(PNG_OUTPUT){
+    if(scalePNG > 0){
       sprintf(pathOutput, "/output/png/%05d.png", 0);
-      if(PNG_UPSCALE_FACTOR < 1){
-        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
-      }
+      png_upscaler(fileBMPPath,pathOutput,scalePNG);
     }
     FSYS.remove(fileBMPPath);             
     testmode = false;
@@ -169,18 +161,14 @@ void ConvertFilesBMP(){
     png_upscaler(fileBMPPath,pathOutput,1);
     
     //Create a 4bits BMP and resize the image
-    if(BMP_OUTPUT){
+    if(scaleBMP > 0){
       #ifdef USE_OLED
         oledStateChange(10); //24bits-BMP to 4bits-BMP
       #endif      
       sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
       Serial.printf("Saving BMP-4bits image in: %s",pathOutput);
       perf = millis();
-      if(BMP_UPSCALE_FACTOR < 1){
-        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
-      }
+      bmp_upscaler(fileBMPPath,pathOutput,scaleBMP);
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       
@@ -190,20 +178,16 @@ void ConvertFilesBMP(){
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
-    } 
+    }
     //Create a PNG and resize the image
-    if(PNG_OUTPUT){
+    if(scalePNG > 0){
       #ifdef USE_OLED
         oledStateChange(6); //BMP to PNG
       #endif
       sprintf(pathOutput, "/output/png/%05d.png", i);
       Serial.printf("Saving PNG image in: %s",pathOutput);
       perf = millis();
-      if(PNG_UPSCALE_FACTOR < 1){
-        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
-      }
+      png_upscaler(fileBMPPath,pathOutput,scalePNG);
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       

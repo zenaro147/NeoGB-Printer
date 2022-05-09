@@ -37,7 +37,7 @@ class LGFX_SSD1306 : public lgfx::LGFX_Device {
         cfg.panel_width      =   SCREEN_WIDTH;  // 実際に表示可能な幅
         cfg.panel_height     =   SCREEN_HEIGHT;  // 実際に表示可能な高さ
         cfg.offset_x         =     0;  // パネルのX方向オフセット量
-        cfg.offset_y         =     0;  // パネルのY方向オフセット量
+        cfg.offset_y         =     0;  // パネルのY方向オフセット量		
         cfg.offset_rotation  =     0;  // 回転方向の値のオフセット 0~7 (4~7は上下反転)
 //      cfg.dummy_read_pixel =     8;  // ピクセル読出し前のダミーリードのビット数
 //      cfg.dummy_read_bits  =     1;  // ピクセル以外のデータ読出し前のダミーリードのビット数

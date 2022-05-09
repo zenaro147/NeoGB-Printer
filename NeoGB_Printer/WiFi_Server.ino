@@ -13,21 +13,21 @@ void DeleteImage(){
   }else{
     Serial.printf("Error deleting %s \n",pathimg);
   }
-  if(BMP_OUTPUT){
-    sprintf(pathimg, "/output/bmp/%s.bmp", img);
-    if(FSYS.remove(pathimg)){
-      Serial.printf("%s Deleted. \n",pathimg);
-    }else{
-      Serial.printf("Error deleting %s \n",pathimg);
-    }
+
+  //Delete BMP image, if exist
+  sprintf(pathimg, "/output/bmp/%s.bmp", img);
+  if(FSYS.remove(pathimg)){
+    Serial.printf("%s Deleted. \n",pathimg);
+  }else{
+    Serial.printf("Error deleting %s \n",pathimg);
   }
-  if(PNG_OUTPUT){
-    sprintf(pathimg, "/output/png/%s.png", img);
-    if(FSYS.remove(pathimg)){
-      Serial.printf("%s Deleted. \n",pathimg);
-    }else{
-      Serial.printf("Error deleting %s \n",pathimg);
-    }
+ 
+  //Delete PNG image, if exist
+  sprintf(pathimg, "/output/png/%s.png", img);
+  if(FSYS.remove(pathimg)){
+    Serial.printf("%s Deleted. \n",pathimg);
+  }else{
+    Serial.printf("Error deleting %s \n",pathimg);
   }
 }
 
@@ -85,21 +85,18 @@ void refreshWebData(){
         file.print("\",\"id\":");
         file.print(imgID);
         
-        if(BMP_OUTPUT){ 
-          sprintf(imgDir, "/output/bmp/%s.bmp", imgName);
-          if(FSYS.exists(imgDir)){
-            file.print(",\"bmp\":1");
-          }else{
-            file.print(",\"bmp\":0");
-          }
-        }        
-        if(PNG_OUTPUT){ 
-          sprintf(imgDir, "/output/png/%s.png", imgName);
-          if(FSYS.exists(imgDir)){
-            file.print(",\"png\":1");
-          }else{
-            file.print(",\"png\":0");
-          }
+        sprintf(imgDir, "/output/bmp/%s.bmp", imgName);
+        if(FSYS.exists(imgDir)){
+          file.print(",\"bmp\":1");
+        }else{
+          file.print(",\"bmp\":0");
+        }
+      
+        sprintf(imgDir, "/output/png/%s.png", imgName);
+        if(FSYS.exists(imgDir)){
+          file.print(",\"png\":1");
+        }else{
+          file.print(",\"png\":0");
         }
 
         file.print("}");

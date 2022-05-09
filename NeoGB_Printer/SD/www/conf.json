@@ -9,11 +9,9 @@
     "psk":"Your wifi password"
   },
   "bmpimage": {
-    "output":1,
     "scale":1
   },
   "pngimage": {
-    "output":1,
     "scale":1
   }
 }
