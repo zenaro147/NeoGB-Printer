@@ -48,9 +48,9 @@ class LGFX_SSD1331 : public lgfx::LGFX_Device {
         cfg.offset_y = 0; // Amount of offset in the Y direction of the panel
         cfg.offset_rotation = 2; // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
         #ifdef OLED_ROTATE
-        cfg.offset_rotation  =     2;  // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
-        #else
         cfg.offset_rotation  =     0;  // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
+        #else
+        cfg.offset_rotation  =     2;  // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
         #endif
         //cfg.dummy_read_pixel = 8; // Number of dummy read bits before pixel read
         //cfg.dummy_read_bits = 1; // Number of bits of dummy read before reading data other than pixels

@@ -39,6 +39,11 @@ class LGFX_SSD1306 : public lgfx::LGFX_Device {
         cfg.offset_x         =     0;  // パネルのX方向オフセット量
         cfg.offset_y         =     0;  // パネルのY方向オフセット量		
         cfg.offset_rotation  =     0;  // 回転方向の値のオフセット 0~7 (4~7は上下反転)
+        #ifdef OLED_ROTATE
+        cfg.offset_rotation  =     2;  // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
+        #else
+        cfg.offset_rotation  =     0;  // Offset of the value in the rotation direction 0 ~ 7 (4 ~ 7 is upside down)
+        #endif
 //      cfg.dummy_read_pixel =     8;  // ピクセル読出し前のダミーリードのビット数
 //      cfg.dummy_read_bits  =     1;  // ピクセル以外のデータ読出し前のダミーリードのビット数
 //      cfg.readable         =  false;  // データ読出しが可能な場合 trueに設定
