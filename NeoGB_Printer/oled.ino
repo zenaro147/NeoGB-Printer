@@ -23,9 +23,9 @@ uint8_t prevlcdStatus=9;
 void oled_setup() {
   display.init();
   #ifdef OLED_ROTATE
-    display.setRotation(2);
-  #else
     display.setRotation(0);
+  #else
+    display.setRotation(2);
   #endif
 }
 
