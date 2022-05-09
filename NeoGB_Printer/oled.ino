@@ -61,12 +61,20 @@ void oled_ShowIP() {
   display.setTextColor(OLED_WHITE);
   
   #ifdef USE_SSD1306
-  display.setCursor(get_xoffset(ip), 21);
+  display.setCursor(get_xoffset(ip), 15);
   #endif
   #ifdef USE_SSD1331 
-  display.setCursor(get_xoffset(ip), 52);
+  display.setCursor(get_xoffset(ip), 47);
   #endif
   display.println(ip);
+
+  #ifdef USE_SSD1306
+  display.setCursor(get_xoffset(mdnsName + ".local"), 23);
+  #endif
+  #ifdef USE_SSD1331 
+  display.setCursor(get_xoffset(mdnsName + ".local"), 56);
+  #endif
+  display.println(mdnsName + ".local");
 }
 
 int get_xoffset(String message) {
