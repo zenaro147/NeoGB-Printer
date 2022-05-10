@@ -39,7 +39,7 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
 * Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
-* Cristofer Cruz: 3D model for the GB Printer shell and LilyGo TTGO T2 board support.
+* Cristofer Cruz: 3D model for the GB Printer shell, code adaptation to LilyGo TTGO T2 Board.
 * Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
 Want to discuss with the authors or share your art and projects with people fond of the Game Boy Camera and Pocket Printer? [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
@@ -53,7 +53,6 @@ Want to discuss with the authors or share your art and projects with people fond
 
 ## Things that can be improved in the future (or not... but feel free to contribute)
 * A better/responsive Web interface. Since the actual is pretty simple.
-* RTC (Real Time Clock) can be implemented but is not planned with this device. RTC obliges the device to be constantly powered even if it can be placed easily in deep sleep mode. Consequence is that the image files generated on SD card do not own time attributes. Copying the files into your favorite storage folder fixes this "issue".
 * The file conversion to PNG uses BMP image as source material. It would be perfectly possible to embed a faster PNG converter that would directly use the binary stream of data. It is not planned for today as png support is yet fast.
 * The BMP upscaling is quite slow due to the lack of onboard memory and because it makes two things. First, all images are processed by reading/writing to the SD card on the fly, using a very limited buffer (one line of pixels per image at most). Second, it compresses the native 24-bits BMP format output by the C decoder library to 4-bits indexed BMP in order to save storage space.
 * The ESP is forced to run at 80 MHz instead of its native 240 MHz during serial protocol. At full speed we experienced protocol unstability with few games. We did not investigate what was the reason (faulty boards sold on Aliexpress ? Need for a magic cap on serial line ?). Anyway, image conversion is made at full speed, so experience for the user is not altered by this programming design choice.
