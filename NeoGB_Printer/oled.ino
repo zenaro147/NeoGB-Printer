@@ -38,7 +38,7 @@ void oled_writeNumImages(int numTotDump) {
   sprintf(textshow, "%d Dumps", numTotDump);
 
   #ifdef USE_SSD1306
-  display.setCursor(get_xoffset(String(textshow)), 15);
+  display.setCursor(56, 15);
   #endif
   #ifdef USE_SSD1331 
   display.setCursor(get_xoffset(String(textshow)), 47);
@@ -47,7 +47,7 @@ void oled_writeNumImages(int numTotDump) {
   display.println(textshow);
 
   #ifdef USE_SSD1306
-  display.setCursor(get_xoffset(String(numVersion)), 23);
+  display.setCursor(56, 23);
   #endif
   #ifdef USE_SSD1331 
   display.setCursor(get_xoffset(String(numVersion)), 56);
@@ -61,7 +61,7 @@ void oled_ShowIP() {
   display.setTextColor(OLED_WHITE);
   
   #ifdef USE_SSD1306
-  display.setCursor(get_xoffset(ip), 15);
+  display.setCursor(0, 13);
   #endif
   #ifdef USE_SSD1331 
   display.setCursor(get_xoffset(ip), 47);
@@ -69,7 +69,7 @@ void oled_ShowIP() {
   display.println(ip);
 
   #ifdef USE_SSD1306
-  display.setCursor(get_xoffset(mdnsName + ".local"), 23);
+  display.setCursor(0, 23);
   #endif
   #ifdef USE_SSD1331 
   display.setCursor(get_xoffset(mdnsName + ".local"), 56);

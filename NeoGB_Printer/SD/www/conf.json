@@ -1,8 +1,8 @@
 {
-  "mdns": "gameboyprinter",
+  "mdns": "gbprinter",
   "ap": {
-    "ssid":"gameboyprinter",
-    "psk":"gameboyprinter"
+    "ssid":"gbprinter",
+    "psk":"gbprinter"
   },    
   "network": {
     "ssid":"Your SSID",
