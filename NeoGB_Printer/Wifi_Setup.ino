@@ -38,21 +38,21 @@ void initWifi(){
     Serial.print(" with IP address: ");
     Serial.println(WiFi.localIP());
 
-    //Get Time from NTP Server
-    ntp.begin();                // Inicia o protocolo
-    ntp.forceUpdate();        // Atualização .          // Variável que armazena
+    //Get Time from NTP Server (Article about RTC/NTP for ESP32: http://suadica.com/dica.php?d=439&t=como-utilizar-relogio-rtc-interno-do-esp32)
+    ntp.begin();                
+    ntp.forceUpdate();       
     Serial.print("Updating Date and Time...");
-    hora = ntp.getEpochTime(); //Atualizar data e hora usando NTP online
-    Serial.print(" NTP Unix: ");
-    Serial.println(hora);
-    timeval tv;//Cria a estrutura temporaria para funcao abaixo.
-    tv.tv_sec = hora;//Atribui minha data atual. Voce pode usar o NTP para isso ou o site citado no artigo!
-    settimeofday(&tv, NULL);//Configura o RTC para manter a data atribuida atualizada.
-    time_t tt = time(NULL);//Obtem o tempo atual em segundos. Utilize isso sempre que precisar obter o tempo atual
-    data = *gmtime(&tt);//Converte o tempo atual e atribui na estrutura
-    strftime(data_formatada, 64, "%d/%m/%Y %H:%M:%S", &data);//Cria uma String formatada da estrutura "data"
+    datetime = ntp.getEpochTime();
+    Serial.print("NTP Unix: ");
+    Serial.println(datetime);
+    timeval tv;
+    tv.tv_sec = datetime;
+    settimeofday(&tv, NULL);
+    time_t tt = time(NULL);
+    data = *gmtime(&tt);
+    strftime(formatted_datetime, 64, "%d/%m/%Y %H:%M:%S", &data);
     Serial.print("Date and Time updated: ");
-    Serial.println(data_formatada);
+    Serial.println(formatted_datetime);
    
   } else {
     WiFi.mode(WIFI_MODE_AP);

@@ -77,10 +77,9 @@ uint8_t scalePNG = PNG_UPSCALE_FACTOR;
 //RTC-NTP Variables
 WiFiUDP udp;
 NTPClient ntp(udp, "0.pool.ntp.org", (RTC_TIMEZONE * 3600)+RTC_TIMEDIFF, 60000); //Create the NTP object
-struct tm data; //Cria a estrutura que contem as informacoes da data.
-int hora;
-char data_formatada[64];
-String hora_ntp;
+struct tm data; //Create struct to store the Date/Time information
+int datetime;
+char formatted_datetime[64];
 
 //MISC
 TaskHandle_t TaskWriteImage;
