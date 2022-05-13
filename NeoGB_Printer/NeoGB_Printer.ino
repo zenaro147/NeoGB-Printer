@@ -27,8 +27,19 @@
 #define numVersion "Ver. 1.6.10b"
 
 /*******************************************************************************
+ * Invert the SO and SI pins if necessary 
 *******************************************************************************/
+#ifdef INVERT_SERIAL_PINS
+  #define GBP_SO_PIN ESP_MOSI_PIN
+  #define GBP_SI_PIN ESP_MISO_PIN
+#else
+  #define GBP_SO_PIN ESP_MISO_PIN 
+  #define GBP_SI_PIN ESP_MOSI_PIN
+#endif
+#define GBP_SC_PIN ESP_CLK_PIN
 
+/*******************************************************************************
+*******************************************************************************/
 // Dev Note: Gamboy camera sends data payload of 640 bytes usually
 #define GBP_BUFFER_SIZE 650
 
