@@ -6,10 +6,10 @@
 // |  6  4  2  |
 //  \_5__3__1_/   (at cable)
 //
-//#define INVERT_SERIAL_PINS //Invert pin 2 and 3 order, since the pin 2 goes o 3 in the other side of the cable, and 3 goes to 2. This is useful if you are using a breakout board for the link cable
 #define ESP_MOSI_PIN 23
 #define ESP_MISO_PIN 19
 #define ESP_CLK_PIN 18
+//#define INVERT_SERIAL_PINS //Invert pin 2 and 3 order, since the pin 2 goes o 3 in the other side of the cable, and 3 goes to 2. This is useful if you are using a breakout board for the link cable
 
 /*****************************
  * SD CARD MODULE DEFINITIONS 
