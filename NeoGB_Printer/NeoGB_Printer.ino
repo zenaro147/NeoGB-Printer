@@ -9,24 +9,37 @@
 #include "./includes/gblink/gbp_serial_io.h"
 
 //SD libraries 
+#include "SPI.h"
 #include "FS.h"
 #include "SD.h"
-#include "SPI.h"
 #define FSYS SD
 
-#ifdef ENABLE_WEBSERVER
-  #include <WiFi.h>
-  #include <ESPmDNS.h>
-  #include <WebServer.h>
-  #include <uri/UriBraces.h>
-//  #include <ArduinoJson.h>
-#endif
+#include <WiFi.h>
+#include <ESPmDNS.h> 
+#include <WebServer.h>
+#include <uri/UriBraces.h>
+#include <ArduinoJson.h>
 
-#define numVersion "Ver. 1.6.7"
+//RTC-NTP Libraries
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+#define numVersion "Ver. 1.6.10"
+
+/*******************************************************************************
+ * Invert the SO and SI pins if necessary 
+*******************************************************************************/
+#ifdef INVERT_SERIAL_PINS
+  #define GBP_SO_PIN ESP_MOSI_PIN
+  #define GBP_SI_PIN ESP_MISO_PIN
+#else
+  #define GBP_SO_PIN ESP_MISO_PIN 
+  #define GBP_SI_PIN ESP_MOSI_PIN
+#endif
+#define GBP_SC_PIN ESP_CLK_PIN
 
 /*******************************************************************************
 *******************************************************************************/
-
 // Dev Note: Gamboy camera sends data payload of 640 bytes usually
 #define GBP_BUFFER_SIZE 650
 
@@ -68,12 +81,16 @@ bool isConverting = false;
 bool isFileSystemMounted = false;
 bool setMultiPrint = false;
 
-//WebServer Variables
-#ifdef ENABLE_WEBSERVER
-  String mdnsName = DEFAULT_MDNS_NAME;
-  String accesPointSSID = DEFAULT_AP_SSID;
-  String accesPointPassword = DEFAULT_AP_PSK;
-#endif
+//Images Output settings
+uint8_t scaleBMP = BMP_UPSCALE_FACTOR;
+uint8_t scalePNG = PNG_UPSCALE_FACTOR;
+
+//RTC-NTP Variables
+WiFiUDP udp;
+NTPClient ntp(udp, "0.pool.ntp.org", (RTC_TIMEZONE * 3600)+RTC_TIMEDIFF, 60000); //Create the NTP object
+struct tm data; //Create struct to store the Date/Time information
+int datetime;
+char formatted_datetime[64];
 
 //MISC
 TaskHandle_t TaskWriteImage;
@@ -98,7 +115,7 @@ const char *gbpCommand_toStr(int val)
 /*******************************************************************************
   Interrupt Service Routine
 *******************************************************************************/
-void ICACHE_RAM_ATTR serialClock_ISR(void)
+void IRAM_ATTR serialClock_ISR(void)
 {
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
@@ -126,7 +143,11 @@ void setup(void){
   #endif
 
   //Check Test Mode
+  #ifdef BTN_INVERT
+  if(!testmode && (digitalRead(BTN_PUSH) == LOW)){
+  #else
   if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
+  #endif
     testmode = true;
     #ifdef USE_OLED
       oledStateChange(99); //Test
@@ -147,17 +168,6 @@ void setup(void){
     LED_blink(LED_STATUS_GREEN, 1, 300, 50);
     LED_blink(LED_STATUS_BLUE, 1, 300, 50);
   #endif
-
-  //Force BMP output and Upscale Factor if no one was defined. 
-  #if !defined(BMP_OUTPUT) && !defined(PNG_OUTPUT)
-      #define BMP_OUTPUT
-  #endif
-  #if defined(BMP_OUTPUT) && !defined(BMP_UPSCALE_FACTOR)
-      #define BMP_UPSCALE_FACTOR 1
-  #endif
-  #if defined(PNG_OUTPUT) && !defined(PNG_UPSCALE_FACTOR)
-      #define PNG_UPSCALE_FACTOR 1
-  #endif
   
   delay(3000); //Little delay for stetic 
 
@@ -166,6 +176,7 @@ void setup(void){
   
   if(isFileSystemMounted){
     ID_file_checker(); //Create/check controller file
+    setupImages(); //Get the Image Scale Factors from config file
     
     //Check the bootMode (Printer mode or WiFi mode)
     #ifdef ENABLE_WEBSERVER
@@ -183,7 +194,10 @@ void setup(void){
       delay(5000);
     }
 
+    initWifi(); //Initiate WiFi and NTP
+
     if (bootAsPrinter){
+      WiFi.disconnect();
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
       Serial.println("-----------------------");
@@ -221,7 +235,6 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
-        initWifi();
         mdns_setup();
         webserver_setup();
         #ifdef USE_OLED
@@ -287,7 +300,11 @@ void loop(){
 
       // Feature to detect a short press and a Long Press
       if(!isWriting){
-        if (digitalRead(BTN_PUSH) == HIGH) {
+        #ifdef BTN_INVERT
+        if(digitalRead(BTN_PUSH) == LOW){
+        #else
+        if(digitalRead(BTN_PUSH) == HIGH){
+        #endif
           if (buttonActive == false) {
             buttonActive = true;
             buttonTimer = millis();  

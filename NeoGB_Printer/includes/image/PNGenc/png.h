@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "zlib.h"
-#include "arduino.h"
+#include "Arduino.h"
 
 // Macro to simplify writing a big-endian 32-bit value on any CPU
 #define WRITEMOTO32(p, o, val) {uint32_t l = val; p[o] = (unsigned char)(l >> 24); p[o+1] = (unsigned char)(l >> 16); p[o+2] = (unsigned char)(l >> 8); p[o+3] = (unsigned char)l;}

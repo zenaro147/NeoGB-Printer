@@ -18,7 +18,7 @@ Latest Development Release  [![Release Version](https://img.shields.io/github/re
 ## How to build one?
 All the instructions can be found in our **Wiki Page** [![Wiki](https://img.shields.io/badge/docs-on%20Wiki-lightgrey)](https://github.com/zenaro147/NeoGB-Printer/wiki)
 
-Want a PCB for a cleaner design and easy to build? Check my PCB project here! [![PCB Project](https://img.shields.io/github/v/release/zenaro147/GBP-ESP32-PCB)](https://github.com/zenaro147/GBP-ESP32-PCB) 
+Want a PCB for a cleaner design and easy to build? Check my **PCB project here**! [![PCB Project](https://img.shields.io/github/v/release/zenaro147/GBP-ESP32-PCB)](https://github.com/zenaro147/GBP-ESP32-PCB) 
 
 If you still have questions, ask us here or in the **Game Boy Camera Club Discord** [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
 
@@ -33,12 +33,13 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 ## Posts about:
 * [Hack a Day Article](https://hackaday.com/2021/10/22/an-open-source-game-boy-printer-that-doesnt-print/)
 * [Reddit post](https://www.reddit.com/r/Gameboy/comments/qdfoys/the_first_opensource_and_fully_standalone_game/)
+* [Distant Arcade - Blog post](https://distantarcade.co.uk/the-neogb-printer-game-boy-printer-emulator/)
 
 ## Authors contribution:
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
 * Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
-* Cristofer Cruz: 3D model for the GB Printer shell,  code adaptation to LilyGo TTGO T2 Board.
+* Cristofer Cruz: 3D model for the GB Printer shell, code adaptation to LilyGo TTGO T2 Board.
 * Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
 Want to discuss with the authors or share your art and projects with people fond of the Game Boy Camera and Pocket Printer? [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)

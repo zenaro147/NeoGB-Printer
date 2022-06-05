@@ -1,8 +1,9 @@
 /NeoGB_Printer/config.h
+/NeoGB_Printer/.vscode/*
 /displayImages/helloOLED*.png
 /GBP Case/GBP Logo.png
 /GBP Case/Solid_GBP_Project.3mf
 /GBP Case/Prusa Projects/*
 /NeoGB_Printer/SD/www/output/*
 /NeoGB_Printer/SD/www/thumb/*
-/NeoGB_Printer/includes/image/Upscalerlib.h.bkp
+/NeoGB_Printer_bkp/*

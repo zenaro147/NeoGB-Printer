@@ -1,0 +1,17 @@
+{
+  "mdns": "gbprinter",
+  "ap": {
+    "ssid":"gbprinter",
+    "psk":"gbprinter"
+  },    
+  "network": {
+    "ssid":"Your SSID",
+    "psk":"Your wifi password"
+  },
+  "bmpimage": {
+    "scale":1
+  },
+  "pngimage": {
+    "scale":1
+  }
+}

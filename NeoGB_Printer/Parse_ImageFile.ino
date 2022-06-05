@@ -52,23 +52,15 @@ void ConvertFilesBMP(){
         gbpdecoder_gotByte(image_test[bytePos]);       
       }
     }
-    #ifdef BMP_OUTPUT
+    if(scaleBMP > 0){
       //Create a 4bits BMP and resize the image
       sprintf(pathOutput, "/output/bmp/%05d.bmp", 0);
-      if(BMP_UPSCALE_FACTOR < 1){
-        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
-      }
-    #endif
-    #ifdef PNG_OUTPUT
+      bmp_upscaler(fileBMPPath,pathOutput,scaleBMP);
+    }
+    if(scalePNG > 0){
       sprintf(pathOutput, "/output/png/%05d.png", 0);
-      if(PNG_UPSCALE_FACTOR < 1){
-        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
-      }
-    #endif
+      png_upscaler(fileBMPPath,pathOutput,scalePNG);
+    }
     FSYS.remove(fileBMPPath);             
     testmode = false;
   }
@@ -89,6 +81,10 @@ void ConvertFilesBMP(){
     #ifdef USE_OLED
       oledStateChange(5); //BIN to BMP
     #endif
+
+    //Reset the counter for the number of files
+    numfiles=0;
+    actualfile=0;
 
     //Check if the file is a long print or a single file
     sprintf(path, "/dumps/%05d.bin", i);
@@ -136,7 +132,6 @@ void ConvertFilesBMP(){
         img_index++;
       }
       file.close();
-      FSYS.remove(path);
            
       //Send each byte to parse the tile
       for(int bytePos=0; bytePos < img_index; bytePos++){
@@ -159,9 +154,6 @@ void ConvertFilesBMP(){
       #endif
     }
     
-    //Reset the counter for the number of files 
-    numfiles=0;
-    actualfile=0;
     delay(100);
 
     //Generate the thumbnail for the Webserver
@@ -169,18 +161,14 @@ void ConvertFilesBMP(){
     png_upscaler(fileBMPPath,pathOutput,1);
     
     //Create a 4bits BMP and resize the image
-    #ifdef BMP_OUTPUT
+    if(scaleBMP > 0){
       #ifdef USE_OLED
         oledStateChange(10); //24bits-BMP to 4bits-BMP
       #endif      
       sprintf(pathOutput, "/output/bmp/%05d.bmp", i);
       Serial.printf("Saving BMP-4bits image in: %s",pathOutput);
       perf = millis();
-      if(BMP_UPSCALE_FACTOR < 1){
-        bmp_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        bmp_upscaler(fileBMPPath,pathOutput,BMP_UPSCALE_FACTOR);
-      }
+      bmp_upscaler(fileBMPPath,pathOutput,scaleBMP);
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       
@@ -190,21 +178,16 @@ void ConvertFilesBMP(){
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
-    #endif
-    
+    }
     //Create a PNG and resize the image
-    #ifdef PNG_OUTPUT
+    if(scalePNG > 0){
       #ifdef USE_OLED
         oledStateChange(6); //BMP to PNG
       #endif
       sprintf(pathOutput, "/output/png/%05d.png", i);
       Serial.printf("Saving PNG image in: %s",pathOutput);
       perf = millis();
-      if(PNG_UPSCALE_FACTOR < 1){
-        png_upscaler(fileBMPPath,pathOutput,1); //Force upscale to 1 if less or equal to 0
-      }else{
-        png_upscaler(fileBMPPath,pathOutput,PNG_UPSCALE_FACTOR);
-      }
+      png_upscaler(fileBMPPath,pathOutput,scalePNG);
       perf = millis() - perf;
       Serial.printf("... Done! in %lums\n",perf);
       
@@ -214,15 +197,33 @@ void ConvertFilesBMP(){
       #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
         LED_blink(LED_STATUS_BLUE,1,100,50);
       #endif
-    #endif
+    }
     
     FSYS.remove(fileBMPPath);
     Serial.printf("\n");
+
+    //Delete the original dump files after the processing is done
+    for (int z = 1; z <= numfiles; z++){
+      //Check if is a single file or a long print
+      if (numfiles == 1){
+        sprintf(path, "/dumps/%05d.bin", i);
+      }else{
+        sprintf(path, "/dumps/%05d_%05d.bin", i, z);
+      }
+      FSYS.remove(path);
+    }
 
     update_dumps(-1); 
   }
   
   dumpCount = get_dumps();
+  // if the printer loses power or gets reset while converting,
+  // the dump count can get out of sync with actual dump files
+  if (dumpCount > 0) {
+    Serial.printf("Dump count is out of sync! %ld dump(s) missing under /dumps\n",dumpCount);
+    set_dumps(0L);
+  }
+
   ResetPrinterVariables(); // Get Next ID available  
 
   //Reset Local Variables

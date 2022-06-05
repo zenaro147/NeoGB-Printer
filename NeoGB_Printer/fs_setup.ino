@@ -5,12 +5,11 @@ bool fs_setup() {
   pinMode(SD_CS, OUTPUT);
   spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, SD_CS); //SCK,MISO,MOSI,SS //HSPI1
 
-  FSYS.begin(SD_CS, spiSD);
-  if (!FSYS.begin(true)) {
+  if (!FSYS.begin(SD_CS, spiSD)) {
     Serial.println("SD Card Mount Failed");
     return false;
   }else{
-    uint8_t cardType = SD.cardType();
+    uint8_t cardType = FSYS.cardType();
     if(cardType == CARD_NONE){
         Serial.println("No SD card attached");
         return false;

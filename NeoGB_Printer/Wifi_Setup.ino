@@ -1,13 +1,17 @@
-#ifdef ENABLE_WEBSERVER
 #include "config.h"
 bool hasNetworkSettings = true;
+String ip = "";
+
+void initWifi(){   
+  hasNetworkSettings = loadWiFiConfig(); //Get Data from the conf.json
+
+  const char * accesPointSSIDc = accesPointSSID.c_str();
+  const char * accesPointPasswordc = accesPointPassword.c_str();
   
-void initWifi(){
   WiFi.disconnect(); 
   Serial.print("Connecting to wifi ");  
   WiFi.mode(WIFI_MODE_STA);  
-  
-  WiFi.begin(DEFAULT_AP_SSID, DEFAULT_AP_PSK);
+  WiFi.begin(accesPointSSIDc, accesPointPasswordc);
   WiFi.setSleep(false);
   
   unsigned int connTimeout = millis() + WIFI_CONNECT_TIMEOUT;
@@ -33,19 +37,34 @@ void initWifi(){
     Serial.print(WiFi.SSID());
     Serial.print(" with IP address: ");
     Serial.println(WiFi.localIP());
-    return;
+
+    //Get Time from NTP Server (Article about RTC/NTP for ESP32: http://suadica.com/dica.php?d=439&t=como-utilizar-relogio-rtc-interno-do-esp32)
+    ntp.begin();                
+    ntp.forceUpdate();       
+    Serial.print("Updating Date and Time...");
+    datetime = ntp.getEpochTime();
+    Serial.print("NTP Unix: ");
+    Serial.println(datetime);
+    timeval tv;
+    tv.tv_sec = datetime;
+    settimeofday(&tv, NULL);
+    time_t tt = time(NULL);
+    data = *gmtime(&tt);
+    strftime(formatted_datetime, 64, "%d/%m/%Y %H:%M:%S", &data);
+    Serial.print("Date and Time updated: ");
+    Serial.println(formatted_datetime);
+   
   } else {
     WiFi.mode(WIFI_MODE_AP);
-    const char * accesPointSSIDc = "gameboyprinter";
-    const char * accesPointPasswordc = "gameboyprinter";
     WiFi.softAP(accesPointSSIDc, accesPointPasswordc);
-    Serial.println("AccessPoint gameboyprinter started");
+    Serial.println("AccessPoint started");
   }
 }
 
+#ifdef ENABLE_WEBSERVER
 void mdns_setup() {
+  loadMdnsConfig();
   String protocol = F("http://");
-  String ip = "";
   String localsrv = ".local";
   
   const char * mdnsNamec = mdnsName.c_str();
