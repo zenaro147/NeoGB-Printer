@@ -24,7 +24,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#define numVersion "Ver. 1.6.10b"
+#define numVersion "Ver. 1.6.10"
 
 /*******************************************************************************
  * Invert the SO and SI pins if necessary 
@@ -115,7 +115,7 @@ const char *gbpCommand_toStr(int val)
 /*******************************************************************************
   Interrupt Service Routine
 *******************************************************************************/
-void ICACHE_RAM_ATTR serialClock_ISR(void)
+void IRAM_ATTR serialClock_ISR(void)
 {
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
