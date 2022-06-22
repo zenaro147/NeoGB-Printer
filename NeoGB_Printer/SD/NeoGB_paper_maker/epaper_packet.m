@@ -1,6 +1,6 @@
 function [output, alpha]=epaper_packet(input,paper_color,darkness,scale_percentage)
 % Raphael BOICHOT 10-09-2020
-% multi OS compatibility improved by Cristofer Cruz 2022/16/21
+% multi OS compatibility improved by Cristofer Cruz 2022/06/21
 % code to simulate the speckle aspect of real Game boy printer
 % image come from function call
 
