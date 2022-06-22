@@ -1,5 +1,5 @@
 % Raphael BOICHOT 25/11/2021 E-paper module for NeoGB printer
-% multi OS compatibility improved by Cristofer Cruz 2022/16/21
+% multi OS compatibility improved by Cristofer Cruz 2022/06/21
 % Compatible with Matlab and Octave
 % image must be 4 colors maximum, which is the native output format
 clear
