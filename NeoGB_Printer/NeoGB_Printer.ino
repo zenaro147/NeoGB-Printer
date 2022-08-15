@@ -229,7 +229,7 @@ void setup(void){
         GetNumberFiles();
       #endif
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
-      #ifdef INIT_WIFI_PRINT_MODE
+      #ifdef ENABLE_RTC
         initWifi();
       #endif
     }

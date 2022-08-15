@@ -72,10 +72,10 @@
  *************************/
 #define ENABLE_WEBSERVER
 #define WIFI_CONNECT_TIMEOUT 10000              //Connection Timeout in ms
-#define INIT_WIFI_PRINT_MODE
 
 /*************************
  * RTC DEFINITIONS
  *************************/
+ #define ENABLE_RTC
  #define RTC_TIMEZONE -3 //Define your timezone
  #define RTC_TIMEDIFF 1080 //Define the time difference between the NTP server and the real time

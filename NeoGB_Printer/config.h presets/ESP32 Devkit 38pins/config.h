@@ -75,5 +75,6 @@
 /*************************
  * RTC DEFINITIONS
  *************************/
+ #define ENABLE_RTC
  #define RTC_TIMEZONE -3      //Define your timezone
  #define RTC_TIMEDIFF 1080    //Define the time difference between the NTP server and the real time
