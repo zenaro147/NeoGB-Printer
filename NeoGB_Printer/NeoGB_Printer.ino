@@ -93,7 +93,7 @@ int datetime;
 char formatted_datetime[64];
 
 //MISC
-TaskHandle_t TaskWriteImage;
+//TaskHandle_t TaskWriteImage;
 SPIClass spiSD(HSPI);
 
 /*******************************************************************************
