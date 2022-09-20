@@ -232,6 +232,7 @@ void setup(void){
       #ifdef ENABLE_RTC
         oledStateChange(12); //Seeking for date/time
         initWifi();
+        oledStateChange(1); //Printer Idle
       #endif
     }
     #ifdef ENABLE_WEBSERVER
