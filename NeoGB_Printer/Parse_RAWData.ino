@@ -1,7 +1,12 @@
 uint8_t dtpck = 0;
 
+//Fix for Photo! print issue
+uint8_t lastchkHeader = 99;
+uint8_t dtpck_qry = 0;
+
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
 byte img_tmp[6000] = {}; // 1GBC Picute (5.874)
+
 
 TaskHandle_t TaskWriteDump;
 /*******************************************************************************
@@ -29,13 +34,15 @@ inline void gbp_packet_capture_loop() {
         
         #ifdef USE_OLED
           oledStateChange(4); //HEX to BIN
-        #endif     
+        #endif    
+        lastchkHeader = chkHeader; //Fix for Photo! print issue
         chkHeader = (int)gbp_serial_io_dataBuff_getByte_Peek(2);
 
         switch (chkHeader) {
           case 1:
             isPrinting = true;
             chkMargin = 0x00;
+            dtpck_qry=0x00; //Fix for Photo! print issue
             break;
           case 4:
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
@@ -44,6 +51,15 @@ inline void gbp_packet_capture_loop() {
               dtpck++;
             }
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
+            break;
+          //Fix for Photo! print issue
+          case 15:
+            dtpck_qry++;
+            if (dtpck_qry >=2 && (isPrinting || setMultiPrint)){
+              dtpck_qry = 0;
+              isPrinting = false;
+              setMultiPrint = false;
+            }
             break;
           default:
             break;
@@ -174,10 +190,12 @@ void storeData(void *pvParameters) {
 void ResetPrinterVariables(){
   Serial.println("Reseting Vars...");
   //Reset Variables
+  dtpck_qry = 0
   setMultiPrint = false;
   totalMultiImages = 1;  
   img_index = 0x00;
   chkHeader = 99;
+  lastchkHeader = 99;
   isWriting = false;  
   isPrinting = false;
   memset(image_data, 0x00, sizeof(image_data));
