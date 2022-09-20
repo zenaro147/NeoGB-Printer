@@ -230,6 +230,7 @@ void setup(void){
       #endif
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
       #ifdef ENABLE_RTC
+        oledStateChange(12); //Seeking for date/time
         initWifi();
       #endif
     }
