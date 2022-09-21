@@ -169,7 +169,7 @@ void setup(void){
     LED_blink(LED_STATUS_BLUE, 1, 300, 50);
   #endif
   
-  delay(3000); //Little delay for stetic 
+  delay(500); //Little delay for stetic 
 
   //Initialize FileSystem
   isFileSystemMounted = fs_setup();
@@ -193,8 +193,6 @@ void setup(void){
       full();
       delay(5000);
     }
-
-    initWifi(); //Initiate WiFi and NTP
 
     if (bootAsPrinter){
       WiFi.disconnect();
@@ -233,10 +231,12 @@ void setup(void){
         oledStateChange(12); //Seeking for date/time
         initWifi();
         oledStateChange(1); //Printer Idle
+        GetNumberFiles();
       #endif
     }
     #ifdef ENABLE_WEBSERVER
-      else{  
+      else{
+        initWifi(); //Initiate WiFi and NTP
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
