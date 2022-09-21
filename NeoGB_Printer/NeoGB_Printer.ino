@@ -195,7 +195,7 @@ void setup(void){
     }
 
     if (bootAsPrinter){
-      initWifi(); //Initiate WiFi and NTP
+      //initWifi(); //Initiate WiFi and NTP
       WiFi.disconnect();
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -230,7 +230,7 @@ void setup(void){
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
       #ifdef ENABLE_RTC
         oledStateChange(12); //Seeking for date/time
-        //initWifi(); //Initiate WiFi and NTP
+        initWifi(); //Initiate WiFi and NTP
         oledStateChange(1); //Printer Idle
         GetNumberFiles();
       #endif
