@@ -194,8 +194,6 @@ void setup(void){
       delay(5000);
     }
 
-    initWifi(); //Initiate WiFi and NTP
-
     if (bootAsPrinter){
       WiFi.disconnect();
       Serial.println("-----------------------");
@@ -237,7 +235,8 @@ void setup(void){
       #endif
     }
     #ifdef ENABLE_WEBSERVER
-      else{  
+      else{
+        initWifi(); //Initiate WiFi and NTP
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
