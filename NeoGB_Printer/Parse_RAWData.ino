@@ -190,7 +190,7 @@ void storeData(void *pvParameters) {
 void ResetPrinterVariables(){
   Serial.println("Reseting Vars...");
   //Reset Variables
-  dtpck_qry = 0;
+  dtpck_qry = 0
   setMultiPrint = false;
   totalMultiImages = 1;  
   img_index = 0x00;
