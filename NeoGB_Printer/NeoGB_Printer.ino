@@ -318,7 +318,8 @@ void loop(){
           if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
             longPressActive = true;
             //Long press to convert to Image Files
-            if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
               Serial.println("Converting to Image File");
               isConverting = true;
               #ifdef USE_OLED
