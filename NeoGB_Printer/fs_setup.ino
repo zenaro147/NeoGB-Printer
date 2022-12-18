@@ -131,12 +131,12 @@ int fs_info() {
 /*******************************************************************************
   Get the number of images and dumps to show
 *******************************************************************************/
+#ifdef USE_OLED
 void GetNumberFiles() {
   int totalDumps=get_dumps();
-  #ifdef USE_OLED
-    oled_writeNumImages(totalDumps);
-  #endif
+  oled_writeNumImages(totalDumps);
 }
+#endif
 
 /*******************************************************************************
   "Printer Full" function
