@@ -36,6 +36,8 @@ inline void gbp_packet_capture_loop() {
           case 1:
             isPrinting = true;
             chkMargin = 0x00;
+            memset(image_data, 0x00, sizeof(image_data));
+            img_index = 0x00;
             break;
           case 4:
             ////////////////////////////////////////////// FIX for merge print in McDonald's Monogatari : Honobono Tenchou Ikusei Game and Nakayoshi Cooking Series 5 : Cake o Tsukurou //////////////////////////////////////////////
