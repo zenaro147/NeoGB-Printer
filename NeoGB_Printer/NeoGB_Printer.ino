@@ -24,7 +24,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#define numVersion "Ver. 1.6.10"
+#define numVersion "Ver. 1.6.11"
 
 /*******************************************************************************
  * Invert the SO and SI pins if necessary 
@@ -169,7 +169,7 @@ void setup(void){
     LED_blink(LED_STATUS_BLUE, 1, 300, 50);
   #endif
   
-  delay(3000); //Little delay for stetic 
+  delay(500); //Little delay for stetic 
 
   //Initialize FileSystem
   isFileSystemMounted = fs_setup();
@@ -194,9 +194,8 @@ void setup(void){
       delay(5000);
     }
 
-    initWifi(); //Initiate WiFi and NTP
-
     if (bootAsPrinter){
+      //initWifi(); //Initiate WiFi and NTP
       WiFi.disconnect();
       Serial.println("-----------------------");
       Serial.println("Booting in printer mode");
@@ -230,11 +229,15 @@ void setup(void){
       #endif
       setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
       #ifdef ENABLE_RTC
-        initWifi();
+        oledStateChange(12); //Seeking for date/time
+        initWifi(); //Initiate WiFi and NTP
+        oledStateChange(1); //Printer Idle
+        GetNumberFiles();
       #endif
     }
     #ifdef ENABLE_WEBSERVER
-      else{  
+      else{
+        initWifi(); //Initiate WiFi and NTP
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
@@ -315,7 +318,8 @@ void loop(){
           if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
             longPressActive = true;
             //Long press to convert to Image Files
-            if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
               Serial.println("Converting to Image File");
               isConverting = true;
               #ifdef USE_OLED

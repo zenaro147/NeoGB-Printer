@@ -127,6 +127,9 @@ void oledStateChange(uint8_t lcdStatus){
       case 11:
         oled_drawStatus(generateListFile);
         break;
+      case 12:
+        oled_drawStatus(Seeking_date_time);
+      break;   
       case 99:
         oled_drawStatus(oledTest);
         break;
