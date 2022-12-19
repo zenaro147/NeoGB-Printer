@@ -225,6 +225,8 @@ void setup(void){
       delay(5000);
     }
     
+    freeFileIndex = get_next_ID();
+    dumpCount = get_dumps();
     ConvertImages();
     
     if (bootAsPrinter){
@@ -234,8 +236,6 @@ void setup(void){
       Serial.println("Booting in printer mode");
       Serial.println("-----------------------");
       
-      freeFileIndex = get_next_ID();
-      dumpCount = get_dumps();
   
       /* Pins from gameboy link cable */
       pinMode(GBP_SC_PIN, INPUT);
