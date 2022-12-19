@@ -115,8 +115,7 @@ const char *gbpCommand_toStr(int val)
 /*******************************************************************************
   Interrupt Service Routine
 *******************************************************************************/
-void IRAM_ATTR serialClock_ISR(void)
-{
+void IRAM_ATTR serialClock_ISR(void){
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
   const bool txBit = gpb_serial_io_OnRising_ISR(digitalRead(GBP_SI_PIN));
@@ -144,10 +143,11 @@ void setup(void){
 
   //Check Test Mode
   #ifdef BTN_INVERT
-  if(!testmode && (digitalRead(BTN_PUSH) == LOW)){
+  if(!testmode && (digitalRead(BTN_PUSH) == LOW))
   #else
-  if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
+  if(!testmode && (digitalRead(BTN_PUSH) == HIGH))
   #endif
+  {
     testmode = true;
     #ifdef USE_OLED
       oledStateChange(99); //Test
@@ -240,17 +240,15 @@ void setup(void){
     
       gbp_pkt_init(&gbp_pktBuff);
   
-      #ifdef USE_OLED
-        oledStateChange(1); //Printer Idle
-        GetNumberFiles();
-      #endif
-      setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
       #ifdef ENABLE_RTC
         oledStateChange(12); //Seeking for date/time
         initWifi(); //Initiate WiFi and NTP
+      #endif  
+      #ifdef USE_OLED
         oledStateChange(1); //Printer Idle
         GetNumberFiles();
-      #endif
+      #endif    
+      setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
     }
     #ifdef ENABLE_WEBSERVER
       else{
@@ -325,10 +323,11 @@ void loop(){
       // Feature to detect a short press and a Long Press
       if(!isWriting){
         #ifdef BTN_INVERT
-        if(digitalRead(BTN_PUSH) == LOW){
+        if(digitalRead(BTN_PUSH) == LOW)
         #else
-        if(digitalRead(BTN_PUSH) == HIGH){
+        if(digitalRead(BTN_PUSH) == HIGH)
         #endif
+        {
           if (buttonActive == false) {
             buttonActive = true;
             buttonTimer = millis();  
@@ -386,11 +385,6 @@ void loop(){
                 freeFileIndex=update_get_next_ID(1);
                 ResetPrinterVariables();
                 
-                #ifdef USE_OLED
-                  oledStateChange(1); //Printer Idle
-                  GetNumberFiles();
-                #endif
-                
                 #ifdef LED_STATUS_PIN 
                   LED_led_OFF(LED_STATUS_PIN);
                 #endif
@@ -398,6 +392,10 @@ void loop(){
                   LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
                 #endif  
                 
+                #ifdef USE_OLED
+                  oledStateChange(1); //Printer Idle
+                  GetNumberFiles();
+                #endif                
               }
             }  
             buttonActive = false;  
