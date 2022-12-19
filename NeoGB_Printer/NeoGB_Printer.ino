@@ -24,7 +24,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#define numVersion "Ver. 1.6.12"
+#define numVersion "Ver. 1.6.11"
 
 /*******************************************************************************
  * Invert the SO and SI pins if necessary 
@@ -115,7 +115,8 @@ const char *gbpCommand_toStr(int val)
 /*******************************************************************************
   Interrupt Service Routine
 *******************************************************************************/
-void IRAM_ATTR serialClock_ISR(void){
+void IRAM_ATTR serialClock_ISR(void)
+{
   // Serial Clock (1 = Rising Edge) (0 = Falling Edge); Master Output Slave Input (This device is slave)
 #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
   const bool txBit = gpb_serial_io_OnRising_ISR(digitalRead(GBP_SI_PIN));
@@ -128,37 +129,6 @@ void IRAM_ATTR serialClock_ISR(void){
 /*******************************************************************************
   Main Setup and Loop
 *******************************************************************************/
-void ConvertImages(){
-  Serial.println("Checking for dumps to convert...");
-  //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
-  if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
-    Serial.println("Converting dumps to image files");
-    isConverting = true;
-    #ifdef USE_OLED
-      oledStateChange(5); //BIN to BMP
-    #endif
-
-    if(bootAsPrinter){
-      //Remove the interrupt to prevent receive data from Gameboy
-      detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
-    }
-    
-    ConvertFilesBMP();
-    
-    if(bootAsPrinter){
-      #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
-        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
-      #else
-        attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
-      #endif
-    }
-    Serial.println("Done!"); 
-  }else{
-    Serial.println("No dumps found!");
-  }
-  
-}
-
 void setup(void){
   Serial.begin(115200); // Config Serial
 
@@ -174,11 +144,10 @@ void setup(void){
 
   //Check Test Mode
   #ifdef BTN_INVERT
-  if(!testmode && (digitalRead(BTN_PUSH) == LOW))
+  if(!testmode && (digitalRead(BTN_PUSH) == LOW)){
   #else
-  if(!testmode && (digitalRead(BTN_PUSH) == HIGH))
+  if(!testmode && (digitalRead(BTN_PUSH) == HIGH)){
   #endif
-  {
     testmode = true;
     #ifdef USE_OLED
       oledStateChange(99); //Test
@@ -224,11 +193,7 @@ void setup(void){
       full();
       delay(5000);
     }
-    
-    freeFileIndex = get_next_ID();
-    dumpCount = get_dumps();
-    ConvertImages();
-    
+
     if (bootAsPrinter){
       //initWifi(); //Initiate WiFi and NTP
       WiFi.disconnect();
@@ -236,6 +201,8 @@ void setup(void){
       Serial.println("Booting in printer mode");
       Serial.println("-----------------------");
       
+      freeFileIndex = get_next_ID();
+      dumpCount = get_dumps();
   
       /* Pins from gameboy link cable */
       pinMode(GBP_SC_PIN, INPUT);
@@ -255,14 +222,15 @@ void setup(void){
       #endif
     
       gbp_pkt_init(&gbp_pktBuff);
-        
+  
+      #ifdef USE_OLED
+        oledStateChange(1); //Printer Idle
+        GetNumberFiles();
+      #endif
+      setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
       #ifdef ENABLE_RTC
         oledStateChange(12); //Seeking for date/time
         initWifi(); //Initiate WiFi and NTP
-      #endif
-      
-      setCpuFrequencyMhz(80); //Force CPU Frequency to 80MHz instead the default 240MHz. This fix protocol issue with some games.
-      #ifdef USE_OLED
         oledStateChange(1); //Printer Idle
         GetNumberFiles();
       #endif
@@ -273,6 +241,25 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
+
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+  Serial.println("Checking for dumps to convert...");
+  //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+      freeFileIndex = get_next_ID();
+      dumpCount = get_dumps();
+  if ((freeFileIndex-1) > 0 && dumpCount > 0){
+    Serial.println("Converting dumps to image files");
+    isConverting = true;
+    #ifdef USE_OLED
+      oledStateChange(5); //BIN to BMP
+    #endif
+    ConvertFilesBMP();
+    Serial.println("Done!"); 
+  }else{
+    Serial.println("No dumps found!");
+  }
+/////////////////////////////////////////////////////////////////////////////////////////////////////        
+
         mdns_setup();
         webserver_setup();
         #ifdef USE_OLED
@@ -339,11 +326,10 @@ void loop(){
       // Feature to detect a short press and a Long Press
       if(!isWriting){
         #ifdef BTN_INVERT
-        if(digitalRead(BTN_PUSH) == LOW)
+        if(digitalRead(BTN_PUSH) == LOW){
         #else
-        if(digitalRead(BTN_PUSH) == HIGH)
+        if(digitalRead(BTN_PUSH) == HIGH){
         #endif
-        {
           if (buttonActive == false) {
             buttonActive = true;
             buttonTimer = millis();  
@@ -351,14 +337,33 @@ void loop(){
           if ((millis() - buttonTimer > longPressTime) && (longPressActive == false)){
             longPressActive = true;
             //Long press to convert to Image Files
-            setCpuFrequencyMhz(240); //File conversion at full speed!
-            ConvertImages();
-            setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz.   
-            #ifdef USE_OLED
-              oledStateChange(1); //Printer Idle
-              GetNumberFiles();
-            #endif         
-          }
+            //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
+            if (!isConverting && (freeFileIndex-1) > 0 && dumpCount > 0){
+              Serial.println("Converting to Image File");
+              isConverting = true;
+              #ifdef USE_OLED
+                oledStateChange(5); //BIN to BMP
+              #endif
+              
+              //Remove the interrupt to prevent receive data from Gameboy
+              detachInterrupt(digitalPinToInterrupt(GBP_SC_PIN));
+              
+              setCpuFrequencyMhz(240); //File conversion at full speed !
+              ConvertFilesBMP();
+              setCpuFrequencyMhz(80); //Force CPU Frequency again to 80MHz instead the default 240MHz. 
+
+              #ifdef GBP_FEATURE_USING_RISING_CLOCK_ONLY_ISR
+                attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, RISING);  // attach interrupt handler
+              #else
+                attachInterrupt(digitalPinToInterrupt(GBP_SC_PIN), serialClock_ISR, CHANGE);  // attach interrupt handler
+              #endif  
+              
+              #ifdef USE_OLED
+                oledStateChange(1); //Printer Idle
+                GetNumberFiles();
+              #endif     
+            }
+          }  
         }else{
           if (buttonActive == true) {
             if (longPressActive == true) {
@@ -382,18 +387,17 @@ void loop(){
                 freeFileIndex=update_get_next_ID(1);
                 ResetPrinterVariables();
                 
-            
+                #ifdef USE_OLED
+                  oledStateChange(1); //Printer Idle
+                  GetNumberFiles();
+                #endif
+                
                 #ifdef LED_STATUS_PIN 
                   LED_led_OFF(LED_STATUS_PIN);
                 #endif
                 #if defined(COMMON_ANODE) || defined(COMMON_CATHODE)
                   LED_led_OFF(LED_STATUS_RED, LED_STATUS_BLUE);
                 #endif  
-                
-                #ifdef USE_OLED
-                  oledStateChange(1); //Printer Idle                  
-                  GetNumberFiles();
-                #endif
                 
               }
             }  
