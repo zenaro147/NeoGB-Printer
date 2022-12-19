@@ -24,7 +24,7 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-#define numVersion "Ver. 1.6.11"
+#define numVersion "Ver. 1.6.12"
 
 /*******************************************************************************
  * Invert the SO and SI pins if necessary 
