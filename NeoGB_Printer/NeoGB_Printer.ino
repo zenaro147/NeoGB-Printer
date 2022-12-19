@@ -193,6 +193,23 @@ void setup(void){
       full();
       delay(5000);
     }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Serial.println("Checking for dumps to convert...");
+    freeFileIndex = get_next_ID();
+    dumpCount = get_dumps();
+    if ((freeFileIndex-1) > 0 && dumpCount > 0){
+      Serial.println("Converting dumps to image files");
+      isConverting = true;
+      #ifdef USE_OLED
+        oledStateChange(5); //BIN to BMP
+      #endif
+      ConvertFilesBMP();
+      Serial.println("Done!"); 
+    }else{
+      Serial.println("No dumps found!");
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (bootAsPrinter){
       //initWifi(); //Initiate WiFi and NTP
@@ -241,24 +258,6 @@ void setup(void){
         Serial.println("-----------------------");
         Serial.println("Booting in server mode");
         Serial.println("-----------------------");
-
-///////////////////////////////////////////////////////////////////////////////////////////////////        
-  Serial.println("Checking for dumps to convert...");
-  //if (!isConverting && !isPrinting && (freeFileIndex-1) > 0 && dumpCount > 0){
-      freeFileIndex = get_next_ID();
-      dumpCount = get_dumps();
-  if ((freeFileIndex-1) > 0 && dumpCount > 0){
-    Serial.println("Converting dumps to image files");
-    isConverting = true;
-    #ifdef USE_OLED
-      oledStateChange(5); //BIN to BMP
-    #endif
-    ConvertFilesBMP();
-    Serial.println("Done!"); 
-  }else{
-    Serial.println("No dumps found!");
-  }
-/////////////////////////////////////////////////////////////////////////////////////////////////////        
 
         mdns_setup();
         webserver_setup();
