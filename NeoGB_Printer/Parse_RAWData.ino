@@ -1,3 +1,6 @@
+//Useful to print the serial data into the Serial Monitor
+//#define DEBUG_SERIAL
+
 uint8_t dtpck = 0;
 
 const char nibbleToCharLUT[] = "0123456789ABCDEF";
@@ -57,17 +60,22 @@ inline void gbp_packet_capture_loop() {
           LED_led_ON(LED_STATUS_GREEN);
         #endif 
         
-//        Serial.print("// ");
-//        Serial.print(pktTotalCount);
-//        Serial.print(" : ");
-//        Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
+        #ifdef DEBUG_SERIAL
+          Serial.print("// ");
+          Serial.print(pktTotalCount);
+          Serial.print(" : ");
+          Serial.println(gbpCommand_toStr(gbp_serial_io_dataBuff_getByte_Peek(2)));
+        #endif
       }
 
       data_8bit = gbp_serial_io_dataBuff_getByte();
+      
+      #ifdef DEBUG_SERIAL
       // Print Hex Byte
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
-//      Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
-
+        Serial.print((char)nibbleToCharLUT[(data_8bit>>4)&0xF]);
+        Serial.print((char)nibbleToCharLUT[(data_8bit>>0)&0xF]);
+      #endif
+      
       if (chkHeader == 1 || chkHeader == 2 || chkHeader == 4){
         image_data[img_index] = (byte)data_8bit;
         img_index++;
@@ -102,11 +110,15 @@ inline void gbp_packet_capture_loop() {
                                   0);               // pin task to core 0 
           dtpck = 0x00;         
         }
-//        Serial.println("");
+        #ifdef DEBUG_SERIAL
+          Serial.println("");
+        #endif
         pktByteIndex = 0;
         pktTotalCount++;
       } else {
-//        Serial.print((char)' ');
+        #ifdef DEBUG_SERIAL
+          Serial.print((char)' ');
+        #endif
         pktByteIndex++; // Byte hex split counter
         byteTotal++; // Byte total counter
       }
