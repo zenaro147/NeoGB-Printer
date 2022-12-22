@@ -38,7 +38,7 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 ## Authors contribution:
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
-* Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
+* Raphaël Boichot: code debugging, image upscalers, blinking stuff support, hardcore gaming with Japanese kusoge.
 * Cristofer Cruz: 3D model for the GB Printer shell, code adaptation to LilyGo TTGO T2 Board.
 * Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
