@@ -6,7 +6,7 @@ A simple PCB design using EasyEDA to work with this projects by me:
 * [NeoGB Printer](https://github.com/zenaro147/NeoGB-Printer)
 * [WiFi GBP Emulator - ESP32 Version](https://github.com/zenaro147/wifi-gbp-emulator/tree/feature/v3-esp32)
 
-[![Order from OSH Park](https://oshpark.com/packs/media/images/badge-5f4e3bf4bf68f72ff88bd92e0089e9cf.png)](https://oshpark.com/shared_projects/Y6LBKwvG)
+[Order from OSH Park](https://oshpark.com/shared_projects/Y6LBKwvG)
 
 ## BOM list 
 | Component | Where to buy |
