@@ -17,7 +17,7 @@ A simple PCB design using EasyEDA to work with this projects by me:
 | 4 channel Logical Level Shifter (highly recommended) | [AliExpress](https://a.aliexpress.com/_m07pFpU) |
 | Female Pin Header with 40 pins (you need at least 38 pins, or 2 with 20pins) | [AliExpress](https://fr.aliexpress.com/item/4000873858801.html) |
 | PushButton 4.5x4.5mm (any height) - ONLY REV. 1  | [AliExpress](https://www.aliexpress.com/item/1005001629344310.html) |
-| PushButton 6x6mm (any height) - ONLY REV. 2 (still W.I.P.) | [AliExpress](https://www.aliexpress.com/item/1005003251295065.html) |
+| PushButton 6x6mm (any height) - ONLY REV. 2 (still W.I.P.) | [AliExpress](https://fr.aliexpress.com/item/4000206046150.html) |
 | 5k or 10k resistor | [AliExpress](https://www.aliexpress.com/item/4001082088353.html) |
 | MicroUSB Female (optional, but mandatory if you want the charging module)| [AliExpress](https://www.aliexpress.com/item/4000385426649.html) |
 | Charging Module with StepUp (5V) - DD05CVSA (optional) | [AliExpress](https://www.aliexpress.com/item/33034500618.html) |
