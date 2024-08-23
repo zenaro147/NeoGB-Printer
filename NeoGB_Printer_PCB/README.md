@@ -13,7 +13,7 @@ A simple PCB design using EasyEDA to work with this projects by me:
 | --- | --- |
 | ESP32 Dev Board (38 pins, this [exact board](/NeoGB_Printer_PCB/ESP32_used.png)) | [AliExpress](https://www.aliexpress.com/item/1005001636295529.html) |
 | OLED Display 128x32 (0.91 inch) (optional) | [AliExpress](https://a.aliexpress.com/_mOHbftG) |
-| SD Card/MicroSD Card Module (Choose only one! I recommend the Standard SD module) | [AliExpress - SD Card](https://a.aliexpress.com/_mMWz2km) / [AliExpress - MicroSD](https://a.aliexpress.com/_m0SS4P4) |
+| SD Card/MicroSD Card Module (Choose only one! I recommend the Standard SD module) | [AliExpress](https://fr.aliexpress.com/item/1005006059963950.html) |
 | 4 channel Logical Level Shifter (highly recommended) | [AliExpress](https://a.aliexpress.com/_m07pFpU) |
 | Female Pin Header with 40 pins (you need at least 38 pins, or 2 with 20pins) | [AliExpress](https://fr.aliexpress.com/item/4000873858801.html) |
 | PushButton 4.5x4.5mm (any height) - ONLY REV. 1  | [AliExpress](https://www.aliexpress.com/item/1005001629344310.html) |
