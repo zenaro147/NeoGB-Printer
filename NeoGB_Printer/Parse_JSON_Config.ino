@@ -1,6 +1,9 @@
 //WebServer Variables
 String accesPointSSID;
 String accesPointPassword;
+String accesPointSSIDLocal;
+String accesPointPasswordLocal;
+
 #ifdef ENABLE_WEBSERVER
   String mdnsName;
 #endif
@@ -51,7 +54,7 @@ void loadMdnsConfig(){
 
 
 
-bool loadWiFiConfig() {  
+bool loadWiFiConfig() {
   StaticJsonDocument<1023> conf;  
   File confFile = FSYS.open("/www/conf.json");
 
@@ -60,40 +63,30 @@ bool loadWiFiConfig() {
     confFile.close();
 
     if (!error) {
+      bool checkreturn = true;
+      
       if (conf.containsKey("network")) {
         accesPointSSID = String(conf["network"]["ssid"].as<String>());
-        accesPointPassword = String(conf["network"]["psk"].as<String>());        
+        accesPointPassword = String(conf["network"]["psk"].as<String>());
+        checkreturn = true;
         if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
-          Serial.println("No WiFi settings configured - getting the Access Point Settings...");
-          if (conf.containsKey("ap")) {
-            accesPointSSID = String(conf["ap"]["ssid"].as<String>());
-            accesPointPassword = String(conf["ap"]["psk"].as<String>());
-            if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
-              Serial.println("No AccessPoint settings configured - using default");
-              accesPointSSID = "gameboyprinter";
-              accesPointPassword = "gameboyprinter";
-            } 
-          }
-          return false;
+          Serial.println("Error during reading WiFi settings configured!");
+          accesPointSSID="";
+          accesPointPassword="";
+          checkreturn = false;
         }
-        return true;
-      } else {
-        if (conf.containsKey("ap")) {
-          Serial.println("No WiFi settings configured - getting the Access Point Settings...");
-          accesPointSSID = String(conf["ap"]["ssid"].as<String>());
-          accesPointPassword = String(conf["ap"]["psk"].as<String>());
-          if(accesPointSSID == "null" || accesPointSSID == "" || accesPointPassword == "null" || accesPointPassword == ""){
-            Serial.println("No AccessPoint settings configured - using default");
-            accesPointSSID = "gameboyprinter";
-            accesPointPassword = "gameboyprinter";
-          }
-        } else {
-          Serial.println("No AccessPoint settings configured - using default");
-          accesPointSSID = "gameboyprinter";
-          accesPointPassword = "gameboyprinter";
-        }
-        return false;
       }
+
+      if (conf.containsKey("ap")) {
+        accesPointSSIDLocal = String(conf["ap"]["ssid"].as<String>());
+        accesPointPasswordLocal = String(conf["ap"]["psk"].as<String>());
+        if(accesPointSSIDLocal == "null" || accesPointSSIDLocal == "" || accesPointPasswordLocal == "null" || accesPointPasswordLocal == ""){
+          Serial.println("No AccessPoint settings configured - using default");
+          accesPointSSIDLocal = "gameboyprinter";
+          accesPointPasswordLocal = "gameboyprinter";
+        } 
+      }
+      return checkreturn;
     } else {
       Serial.println("Error parsing conf.json");
       Serial.println(error.c_str());

@@ -7,10 +7,12 @@ void initWifi(){
 
   const char * accesPointSSIDc = accesPointSSID.c_str();
   const char * accesPointPasswordc = accesPointPassword.c_str();
+  const char * accesPointSSIDLc = accesPointSSIDLocal.c_str();
+  const char * accesPointPasswordLc = accesPointPasswordLocal.c_str();
   
   WiFi.disconnect(); 
   Serial.print("Connecting to wifi ");  
-  WiFi.mode(WIFI_MODE_STA);  
+  WiFi.mode(WIFI_MODE_STA);
   WiFi.begin(accesPointSSIDc, accesPointPasswordc);
   WiFi.setSleep(false);
   
@@ -56,7 +58,7 @@ void initWifi(){
    
   } else {
     WiFi.mode(WIFI_MODE_AP);
-    WiFi.softAP(accesPointSSIDc, accesPointPasswordc);
+    WiFi.softAP(accesPointSSIDLc, accesPointPasswordLc);
     Serial.println("AccessPoint started");
   }
 }
