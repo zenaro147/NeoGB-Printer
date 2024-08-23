@@ -18,7 +18,7 @@ Latest Stable Release  [![Release Version](https://img.shields.io/github/v/relea
 
 Latest Development Release  [![Release Version](https://img.shields.io/github/release/zenaro147/NeoGB-Printer/all.svg?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/) [![Release Date](https://img.shields.io/github/release-date-pre/zenaro147/NeoGB-Printer.svg?style=plastic)](https://github.com/zenaro147/NeoGB-Printer/releases/) 
 
-Want a PCB for a cleaner design and easy to build? Check my **PCB project here**! [![PCB Project](https://img.shields.io/github/v/release/zenaro147/GBP-ESP32-PCB)](https://github.com/zenaro147/GBP-ESP32-PCB) 
+Want a PCB for a cleaner design and easy to build? Check my [**PCB project here**](/NeoGB_Printer_PCB) !
 
 If you still have questions, ask us here or in the **Game Boy Camera Club Discord** [![Discord Group](https://img.shields.io/badge/chat-on%20Discord-738ADB)](https://discord.gg/dKND7cFuqM)
 
@@ -38,7 +38,7 @@ If you still have questions, ask us here or in the **Game Boy Camera Club Discor
 ## Authors contribution:
 * Rafael Zenaro: main code, hardware setting, new ideas, concept art, technical innovations and group facilitation.
 * Brian Khuu: architect of the Matrix, Game Boy Printer emulator core, BMP image decoder core.
-* Raphaël Boichot: serial protocol and code debugging, BMP and PNG upscalers, RGB led support, hardcore gaming with Japanese kusoge.
+* Raphaël Boichot: code debugging, pixel perfect upscalers, blinking stuff support, hardcore gaming with Japanese kusoge.
 * Cristofer Cruz: 3D model for the GB Printer shell, code adaptation to LilyGo TTGO T2 Board.
 * Herr_Zatacke: support for the Game Boy Printer Web compatibility.
 
